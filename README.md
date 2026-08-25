@@ -23,8 +23,7 @@ Desarrollar una solución tecnológica que facilite el acceso a información con
 - React
 - React Native + Expo
 - Node.js
-- PostgreSQL
-- Prisma ORM
+- SQL
 - JWT
 - Google Maps API
 - Cloudinary
