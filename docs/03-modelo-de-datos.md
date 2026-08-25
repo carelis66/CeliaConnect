@@ -1,15 +1,13 @@
-# 03 - Modelo de Datos
-
 ## Información del documento
 
 | Campo | Valor |
 |--------|--------|
 | Proyecto | CeliaConnect |
 | Documento | Modelo de Datos |
-| Versión | 1.0 |
-| Fecha | 31/07/2026 |
+| Versión | 2.0 |
+| Fecha | 25/08/2026 |
 | Autor | Carelis Fagundez |
-| Estado | En elaboración |
+| Estado | Finalizado |
 
 ---
 
@@ -19,7 +17,7 @@ El presente documento describe el modelo de datos de CeliaConnect.
 
 Su objetivo es definir las entidades principales del sistema, sus atributos y las relaciones existentes entre ellas, proporcionando una base sólida para el diseño e implementación de la base de datos.
 
-Este modelo servirá como referencia durante el desarrollo del backend y permitirá garantizar la integridad y consistencia de la información almacenada.
+El modelo fue diseñado para soportar las funcionalidades principales de la plataforma, garantizando la integridad de la información y facilitando el desarrollo del backend mediante Microsoft SQL Server.
 
 ---
 
@@ -28,32 +26,69 @@ Este modelo servirá como referencia durante el desarrollo del backend y permiti
 - Identificar las entidades principales del sistema.
 - Definir los atributos de cada entidad.
 - Establecer las relaciones entre las entidades.
-- Facilitar el diseño de la base de datos.
-- Servir como base para la implementación mediante SQL Server.
+- Garantizar la integridad referencial de la base de datos.
+- Servir como base para la implementación del backend.
 
 ---
 
 # 3. Entidades del sistema
 
-## 3.1 Usuario
+## 3.1 Rol
+
+Representa los perfiles de acceso del sistema.
+
+### Atributos
+
+- Id
+- Nombre
+
+---
+
+## 3.2 Usuario
 
 Representa a las personas registradas en la plataforma.
 
 ### Atributos
 
 - Id
+- Documento
 - Nombre
 - Apellido
+- FechaNacimiento
+- Genero
+- Telefono
 - Email
-- Contraseña
+- PasswordHash
 - FotoPerfil
 - FechaRegistro
-- Rol
-- Estado
+- RolId
 
 ---
 
-## 3.2 Producto
+## 3.3 Marca
+
+Representa la marca comercial de un producto.
+
+### Atributos
+
+- Id
+- Nombre
+- Logo
+
+---
+
+## 3.4 Categoría
+
+Clasifica los productos disponibles en la aplicación.
+
+### Atributos
+
+- Id
+- Nombre
+
+---
+
+## 3.5 Producto
 
 Representa un producto apto para personas celíacas.
 
@@ -61,147 +96,265 @@ Representa un producto apto para personas celíacas.
 
 - Id
 - Nombre
-- Marca
-- Descripción
+- Descripcion
 - Ingredientes
-- InformaciónNutricional
+- InformacionNutricional
 - Imagen
-- Estado
+- CertificacionSinTACC
+- MarcaId
+- CategoriaId
 
 ---
 
-## 3.3 Restaurante
+## 3.6 Barrio
 
-Representa un restaurante registrado en la plataforma.
+Representa los barrios de la Ciudad Autónoma de Buenos Aires.
 
 ### Atributos
 
 - Id
 - Nombre
-- Dirección
-- Ciudad
-- Provincia
-- Latitud
-- Longitud
-- Teléfono
+
+---
+
+## 3.7 TipoComida
+
+Clasifica los restaurantes según el tipo de comida ofrecida.
+
+### Atributos
+
+- Id
+- Nombre
+
+---
+
+## 3.8 TipoLocal
+
+Clasifica los locales comerciales.
+
+### Atributos
+
+- Id
+- Nombre
+
+---
+
+## 3.9 Característica
+
+Representa los servicios o características que ofrece un restaurante o local.
+
+Ejemplos:
+
+- Menú Sin TACC
+- Cocina exclusiva Sin TACC
+- Opciones sin lactosa
+- Opciones veganas
+
+### Atributos
+
+- Id
+- Nombre
+- Icono
+
+---
+
+## 3.10 Restaurante
+
+Representa los restaurantes registrados en la plataforma.
+
+### Atributos
+
+- Id
+- Nombre
+- Descripcion
+- ImagenExterior
+- ImagenInterior
+- Direccion
+- BarrioId
+- Telefono
+- Email
+- Instagram
 - SitioWeb
 - Horario
-- Imagen
-- Estado
-
----
-
-## 3.4 Tienda
-
-Representa un comercio donde se venden productos aptos.
-
-### Atributos
-
-- Id
-- Nombre
-- Dirección
-- Ciudad
-- Provincia
 - Latitud
 - Longitud
-- Teléfono
-- Imagen
-- Estado
+- TipoComidaId
 
 ---
 
-## 3.5 Nutricionista
+## 3.11 Local
 
-Representa un profesional especializado.
+Representa supermercados y dietéticas.
 
 ### Atributos
 
 - Id
 - Nombre
-- Matrícula
-- Especialidad
-- Dirección
-- Teléfono
-- Email
+- Descripcion
 - Imagen
-- Estado
+- Direccion
+- BarrioId
+- Telefono
+- Email
+- Instagram
+- SitioWeb
+- Horario
+- Latitud
+- Longitud
+- TipoLocalId
 
 ---
 
-## 3.6 Promoción
+## 3.12 Nutricionista
 
-Representa promociones publicadas por comercios.
+Representa profesionales especializados en celiaquía e intolerancias alimentarias.
 
 ### Atributos
 
 - Id
-- Título
-- Descripción
+- Nombre
+- Apellido
+- Matricula
+- Descripcion
+- FotoPerfil
+- Direccion
+- BarrioId
+- Telefono
+- TieneWhatsApp
+- Email
+- Instagram
+- SitioWeb
+- Horario
+- Latitud
+- Longitud
+
+---
+
+## 3.13 Promoción
+
+Representa promociones publicadas por restaurantes y locales.
+
+### Atributos
+
+- Id
+- Titulo
+- Descripcion
+- Imagen
+- CodigoDescuento
 - FechaInicio
 - FechaFin
-- Imagen
-- Estado
+- RestauranteId
+- LocalId
 
 ---
 
-## 3.7 Comentario
+## 3.14 ComentarioRestaurante
 
-Representa opiniones realizadas por los usuarios.
+Representa las opiniones realizadas por los usuarios sobre restaurantes.
 
 ### Atributos
 
 - Id
-- Descripción
-- Calificación
-- Fecha
+- Titulo
+- Comentario
+- Calificacion
+- FechaComentario
 - UsuarioId
+- RestauranteId
 
 ---
 
-## 3.8 Favorito
+## 3.15 ComentarioLocal
 
-Representa los elementos guardados por un usuario.
+Representa las opiniones realizadas por los usuarios sobre locales.
 
 ### Atributos
 
 - Id
+- Titulo
+- Comentario
+- Calificacion
+- FechaComentario
 - UsuarioId
-- Tipo
-- ElementoId
-- Fecha
+- LocalId
+
+---
+
+## 3.16 FavoritoRestaurante
+
+Representa los restaurantes guardados por un usuario.
+
+### Atributos
+
+- UsuarioId
+- RestauranteId
+- FechaAgregado
+
+---
+
+## 3.17 FavoritoLocal
+
+Representa los locales guardados por un usuario.
+
+### Atributos
+
+- UsuarioId
+- LocalId
+- FechaAgregado
+
+---
+
+## 3.18 FavoritoNutricionista
+
+Representa los nutricionistas guardados por un usuario.
+
+### Atributos
+
+- UsuarioId
+- NutricionistaId
+- FechaAgregado
+
+---
+
+## 3.19 RestauranteCaracterística
+
+Relaciona los restaurantes con sus características.
+
+### Atributos
+
+- RestauranteId
+- CaracteristicaId
+
+---
+
+## 3.20 LocalCaracterística
+
+Relaciona los locales con sus características.
+
+### Atributos
+
+- LocalId
+- CaracteristicaId
 
 ---
 
 # 4. Relaciones
 
-## Usuario
+Las principales relaciones del modelo son:
 
-- Un usuario puede realizar muchos comentarios.
-- Un usuario puede guardar muchos favoritos.
-
----
-
-## Restaurante
-
-- Un restaurante puede recibir muchos comentarios.
-
----
-
-## Producto
-
-- Un producto puede ser marcado como favorito por muchos usuarios.
-
----
-
-## Tienda
-
-- Una tienda puede tener varias promociones.
-
----
-
-## Nutricionista
-
-- Un nutricionista puede ser consultado por muchos usuarios.
+- Un Rol puede tener muchos Usuarios.
+- Una Marca puede tener muchos Productos.
+- Una Categoría puede tener muchos Productos.
+- Un Barrio puede tener muchos Restaurantes, Locales y Nutricionistas.
+- Un Tipo de Comida puede pertenecer a muchos Restaurantes.
+- Un Tipo de Local puede pertenecer a muchos Locales.
+- Un Usuario puede realizar muchos Comentarios de Restaurantes y Locales.
+- Un Restaurante puede recibir muchos Comentarios.
+- Un Local puede recibir muchos Comentarios.
+- Un Usuario puede guardar muchos Restaurantes, Locales y Nutricionistas como favoritos.
+- Un Restaurante puede poseer múltiples Características.
+- Un Local puede poseer múltiples Características.
+- Un Restaurante o un Local pueden publicar múltiples Promociones.
 
 ---
 
@@ -209,34 +362,52 @@ Representa los elementos guardados por un usuario.
 
 | Relación | Cardinalidad |
 |----------|--------------|
-| Usuario → Comentario | 1 : N |
-| Usuario → Favorito | 1 : N |
-| Restaurante → Comentario | 1 : N |
-| Tienda → Promoción | 1 : N |
+| Rol → Usuario | 1 : N |
+| Marca → Producto | 1 : N |
+| Categoría → Producto | 1 : N |
+| Barrio → Restaurante | 1 : N |
+| Barrio → Local | 1 : N |
+| Barrio → Nutricionista | 1 : N |
+| TipoComida → Restaurante | 1 : N |
+| TipoLocal → Local | 1 : N |
+| Usuario → ComentarioRestaurante | 1 : N |
+| Usuario → ComentarioLocal | 1 : N |
+| Restaurante → ComentarioRestaurante | 1 : N |
+| Local → ComentarioLocal | 1 : N |
+| Usuario ↔ Restaurante | N : N |
+| Usuario ↔ Local | N : N |
+| Usuario ↔ Nutricionista | N : N |
+| Restaurante ↔ Característica | N : N |
+| Local ↔ Característica | N : N |
+| Restaurante → Promoción | 1 : N |
+| Local → Promoción | 1 : N |
 
 ---
 
 # 6. Diagrama Entidad-Relación
 
-El diagrama entidad-relación (MER) será elaborado una vez finalizado el diseño lógico de todas las entidades y relaciones del sistema.
+El Diagrama Entidad-Relación (DER) fue definido durante la etapa de diseño del sistema y representa gráficamente todas las entidades, atributos y relaciones de CeliaConnect.
+
+El diagrama se encuentra disponible en el documento **06-DER** y en la carpeta **diagramas** del repositorio del proyecto.
 
 ---
 
 # 7. Consideraciones
 
-- Cada entidad contará con una clave primaria (Id).
-- Las relaciones se implementarán mediante claves foráneas.
-- La base de datos será desarrollada utilizando Microsoft SQL Server.
-- El acceso a los datos será realizado mediante Prisma ORM.
-- Se garantizará la integridad referencial entre todas las entidades.
+- Cada entidad posee una clave primaria.
+- Las relaciones se implementan mediante claves foráneas.
+- Las tablas de favoritos y características utilizan claves primarias compuestas.
+- La integridad referencial será garantizada mediante restricciones en Microsoft SQL Server.
+- El modelo está orientado al desarrollo de un MVP enfocado en la Ciudad Autónoma de Buenos Aires.
 
 ---
 
 # 8. Próximos pasos
 
-Una vez validado el modelo de datos se procederá con:
+Con el modelo de datos finalizado, las siguientes etapas del proyecto serán:
 
-- Diseño físico de la base de datos.
-- Implementación de las tablas.
-- Creación de la API REST.
+- Implementación física de la base de datos en SQL Server.
+- Creación del script de base de datos.
 - Desarrollo del Backend.
+- Desarrollo de la API REST.
+- Desarrollo del Frontend Web y Mobile.
