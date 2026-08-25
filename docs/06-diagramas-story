@@ -29,7 +29,7 @@ El Diagrama Entidad-Relación representa el modelo lógico de la base de datos d
 
 En él se visualizan las entidades del sistema, sus atributos principales y las relaciones existentes entre ellas. Este diagrama constituye la base para la implementación física de la base de datos en Microsoft SQL Server.
 
-![DER](diagramas/DER-CeliaConnect.png)
+![DER](diagramas/DER DB.png)
 
 ---
 
@@ -57,7 +57,7 @@ La solución estará compuesta por dos clientes (Web y Mobile), una API REST enc
 
 Este diseño permite mantener una arquitectura desacoplada, facilitando el mantenimiento, la escalabilidad y la reutilización de los distintos componentes del sistema.
 
-![Diagrama de Componentes](diagramas/Componentes.png)
+![Diagrama de Componentes](diagramas/Diagrama de Componentes.png)
 
 ---
 
