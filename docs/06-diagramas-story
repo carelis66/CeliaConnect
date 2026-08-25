@@ -63,9 +63,15 @@ Este diseño permite mantener una arquitectura desacoplada, facilitando el mante
 
 # Diagrama de Clases
 
-**Estado:** Pendiente.
+El Diagrama de Clases representa la estructura lógica del sistema desde una perspectiva orientada a objetos.
 
-Mostrará la estructura orientada a objetos del sistema, incluyendo clases, atributos, métodos y relaciones utilizadas durante el desarrollo del backend.
+En él se describen las principales clases que conforman CeliaConnect, sus atributos, métodos y las relaciones existentes entre ellas. Este diagrama sirve como base para el desarrollo del backend y facilita la implementación de la lógica de negocio.
+
+Las clases principales representan los módulos funcionales del sistema, mientras que las relaciones muestran la interacción entre usuarios, productos, restaurantes, locales, nutricionistas, promociones y demás entidades.
+
+El objetivo de este diagrama es proporcionar una visión general del diseño orientado a objetos que será utilizado durante la etapa de implementación.
+
+![Diagrama de Clases](diagramas/DiagramaClases.png)
 
 ---
 
