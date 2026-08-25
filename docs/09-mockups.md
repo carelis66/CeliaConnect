@@ -15,9 +15,9 @@
 
 # 1. Introducción
 
-Los siguientes mockups representan el diseño preliminar de la interfaz gráfica de CeliaConnect.
+Los siguientes mockups representan el diseño preliminar de la interfaz de usuario (UI) y la experiencia de usuario (UX) de CeliaConnect.
 
-Su objetivo es mostrar la propuesta de experiencia de usuario (UX) e interfaz de usuario (UI) que será implementada durante la etapa de desarrollo. Los diseños contemplan tanto la versión Web como la aplicación Mobile.
+Su objetivo es ilustrar la apariencia y la organización de las principales pantallas que formarán parte de la aplicación web y móvil. Estos diseños sirven como referencia para la etapa de desarrollo, permitiendo validar la navegación, la distribución de los componentes y la interacción entre los distintos módulos del sistema antes de su implementación.
 
 ---
 
@@ -25,7 +25,8 @@ Su objetivo es mostrar la propuesta de experiencia de usuario (UX) e interfaz de
 
 ## 2.1 Página de Inicio
 
-![Inicio](diagramas/mockups/web-home.png)
+![Inicio](mockups/web-home.png)
+
 
 ### Descripción
 
@@ -35,7 +36,7 @@ La página principal presenta la propuesta de valor de CeliaConnect y permite ac
 
 ## 2.2 Inicio de Sesión
 
-![Login](diagramas/mockups/web-login.png)
+![Login](mockups/web-login.png)
 
 ### Descripción
 
@@ -45,7 +46,7 @@ Pantalla destinada a la autenticación de usuarios registrados. Incluye acceso a
 
 ## 2.3 Restaurantes
 
-![Restaurantes](diagramas/mockups/web-restaurantes.png)
+![Restaurantes](mockups/web-restaurantes.png)
 
 ### Descripción
 
@@ -55,33 +56,20 @@ Pantalla para consultar restaurantes aptos para personas celíacas mediante filt
 
 # 3. Mockups Mobile
 
-## 3.1 Registro
-
-![Registro Mobile](diagramas/mockups/mobile-registro.png)
+![Mockups Mobile](mockups/mobile-registro-login-home.png)
 
 ### Descripción
 
-Formulario para la creación de una nueva cuenta desde la aplicación móvil.
+Los mockups de la aplicación móvil presentan las principales pantallas diseñadas para CeliaConnect.
 
----
+Las interfaces incluidas corresponden a:
 
-## 3.2 Inicio de Sesión
+- **Registro de usuario:** permite la creación de una nueva cuenta mediante un formulario simple e intuitivo.
+- **Inicio de sesión:** posibilita la autenticación de usuarios registrados y el acceso a la recuperación de contraseña.
+- **Pantalla principal:** ofrece acceso a los módulos principales de la aplicación, como Productos, Restaurantes, Nutricionistas, Recetas y Promociones, además de una barra de navegación inferior para facilitar la interacción del usuario.
 
-![Login Mobile](diagramas/mockups/mobile-login.png)
+El diseño sigue una línea visual consistente con la versión web, priorizando la simplicidad, la accesibilidad y una experiencia de usuario intuitiva.
 
-### Descripción
-
-Pantalla de autenticación para acceder a la aplicación móvil.
-
----
-
-## 3.3 Inicio
-
-![Inicio Mobile](diagramas/mockups/mobile-home.png)
-
-### Descripción
-
-Pantalla principal de la aplicación móvil con acceso a los módulos disponibles y navegación inferior.
 
 ---
 
