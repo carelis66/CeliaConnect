@@ -1,0 +1,80 @@
+# 0 - Diagramas
+
+## Información del documento
+
+| Campo | Valor |
+|--------|--------|
+| Proyecto | CeliaConnect |
+| Documento | Diagramas |
+| Versión | 1.0 |
+| Fecha | 25/08/2026 |
+| Autor | Carelis Fagundez |
+| Estado | En elaboración |
+
+---
+
+# 1. Introducción
+
+El presente documento reúne los principales diagramas desarrollados durante el análisis y diseño de CeliaConnect.
+
+Cada uno de ellos representa una vista diferente del sistema y permite comprender su estructura, funcionamiento y planificación antes de comenzar la etapa de implementación.
+
+A medida que avance el proyecto, este documento será actualizado incorporando nuevos diagramas correspondientes a las distintas fases del desarrollo.
+
+---
+
+# 2. Diagrama Entidad-Relación (DER)
+
+El Diagrama Entidad-Relación representa el modelo lógico de la base de datos de CeliaConnect.
+
+En él se visualizan las entidades del sistema, sus atributos principales y las relaciones existentes entre ellas. Este diagrama constituye la base para la implementación física de la base de datos en Microsoft SQL Server.
+
+![DER](diagramas/DER-CeliaConnect.png)
+
+---
+
+# 3. Diagrama de Casos de Uso
+
+**Estado:** Pendiente.
+
+Este diagrama representará las funcionalidades principales del sistema desde la perspectiva de los actores involucrados (Usuario y Administrador), mostrando la interacción entre ambos y los distintos casos de uso.
+
+---
+
+# 4. Diagrama de Componentes
+
+**Estado:** Pendiente.
+
+Permitirá representar la arquitectura del sistema, identificando los principales componentes de software y las relaciones existentes entre ellos.
+
+---
+
+# 5. Diagrama de Clases
+
+**Estado:** Pendiente.
+
+Mostrará la estructura orientada a objetos del sistema, incluyendo clases, atributos, métodos y relaciones utilizadas durante el desarrollo del backend.
+
+---
+
+# 6. Diagramas de Secuencia
+
+**Estado:** Pendiente.
+
+Representarán el flujo de interacción entre los distintos componentes del sistema para las funcionalidades más importantes.
+
+---
+
+# 7. Diagrama de Gantt
+
+**Estado:** Pendiente.
+
+Permitirá visualizar la planificación temporal del proyecto, mostrando las actividades previstas y su distribución a lo largo del desarrollo.
+
+---
+
+# 8. Observaciones
+
+Los diagramas incluidos en este documento serán actualizados conforme avance el desarrollo de CeliaConnect.
+
+Cada uno de ellos complementa la documentación funcional y técnica del proyecto, proporcionando una representación visual que facilita su comprensión y mantenimiento.
