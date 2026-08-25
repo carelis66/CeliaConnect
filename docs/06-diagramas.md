@@ -43,7 +43,7 @@ Este diagrama representa las funcionalidades disponibles para los usuarios de Ce
 
 Se describen las acciones que un usuario puede realizar dentro de la plataforma, como registrarse, iniciar sesión, consultar productos, restaurantes, nutricionistas, promociones y administrar sus favoritos.
 
-![Casos de Uso](diagramas/CasoDeUso.png)
+![Casos de Uso](diagramas/CasosDeUso.png)
 
 ---
 
