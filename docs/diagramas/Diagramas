@@ -13,7 +13,7 @@
 
 ---
 
-# 1. Introducción
+# Introducción
 
 El presente documento reúne los principales diagramas desarrollados durante el análisis y diseño de CeliaConnect.
 
@@ -23,7 +23,7 @@ A medida que avance el proyecto, este documento será actualizado incorporando n
 
 ---
 
-# 2. Diagrama Entidad-Relación (DER)
+# Diagrama Entidad-Relación (DER)
 
 El Diagrama Entidad-Relación representa el modelo lógico de la base de datos de CeliaConnect.
 
@@ -49,15 +49,19 @@ El siguiente diagrama representa las funcionalidades administrativas del sistema
 
 ---
 
-# 4. Diagrama de Componentes
+## Diagrama de Componentes
 
-**Estado:** Pendiente.
+El siguiente diagrama representa la arquitectura lógica de CeliaConnect y la interacción entre los principales componentes que conforman el sistema.
 
-Permitirá representar la arquitectura del sistema, identificando los principales componentes de software y las relaciones existentes entre ellos.
+La solución estará compuesta por dos clientes (Web y Mobile), una API REST encargada de procesar las solicitudes, una capa de lógica de negocio donde se implementarán las reglas funcionales y una base de datos Microsoft SQL Server para el almacenamiento de la información.
+
+Este diseño permite mantener una arquitectura desacoplada, facilitando el mantenimiento, la escalabilidad y la reutilización de los distintos componentes del sistema.
+
+![Diagrama de Componentes](diagramas/Componentes.png)
 
 ---
 
-# 5. Diagrama de Clases
+# Diagrama de Clases
 
 **Estado:** Pendiente.
 
