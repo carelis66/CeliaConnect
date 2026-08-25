@@ -33,11 +33,19 @@ En él se visualizan las entidades del sistema, sus atributos principales y las 
 
 ---
 
-# 3. Diagrama de Casos de Uso
+## Diagrama de Casos de Uso - Usuario
 
-**Estado:** Pendiente.
+El siguiente diagrama representa las funcionalidades disponibles para los usuarios registrados en CeliaConnect.
 
-Este diagrama representará las funcionalidades principales del sistema desde la perspectiva de los actores involucrados (Usuario y Administrador), mostrando la interacción entre ambos y los distintos casos de uso.
+![Casos de Uso Usuario](diagramas/CasosDeUso-Usuario.png)
+
+---
+
+## Diagrama de Casos de Uso - Administrador
+
+El siguiente diagrama representa las funcionalidades administrativas del sistema.
+
+![Casos de Uso Administrador](diagramas/CasosDeUso-Administrador.png)
 
 ---
 
