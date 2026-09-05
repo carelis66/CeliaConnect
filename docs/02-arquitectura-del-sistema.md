@@ -224,7 +224,6 @@ La versión Web y Mobile compartirán la misma infraestructura backend.
 # 11. Beneficios de la arquitectura
 
 La arquitectura seleccionada permitirá:
-
 - Separar responsabilidades entre los distintos componentes.
 - Reutilizar la lógica de negocio.
 - Facilitar futuras ampliaciones.
@@ -233,8 +232,19 @@ La arquitectura seleccionada permitirá:
 - Escalar el proyecto de forma ordenada.
 
 ---
+# 12. Decisiones de Diseño
 
-# 12. Próximos pasos
+Consideraciones de Arquitectura:
+# Alcance Geográfico del MVP
+
+La primera versión de CeliaConnect estará orientada exclusivamente a la Ciudad Autónoma de Buenos Aires (CABA).
+Esta decisión permite reducir la complejidad inicial del sistema y enfocar el desarrollo en una zona con una amplia oferta de productos, restaurantes y comercios aptos para personas celíacas.
+Como consecuencia, el modelo de datos incorpora la entidad **Barrio** para representar la ubicación de los establecimientos, evitando una estructura más compleja compuesta por País, Provincia y Ciudad.
+
+La arquitectura del sistema fue diseñada para permitir una futura expansión hacia otras provincias y países mediante la incorporación de nuevas entidades geográficas sin afectar el funcionamiento actual del sistema.
+
+---
+# 13. Próximos pasos
 
 Una vez aprobada la arquitectura técnica, se continuará con:
 
