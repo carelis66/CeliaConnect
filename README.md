@@ -41,7 +41,7 @@ Desarrollar una solución tecnológica que permita centralizar información conf
 
 ## Base de Datos
 
-- Microsoft SQL Server
+- Base de datos relacional SQL
 
 ## Servicios
 
