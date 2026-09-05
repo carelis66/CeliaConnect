@@ -10,3 +10,11 @@
 */
 
 USE celiaconnectdb;
+/*======================================================
+  MÓDULO: SEGURIDAD
+======================================================*/
+
+INSERT INTO rol (nombre)
+VALUES
+('Administrador'),
+('Usuario');
