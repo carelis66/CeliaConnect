@@ -17,7 +17,7 @@ El presente documento describe el modelo de datos de CeliaConnect.
 
 Su objetivo es definir las entidades principales del sistema, sus atributos y las relaciones existentes entre ellas, proporcionando una base sólida para el diseño e implementación de la base de datos.
 
-El modelo fue diseñado para soportar las funcionalidades principales de la plataforma, garantizando la integridad de la información y facilitando el desarrollo del backend mediante Microsoft SQL Server.
+El modelo fue diseñado para soportar las funcionalidades principales de la plataforma, garantizando la integridad de la información y facilitando el desarrollo del backend mediante una Base de datos relacional SQL
 
 ---
 
