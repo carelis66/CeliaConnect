@@ -3,16 +3,14 @@
 ## Información del documento
 
 | Campo | Valor |
-|--------|--------|
+|---|---|
 | Proyecto | CeliaConnect |
-| Versión | 1.0 |
-| Fecha | 31/07/2026 |
+| Versión | 1.1 |
+| Fecha | 15/09/2026 |
 | Autor | Carelis Fagundez |
 | Estado | En elaboración |
 
----
-
-# 1. Introducción
+## 1. Introducción
 
 Este documento describe los módulos funcionales que conforman la plataforma CeliaConnect.
 
@@ -20,9 +18,7 @@ Cada módulo representa un conjunto de funcionalidades relacionadas que serán d
 
 El objetivo es definir claramente el alcance funcional del sistema antes de iniciar el desarrollo.
 
----
-
-# 2. Objetivos
+## 2. Objetivos
 
 Los objetivos de este documento son:
 
@@ -31,18 +27,14 @@ Los objetivos de este documento son:
 - Determinar qué tipo de usuario utilizará cada funcionalidad.
 - Servir como base para el diseño del software.
 
----
-
-# 3. Roles del sistema
+## 3. Roles del sistema
 
 Actualmente el sistema contempla dos tipos de usuarios.
 
-## Usuario
-
+### Usuario
 Persona que utilizará la aplicación para consultar información relacionada con la celiaquía.
 
 Podrá:
-
 - Registrarse.
 - Iniciar sesión.
 - Buscar productos.
@@ -54,14 +46,10 @@ Podrá:
 - Publicar comentarios.
 - Editar su perfil.
 
----
-
-## Administrador
-
+### Administrador
 Usuario encargado de mantener actualizada la información del sistema.
 
 Podrá:
-
 - Administrar productos.
 - Administrar restaurantes.
 - Administrar tiendas.
@@ -70,68 +58,38 @@ Podrá:
 - Moderar comentarios.
 - Gestionar usuarios.
 
----
+## 4. Módulos del sistema
 
-# 4. Módulos del sistema
+### 4.1 Autenticación
+**Objetivo:** Gestionar el acceso seguro a la plataforma.
 
-## 4.1 Autenticación
-
-### Objetivo
-
-Gestionar el acceso seguro a la plataforma.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Registro de usuario
 - Inicio de sesión
 - Recuperación de contraseña
 - Cierre de sesión
-- Validación mediante JWT
+- Validación de sesión *(mecanismo — JWT en evaluación, ver sección 6)*
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
+**Dependencias:** Usuarios
 
-- Usuario
-- Administrador
+### 4.2 Usuarios
+**Objetivo:** Gestionar la información personal de cada usuario.
 
-### Dependencias
-
-- Usuarios
-
----
-
-## 4.2 Usuarios
-
-### Objetivo
-
-Gestionar la información personal de cada usuario.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Ver perfil
 - Editar perfil
 - Cambiar contraseña
 - Cambiar foto de perfil
 - Configurar preferencias
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
+**Dependencias:** Autenticación
 
-- Usuario
-- Administrador
+### 4.3 Productos
+**Objetivo:** Permitir la consulta de productos aptos para personas celíacas.
 
-### Dependencias
-
-- Autenticación
-
----
-
-## 4.3 Productos
-
-### Objetivo
-
-Permitir la consulta de productos aptos para personas celíacas.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Buscar productos
 - Filtrar productos
 - Consultar detalle
@@ -140,26 +98,13 @@ Permitir la consulta de productos aptos para personas celíacas.
 - Consultar información nutricional
 - Agregar a favoritos
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
+**Dependencias:** Favoritos, Comentarios
 
-- Usuario
-- Administrador
+### 4.4 Restaurantes
+**Objetivo:** Permitir la búsqueda de restaurantes con opciones aptas para personas celíacas.
 
-### Dependencias
-
-- Favoritos
-- Comentarios
-
----
-
-## 4.4 Restaurantes
-
-### Objetivo
-
-Permitir la búsqueda de restaurantes con opciones aptas para personas celíacas.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Buscar restaurantes
 - Consultar ubicación
 - Ver información
@@ -168,179 +113,93 @@ Permitir la búsqueda de restaurantes con opciones aptas para personas celíacas
 - Ver opiniones
 - Agregar a favoritos
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
+**Dependencias:** Comentarios, Favoritos, Geolocalización
 
-- Usuario
-- Administrador
+### 4.5 Tiendas
+**Objetivo:** Permitir localizar comercios donde adquirir productos aptos.
 
-### Dependencias
-
-- Comentarios
-- Favoritos
-- Geolocalización
-
----
-
-## 4.5 Tiendas
-
-### Objetivo
-
-Permitir localizar comercios donde adquirir productos aptos.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Buscar tiendas
 - Consultar ubicación
 - Ver horarios
 - Ver productos disponibles
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
+**Dependencias:** Geolocalización
 
-- Usuario
-- Administrador
+> ⚠️ **Pendiente de modelo de datos:** "Tienda" es una entidad nueva, distinta de `local` (que hoy representa una sucursal de `restaurante`). Falta incorporarla al modelo entidad-relación en el documento 03-modelo-de-datos — hoy no existe como tabla propia.
 
-### Dependencias
+### 4.6 Nutricionistas
+**Objetivo:** Facilitar el acceso a profesionales especializados en celiaquía.
 
-- Geolocalización
-
----
-
-## 4.6 Nutricionistas
-
-### Objetivo
-
-Facilitar el acceso a profesionales especializados en celiaquía.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Buscar profesionales
 - Consultar especialidad
 - Ver información de contacto
 - Consultar ubicación
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
+**Dependencias:** Geolocalización
 
-- Usuario
-- Administrador
+### 4.7 Promociones
+**Objetivo:** Mostrar promociones relacionadas con productos y establecimientos, a modo de banners informativos (sin flujo de canje ni cupones en este MVP).
 
-### Dependencias
-
-- Geolocalización
-
----
-
-## 4.7 Promociones
-
-### Objetivo
-
-Mostrar promociones relacionadas con productos y establecimientos.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Consultar promociones
 - Filtrar promociones
 - Ver vigencia
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
 
-- Usuario
-- Administrador
+### 4.8 Favoritos
+**Objetivo:** Permitir guardar elementos de interés para futuras consultas.
 
----
-
-## 4.8 Favoritos
-
-### Objetivo
-
-Permitir guardar elementos de interés para futuras consultas.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Agregar favorito
 - Eliminar favorito
 - Consultar favoritos
 
-### Usuarios
+**Usuarios:** Usuario
+**Dependencias:** Productos, Restaurantes, Tiendas
 
-- Usuario
+### 4.9 Comentarios
+**Objetivo:** Permitir que los usuarios compartan experiencias y opiniones.
 
-### Dependencias
-
-- Productos
-- Restaurantes
-- Tiendas
-
----
-
-## 4.9 Comentarios
-
-### Objetivo
-
-Permitir que los usuarios compartan experiencias y opiniones.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Crear comentario
 - Editar comentario
 - Eliminar comentario
 - Calificar mediante estrellas
 
-### Usuarios
+**Usuarios:** Usuario, Administrador
 
-- Usuario
-- Administrador
+### 4.10 Geolocalización
+**Objetivo:** Mostrar información basada en la ubicación del usuario.
 
----
-
-## 4.10 Geolocalización
-
-### Objetivo
-
-Mostrar información basada en la ubicación del usuario.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Obtener ubicación actual
 - Buscar lugares cercanos
 - Mostrar mapa
 - Calcular distancia
 
-### Usuarios
+**Usuarios:** Usuario
+**Dependencias:** Google Maps API
 
-- Usuario
+### 4.11 Multimedia
+**Objetivo:** Gestionar las imágenes utilizadas por la plataforma.
 
-### Dependencias
-
-- Google Maps API
-
----
-
-## 4.11 Multimedia
-
-### Objetivo
-
-Gestionar las imágenes utilizadas por la plataforma.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Subir imágenes
 - Actualizar imágenes
 - Eliminar imágenes
 
-### Dependencias
+**Dependencias:** Servicio de almacenamiento de imágenes *(Cloudinary en evaluación, ver sección 6)*
 
-- Cloudinary
+### 4.12 Administración
+**Objetivo:** Permitir la gestión integral del contenido del sistema.
 
----
-
-## 4.12 Administración
-
-### Objetivo
-
-Permitir la gestión integral del contenido del sistema.
-
-### Funcionalidades
-
+**Funcionalidades:**
 - Gestionar usuarios
 - Gestionar productos
 - Gestionar restaurantes
@@ -349,16 +208,12 @@ Permitir la gestión integral del contenido del sistema.
 - Gestionar promociones
 - Moderar comentarios
 
-### Usuarios
+**Usuarios:** Administrador
 
-- Administrador
-
----
-
-# 5. Relación entre módulos
+## 5. Relación entre módulos
 
 | Módulo | Depende de |
-|----------|----------------|
+|---|---|
 | Autenticación | Usuarios |
 | Usuarios | Autenticación |
 | Productos | Favoritos, Comentarios |
@@ -368,29 +223,24 @@ Permitir la gestión integral del contenido del sistema.
 | Promociones | Administración |
 | Favoritos | Productos, Restaurantes, Tiendas |
 | Comentarios | Usuarios |
-| Multimedia | Cloudinary |
+| Multimedia | Servicio de almacenamiento de imágenes |
 | Geolocalización | Google Maps |
 | Administración | Todos los módulos |
 
----
+## 6. Consideraciones
 
-# 6. Consideraciones
-
-- La plataforma contará con una versión Web y una versión Mobile.
+- La plataforma contará con una versión Web y una versión Mobile (esta última como PWA instalable, generada con PWABuilder).
 - Ambas consumirán la misma API REST.
-- La autenticación será mediante JWT.
-- La información será almacenada en PostgreSQL.
-- Las imágenes serán administradas mediante Cloudinary.
-- La geolocalización utilizará Google Maps API.
+- La información será almacenada en **MySQL**.
+- La geolocalización utilizará **Google Maps API**.
+- **En evaluación, aún no confirmados:** mecanismo de autenticación mediante JWT, y almacenamiento de imágenes mediante Cloudinary. Se definen al momento de construir el backend.
 
----
-
-# 7. Próximos pasos
+## 7. Próximos pasos
 
 A partir de este documento se desarrollarán los siguientes entregables:
 
 - Arquitectura del sistema.
-- Modelo entidad-relación.
+- Modelo entidad-relación (incorporando la entidad Tienda, ver nota en 4.5).
 - Diseño de la API REST.
 - Diseño de interfaces.
 - Desarrollo Backend.
