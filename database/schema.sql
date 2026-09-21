@@ -1,216 +1,279 @@
 /*
 =======================================================
  Proyecto: CeliaConnect
- Archivo : schema.sql
+ Archivo : seed.sql
  Autor   : Carelis Fagundez
  Descripción:
- Script de creación de la estructura de la base de datos
+ Datos iniciales necesarios para el funcionamiento
+ de CeliaConnect.
 =======================================================
 */
 
-CREATE DATABASE IF NOT EXISTS celiaconnectdb;
 USE celiaconnectdb;
-
-
-
 
 
 /*======================================================
   MÓDULO: SEGURIDAD
 ======================================================*/
 
-CREATE TABLE rol (
-    id INT NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(50) NOT NULL,
-    descripcion VARCHAR(255),
-    PRIMARY KEY (id)
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
-
-
-
-CREATE TABLE usuario (
-    id INT NOT NULL AUTO_INCREMENT,
-    documento VARCHAR(20) NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    genero VARCHAR(20),
-    email VARCHAR(150) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    telefono VARCHAR(50),
-    fotoPerfil VARCHAR(255),
-    fechaNacimiento DATE,
-    fechaRegistro DATETIME NOT NULL,
-    esActivo BOOLEAN NOT NULL DEFAULT TRUE,
-    rolId INT NOT NULL,
-
-    PRIMARY KEY (id),
-
-    UNIQUE (email),
-    UNIQUE (documento),
-
-    CONSTRAINT fk_usuario_rol
-        FOREIGN KEY (rolId)
-        REFERENCES rol(id)
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
-
-
-
+INSERT INTO rol (nombre, descripcion)
+VALUES
+('Administrador', 'Administrador del sistema'),
+('Usuario', 'Usuario registrado en la plataforma');
 
 
 /*======================================================
   MÓDULO: PRODUCTOS
 ======================================================*/
 
-CREATE TABLE categoria (
-    id INT NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
+INSERT INTO categoria (nombre)
+VALUES
+('Harinas'),
+('Pas/*
+=======================================================
+ Proyecto: CeliaConnect
+ Archivo : seed.sql
+ Autor   : Carelis Fagundez
+ Descripción:
+ Datos iniciales necesarios para el funcionamiento
+ de CeliaConnect.
+=======================================================
+*/
 
-    PRIMARY KEY (id)
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
-
-
-
-CREATE TABLE marca (
-    id INT NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
-    logo VARCHAR(255),
-
-    PRIMARY KEY (id)
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
+USE celiaconnectdb;
 
 
+/*======================================================
+  MÓDULO: SEGURIDAD
+======================================================*/
 
-CREATE TABLE producto (
-
-    id INT NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(150) NOT NULL,
-    descripcion TEXT,
-    ingredientes TEXT,
-    informacionNutricional TEXT,
-    imagen VARCHAR(255),
-    codigoBarras VARCHAR(50),
-    certificadoSinTacc BOOLEAN NOT NULL DEFAULT FALSE,
-    fechaCreacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    marcaId INT NOT NULL,
-    categoriaId INT NOT NULL,
-
-    PRIMARY KEY (id),
-
-    CONSTRAINT fk_producto_marca
-        FOREIGN KEY (marcaId)
-        REFERENCES marca(id),
-
-    CONSTRAINT fk_producto_categoria
-        FOREIGN KEY (categoriaId)
-        REFERENCES categoria(id)
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
+INSERT INTO rol (nombre, descripcion)
+VALUES
+('Administrador', 'Administrador del sistema'),
+('Usuario', 'Usuario registrado en la plataforma');
 
 
+/*======================================================
+  MÓDULO: PRODUCTOS
+======================================================*/
 
+INSERT INTO categoria (nombre)
+VALUES
+('Harinas'),
+('Pastas'),
+('Panificados'),
+('Galletitas'),
+('Snacks'),
+('Congelados'),
+('Lácteos'),
+('Bebidas'),
+('Premezclas');
+
+
+INSERT INTO marca (nombre)
+VALUES
+('Schär'),
+('Kapac'),
+('Valente'),
+('Free Foods'),
+('Molino Cañuelas');
 
 
 /*======================================================
   MÓDULO: RESTAURANTES
 ======================================================*/
 
-CREATE TABLE tipoRestaurante (
-
-    id INT NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
-
-    PRIMARY KEY (id)
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
+INSERT INTO tipoRestaurante (nombre)
+VALUES
+('Restaurante'),
+('Cafetería'),
+('Panadería'),
+('Heladería'),
+('Fast Food'),
+('Pastelería');
 
 
+INSERT INTO barrio (nombre)
+VALUES
+('Agronomía'),
+('Almagro'),
+('Balvanera'),
+('Barracas'),
+('Belgrano'),
+('Boedo'),
+('Caballito'),
+('Chacarita'),
+('Coghlan'),
+('Colegiales'),
+('Constitución'),
+('Flores'),
+('Floresta'),
+('La Boca'),
+('La Paternal'),
+('Liniers'),
+('Mataderos'),
+('Monserrat'),
+('Monte Castro'),
+('Nueva Pompeya'),
+('Núñez'),
+('Palermo'),
+('Parque Avellaneda'),
+('Parque Chacabuco'),
+('Parque Chas'),
+('Parque Patricios'),
+('Puerto Madero'),
+('Recoleta'),
+('Retiro'),
+('Saavedra'),
+('San Cristóbal'),
+('San Nicolás'),
+('San Telmo'),
+('Vélez Sarsfield'),
+('Versalles'),
+('Villa Crespo'),
+('Villa del Parque'),
+('Villa Devoto'),
+('Villa General Mitre'),
+('Villa Lugano'),
+('Villa Luro'),
+('Villa Ortúzar'),
+('Villa Pueyrredón'),
+('Villa Real'),
+('Villa Riachuelo'),
+('Villa Santa Rita'),
+('Villa Soldati'),
+('Villa Urquiza');
 
-CREATE TABLE barrio (
 
-    id INT NOT NULL AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
+/*======================================================
+  MÓDULO: LOCALES (TIENDAS)
+======================================================*/
 
-    PRIMARY KEY (id)
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
-
-
-
-CREATE TABLE restaurante (
-
-    id INT NOT NULL AUTO_INCREMENT,
-
-    nombre VARCHAR(150) NOT NULL,
-    descripcion TEXT,
-    imagenExterior VARCHAR(255),
-    imagenInterior VARCHAR(255),
-    direccion VARCHAR(255),
-    telefono VARCHAR(50),
-    email VARCHAR(150),
-    instagram VARCHAR(150),
-    sitioWeb VARCHAR(255),
-    horario VARCHAR(255),
-    latitud DECIMAL(10,8),
-    longitud DECIMAL(11,8),
-
-    verificado BOOLEAN NOT NULL DEFAULT FALSE,
-    calificacionPromedio DECIMAL(2,1) NOT NULL DEFAULT 0,
-    cantidadResenas INT NOT NULL DEFAULT 0,
-
-    tipoRestauranteId INT NOT NULL,
-    barrioId INT NOT NULL,
-
-    PRIMARY KEY (id),
-
-    CONSTRAINT fk_restaurante_tipo
-        FOREIGN KEY (tipoRestauranteId)
-        REFERENCES tipoRestaurante(id),
-
-    CONSTRAINT fk_restaurante_barrio
-        FOREIGN KEY (barrioId)
-        REFERENCES barrio(id)
-
-) ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_general_ci;
+INSERT INTO tipoLocal (nombre)
+VALUES
+('Supermercado'),
+('Dietética'),
+('Almacén naturista'),
+('Verdulería');
 
 
-/*
-=========================================================
-PENDIENTE
+/*======================================================
+  MÓDULO: CARACTERÍSTICAS
+======================================================*/
 
-CREATE TABLE tipoLocal (...)
-CREATE TABLE local (...)
-CREATE TABLE nutricionista (...)
-CREATE TABLE caracteristica (...)
-CREATE TABLE restauranteCaracteristica (...)
-CREATE TABLE localCaracteristica (...)
-CREATE TABLE comentarioRestaurante (...)
-CREATE TABLE comentarioLocal (...)
-CREATE TABLE favoritoRestaurante (...)
-CREATE TABLE favoritoLocal (...)
-CREATE TABLE favoritoNutricionista (...)
-CREATE TABLE promocion (...)
+INSERT INTO caracteristica (nombre, icono)
+VALUES
+('Menú Sin TACC', 'menu-sin-tacc.svg'),
+('Cocina exclusiva Sin TACC', 'cocina-exclusiva.svg'),
+('Opciones sin lactosa', 'sin-lactosa.svg'),
+('Opciones veganas', 'vegano.svg'),
+('Apto celíacos certificado', 'certificado.svg'),
+('Con delivery', 'delivery.svg');tas'),
+('Panificados'),
+('Galletitas'),
+('Snacks'),
+('Congelados'),
+('Lácteos'),
+('Bebidas'),
+('Premezclas');
 
-(se agregarán a medida que se complete el script,
-usando como referencia el documento 03-modelo-de-datos)
-=========================================================
-*/
+
+INSERT INTO marca (nombre)
+VALUES
+('Schär'),
+('Kapac'),
+('Valente'),
+('Free Foods'),
+('Molino Cañuelas');
+
+
+/*======================================================
+  MÓDULO: RESTAURANTES
+======================================================*/
+
+INSERT INTO tipoRestaurante (nombre)
+VALUES
+('Restaurante'),
+('Cafetería'),
+('Panadería'),
+('Heladería'),
+('Fast Food'),
+('Pastelería');
+
+
+INSERT INTO barrio (nombre)
+VALUES
+('Agronomía'),
+('Almagro'),
+('Balvanera'),
+('Barracas'),
+('Belgrano'),
+('Boedo'),
+('Caballito'),
+('Chacarita'),
+('Coghlan'),
+('Colegiales'),
+('Constitución'),
+('Flores'),
+('Floresta'),
+('La Boca'),
+('La Paternal'),
+('Liniers'),
+('Mataderos'),
+('Monserrat'),
+('Monte Castro'),
+('Nueva Pompeya'),
+('Núñez'),
+('Palermo'),
+('Parque Avellaneda'),
+('Parque Chacabuco'),
+('Parque Chas'),
+('Parque Patricios'),
+('Puerto Madero'),
+('Recoleta'),
+('Retiro'),
+('Saavedra'),
+('San Cristóbal'),
+('San Nicolás'),
+('San Telmo'),
+('Vélez Sarsfield'),
+('Versalles'),
+('Villa Crespo'),
+('Villa del Parque'),
+('Villa Devoto'),
+('Villa General Mitre'),
+('Villa Lugano'),
+('Villa Luro'),
+('Villa Ortúzar'),
+('Villa Pueyrredón'),
+('Villa Real'),
+('Villa Riachuelo'),
+('Villa Santa Rita'),
+('Villa Soldati'),
+('Villa Urquiza');
+
+
+/*======================================================
+  MÓDULO: LOCALES (TIENDAS)
+======================================================*/
+
+INSERT INTO tipoLocal (nombre)
+VALUES
+('Supermercado'),
+('Dietética'),
+('Almacén naturista'),
+('Verdulería');
+
+
+/*======================================================
+  MÓDULO: CARACTERÍSTICAS
+======================================================*/
+
+INSERT INTO caracteristica (nombre, icono)
+VALUES
+('Menú Sin TACC', 'menu-sin-tacc.svg'),
+('Cocina exclusiva Sin TACC', 'cocina-exclusiva.svg'),
+('Opciones sin lactosa', 'sin-lactosa.svg'),
+('Opciones veganas', 'vegano.svg'),
+('Apto celíacos certificado', 'certificado.svg'),
+('Con delivery', 'delivery.svg');
