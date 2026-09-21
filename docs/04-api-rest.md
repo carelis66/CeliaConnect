@@ -6,8 +6,8 @@
 |--------|--------|
 | Proyecto | CeliaConnect |
 | Documento | API REST |
-| Versión | 1.0 |
-| Fecha | 31/07/2026 |
+| Versión | 1.1 |
+| Fecha | 15/09/2026 |
 | Autor | Carelis Fagundez |
 | Estado | En elaboración |
 
@@ -17,7 +17,7 @@
 
 Este documento describe el diseño de la API REST de CeliaConnect.
 
-La API será el punto de comunicación entre la aplicación web, la aplicación móvil y la base de datos, centralizando la lógica de negocio y garantizando el acceso seguro a la información.
+La API será el punto de comunicación entre la aplicación web, la versión mobile (PWA) y la base de datos, centralizando la lógica de negocio y garantizando el acceso seguro a la información.
 
 ---
 
@@ -25,7 +25,7 @@ La API será el punto de comunicación entre la aplicación web, la aplicación 
 
 - Centralizar la lógica de negocio.
 - Proporcionar un único punto de acceso a los datos.
-- Permitir que la aplicación Web y Mobile compartan la misma información.
+- Permitir que la Web y la versión mobile (PWA) compartan la misma información.
 - Facilitar futuras integraciones.
 
 ---
@@ -34,7 +34,7 @@ La API será el punto de comunicación entre la aplicación web, la aplicación 
 
 La API seguirá una arquitectura REST utilizando el protocolo HTTP y el intercambio de información en formato JSON.
 
-Cada recurso será representado mediante un conjunto de endpoints.
+Cada recurso será representado mediante un conjunto de endpoints. Implementada con Node.js + Express + Sequelize sobre MySQL.
 
 ---
 
@@ -46,7 +46,9 @@ Una vez autenticado, el usuario recibirá un token que deberá enviar en cada so
 
 Ejemplo:
 
+```
 Authorization: Bearer {token}
+```
 
 ---
 
@@ -58,7 +60,7 @@ La API estará organizada en los siguientes recursos:
 - Usuarios
 - Productos
 - Restaurantes
-- Tiendas
+- Tiendas *(entidad `Local` en el modelo de datos)*
 - Nutricionistas
 - Promociones
 - Comentarios
@@ -112,7 +114,7 @@ La API estará organizada en los siguientes recursos:
 
 ---
 
-## 6.5 Tiendas
+## 6.5 Tiendas (`Local`)
 
 | Método | Endpoint |
 |----------|---------------------|
@@ -150,22 +152,32 @@ La API estará organizada en los siguientes recursos:
 
 ## 6.8 Comentarios
 
-| Método | Endpoint |
-|----------|---------------------------|
-| GET | /api/comments |
-| POST | /api/comments |
-| PUT | /api/comments/{id} |
-| DELETE | /api/comments/{id} |
+Anidados bajo el establecimiento comentado, reflejando `ComentarioRestaurante` y `ComentarioLocal` del modelo de datos.
+
+| Método | Endpoint | Descripción |
+|----------|---------------------------|-------------|
+| GET | /api/restaurants/{id}/comments | Comentarios de un restaurante |
+| POST | /api/restaurants/{id}/comments | Crear comentario sobre un restaurante |
+| GET | /api/stores/{id}/comments | Comentarios de una tienda |
+| POST | /api/stores/{id}/comments | Crear comentario sobre una tienda |
+| PUT | /api/comments/{id} | Editar un comentario propio |
+| DELETE | /api/comments/{id} | Eliminar un comentario |
 
 ---
 
 ## 6.9 Favoritos
 
-| Método | Endpoint |
-|----------|----------------------------|
-| GET | /api/favorites |
-| POST | /api/favorites |
-| DELETE | /api/favorites/{id} |
+Reflejando `FavoritoRestaurante`, `FavoritoLocal` y `FavoritoNutricionista` del modelo de datos.
+
+| Método | Endpoint | Descripción |
+|----------|----------------------------|-------------|
+| GET | /api/favorites | Todos los favoritos del usuario autenticado |
+| POST | /api/favorites/restaurants/{id} | Agregar restaurante a favoritos |
+| DELETE | /api/favorites/restaurants/{id} | Quitar restaurante de favoritos |
+| POST | /api/favorites/stores/{id} | Agregar tienda a favoritos |
+| DELETE | /api/favorites/stores/{id} | Quitar tienda de favoritos |
+| POST | /api/favorites/nutritionists/{id} | Agregar nutricionista a favoritos |
+| DELETE | /api/favorites/nutritionists/{id} | Quitar nutricionista de favoritos |
 
 ---
 
@@ -175,17 +187,21 @@ Las respuestas de la API se devolverán en formato JSON.
 
 Ejemplo:
 
+```json
 {
     "success": true,
     "data": { }
 }
+```
 
 En caso de error:
 
+```json
 {
     "success": false,
     "message": "Recurso no encontrado."
 }
+```
 
 ---
 
@@ -219,7 +235,7 @@ La API implementará:
 
 Una vez definida la API REST se procederá con:
 
-- Implementación del Backend.
+- Implementación del Backend (Node.js + Express + Sequelize).
 - Desarrollo del Frontend Web.
-- Desarrollo de la Aplicación Mobile.
-- Integración con SQL Server.
+- Desarrollo de la versión mobile (PWA).
+- Integración con MySQL.
