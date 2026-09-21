@@ -1,27 +1,25 @@
+# 03 - Modelo de Datos
+
 ## Información del documento
 
 | Campo | Valor |
-|--------|--------|
+|---|---|
 | Proyecto | CeliaConnect |
 | Documento | Modelo de Datos |
-| Versión | 2.0 |
-| Fecha | 25/08/2026 |
+| Versión | 2.1 |
+| Fecha | 15/09/2026 |
 | Autor | Carelis Fagundez |
 | Estado | Finalizado |
 
----
-
-# 1. Introducción
+## 1. Introducción
 
 El presente documento describe el modelo de datos de CeliaConnect.
 
 Su objetivo es definir las entidades principales del sistema, sus atributos y las relaciones existentes entre ellas, proporcionando una base sólida para el diseño e implementación de la base de datos.
 
-El modelo fue diseñado para soportar las funcionalidades principales de la plataforma, garantizando la integridad de la información y facilitando el desarrollo del backend mediante una Base de datos relacional SQL
+El modelo fue diseñado para soportar las funcionalidades principales de la plataforma, garantizando la integridad de la información y facilitando el desarrollo del backend mediante MySQL.
 
----
-
-# 2. Objetivos
+## 2. Objetivos
 
 - Identificar las entidades principales del sistema.
 - Definir los atributos de cada entidad.
@@ -29,325 +27,120 @@ El modelo fue diseñado para soportar las funcionalidades principales de la plat
 - Garantizar la integridad referencial de la base de datos.
 - Servir como base para la implementación del backend.
 
----
+## 3. Entidades del sistema
 
-# 3. Entidades del sistema
-
-## 3.1 Rol
-
+### 3.1 Rol
 Representa los perfiles de acceso del sistema.
 
-### Atributos
+**Atributos:** Id, Nombre
 
-- Id
-- Nombre
-
----
-
-## 3.2 Usuario
-
+### 3.2 Usuario
 Representa a las personas registradas en la plataforma.
 
-### Atributos
+**Atributos:** Id, Documento, Nombre, Apellido, FechaNacimiento, Genero, Telefono, Email, PasswordHash, FotoPerfil, FechaRegistro, RolId
 
-- Id
-- Documento
-- Nombre
-- Apellido
-- FechaNacimiento
-- Genero
-- Telefono
-- Email
-- PasswordHash
-- FotoPerfil
-- FechaRegistro
-- RolId
-
----
-
-## 3.3 Marca
-
+### 3.3 Marca
 Representa la marca comercial de un producto.
 
-### Atributos
+**Atributos:** Id, Nombre, Logo
 
-- Id
-- Nombre
-- Logo
-
----
-
-## 3.4 Categoría
-
+### 3.4 Categoría
 Clasifica los productos disponibles en la aplicación.
 
-### Atributos
+**Atributos:** Id, Nombre
 
-- Id
-- Nombre
-
----
-
-## 3.5 Producto
-
+### 3.5 Producto
 Representa un producto apto para personas celíacas.
 
-### Atributos
+**Atributos:** Id, Nombre, Descripcion, Ingredientes, InformacionNutricional, Imagen, CertificacionSinTACC, MarcaId, CategoriaId
 
-- Id
-- Nombre
-- Descripcion
-- Ingredientes
-- InformacionNutricional
-- Imagen
-- CertificacionSinTACC
-- MarcaId
-- CategoriaId
-
----
-
-## 3.6 Barrio
-
+### 3.6 Barrio
 Representa los barrios de la Ciudad Autónoma de Buenos Aires.
 
-### Atributos
+**Atributos:** Id, Nombre
 
-- Id
-- Nombre
-
----
-
-## 3.7 TipoComida
-
+### 3.7 TipoRestaurante
 Clasifica los restaurantes según el tipo de comida ofrecida.
 
-### Atributos
+**Atributos:** Id, Nombre
 
-- Id
-- Nombre
+### 3.8 TipoLocal
+Clasifica los locales comerciales (tiendas).
 
----
+**Atributos:** Id, Nombre
 
-## 3.8 TipoLocal
-
-Clasifica los locales comerciales.
-
-### Atributos
-
-- Id
-- Nombre
-
----
-
-## 3.9 Característica
-
+### 3.9 Característica
 Representa los servicios o características que ofrece un restaurante o local.
 
-Ejemplos:
+Ejemplos: Menú Sin TACC, Cocina exclusiva Sin TACC, Opciones sin lactosa, Opciones veganas.
 
-- Menú Sin TACC
-- Cocina exclusiva Sin TACC
-- Opciones sin lactosa
-- Opciones veganas
+**Atributos:** Id, Nombre, Icono
 
-### Atributos
-
-- Id
-- Nombre
-- Icono
-
----
-
-## 3.10 Restaurante
-
+### 3.10 Restaurante
 Representa los restaurantes registrados en la plataforma.
 
-### Atributos
+**Atributos:** Id, Nombre, Descripcion, ImagenExterior, ImagenInterior, Direccion, BarrioId, Telefono, Email, Instagram, SitioWeb, Horario, Latitud, Longitud, TipoRestauranteId
 
-- Id
-- Nombre
-- Descripcion
-- ImagenExterior
-- ImagenInterior
-- Direccion
-- BarrioId
-- Telefono
-- Email
-- Instagram
-- SitioWeb
-- Horario
-- Latitud
-- Longitud
-- TipoComidaId
+### 3.11 Local
+Representa las tiendas del sistema: supermercados y dietéticas.
 
----
+> Corresponde al módulo funcional "Tiendas" (documento 01-módulos-del-sistema) — es la misma entidad, solo cambia el nombre.
 
-## 3.11 Local
+**Atributos:** Id, Nombre, Descripcion, Imagen, Direccion, BarrioId, Telefono, Email, Instagram, SitioWeb, Horario, Latitud, Longitud, TipoLocalId
 
-Representa supermercados y dietéticas.
-
-### Atributos
-
-- Id
-- Nombre
-- Descripcion
-- Imagen
-- Direccion
-- BarrioId
-- Telefono
-- Email
-- Instagram
-- SitioWeb
-- Horario
-- Latitud
-- Longitud
-- TipoLocalId
-
----
-
-## 3.12 Nutricionista
-
+### 3.12 Nutricionista
 Representa profesionales especializados en celiaquía e intolerancias alimentarias.
 
-### Atributos
+**Atributos:** Id, Nombre, Apellido, Matricula, Descripcion, FotoPerfil, Direccion, BarrioId, Telefono, TieneWhatsApp, Email, Instagram, SitioWeb, Horario, Latitud, Longitud
 
-- Id
-- Nombre
-- Apellido
-- Matricula
-- Descripcion
-- FotoPerfil
-- Direccion
-- BarrioId
-- Telefono
-- TieneWhatsApp
-- Email
-- Instagram
-- SitioWeb
-- Horario
-- Latitud
-- Longitud
+### 3.13 Promoción
+Representa promociones publicadas por restaurantes y locales, a modo de banner informativo (sin flujo de cupón/canje en este MVP).
 
----
+**Atributos:** Id, Titulo, Descripcion, Imagen, FechaInicio, FechaFin, RestauranteId, LocalId
 
-## 3.13 Promoción
-
-Representa promociones publicadas por restaurantes y locales.
-
-### Atributos
-
-- Id
-- Titulo
-- Descripcion
-- Imagen
-- CodigoDescuento
-- FechaInicio
-- FechaFin
-- RestauranteId
-- LocalId
-
----
-
-## 3.14 ComentarioRestaurante
-
+### 3.14 ComentarioRestaurante
 Representa las opiniones realizadas por los usuarios sobre restaurantes.
 
-### Atributos
+**Atributos:** Id, Titulo, Comentario, Calificacion, FechaComentario, UsuarioId, RestauranteId
 
-- Id
-- Titulo
-- Comentario
-- Calificacion
-- FechaComentario
-- UsuarioId
-- RestauranteId
-
----
-
-## 3.15 ComentarioLocal
-
+### 3.15 ComentarioLocal
 Representa las opiniones realizadas por los usuarios sobre locales.
 
-### Atributos
+**Atributos:** Id, Titulo, Comentario, Calificacion, FechaComentario, UsuarioId, LocalId
 
-- Id
-- Titulo
-- Comentario
-- Calificacion
-- FechaComentario
-- UsuarioId
-- LocalId
-
----
-
-## 3.16 FavoritoRestaurante
-
+### 3.16 FavoritoRestaurante
 Representa los restaurantes guardados por un usuario.
 
-### Atributos
+**Atributos:** UsuarioId, RestauranteId, FechaAgregado
 
-- UsuarioId
-- RestauranteId
-- FechaAgregado
+### 3.17 FavoritoLocal
+Representa los locales (tiendas) guardados por un usuario.
 
----
+**Atributos:** UsuarioId, LocalId, FechaAgregado
 
-## 3.17 FavoritoLocal
-
-Representa los locales guardados por un usuario.
-
-### Atributos
-
-- UsuarioId
-- LocalId
-- FechaAgregado
-
----
-
-## 3.18 FavoritoNutricionista
-
+### 3.18 FavoritoNutricionista
 Representa los nutricionistas guardados por un usuario.
 
-### Atributos
+**Atributos:** UsuarioId, NutricionistaId, FechaAgregado
 
-- UsuarioId
-- NutricionistaId
-- FechaAgregado
-
----
-
-## 3.19 RestauranteCaracterística
-
+### 3.19 RestauranteCaracterística
 Relaciona los restaurantes con sus características.
 
-### Atributos
+**Atributos:** RestauranteId, CaracteristicaId
 
-- RestauranteId
-- CaracteristicaId
+### 3.20 LocalCaracterística
+Relaciona los locales (tiendas) con sus características.
 
----
+**Atributos:** LocalId, CaracteristicaId
 
-## 3.20 LocalCaracterística
-
-Relaciona los locales con sus características.
-
-### Atributos
-
-- LocalId
-- CaracteristicaId
-
----
-
-# 4. Relaciones
-
-Las principales relaciones del modelo son:
+## 4. Relaciones
 
 - Un Rol puede tener muchos Usuarios.
 - Una Marca puede tener muchos Productos.
 - Una Categoría puede tener muchos Productos.
 - Un Barrio puede tener muchos Restaurantes, Locales y Nutricionistas.
-- Un Tipo de Comida puede pertenecer a muchos Restaurantes.
-- Un Tipo de Local puede pertenecer a muchos Locales.
+- Un TipoRestaurante puede pertenecer a muchos Restaurantes.
+- Un TipoLocal puede pertenecer a muchos Locales.
 - Un Usuario puede realizar muchos Comentarios de Restaurantes y Locales.
 - Un Restaurante puede recibir muchos Comentarios.
 - Un Local puede recibir muchos Comentarios.
@@ -356,19 +149,17 @@ Las principales relaciones del modelo son:
 - Un Local puede poseer múltiples Características.
 - Un Restaurante o un Local pueden publicar múltiples Promociones.
 
----
-
-# 5. Cardinalidades
+## 5. Cardinalidades
 
 | Relación | Cardinalidad |
-|----------|--------------|
+|---|---|
 | Rol → Usuario | 1 : N |
 | Marca → Producto | 1 : N |
 | Categoría → Producto | 1 : N |
 | Barrio → Restaurante | 1 : N |
 | Barrio → Local | 1 : N |
 | Barrio → Nutricionista | 1 : N |
-| TipoComida → Restaurante | 1 : N |
+| TipoRestaurante → Restaurante | 1 : N |
 | TipoLocal → Local | 1 : N |
 | Usuario → ComentarioRestaurante | 1 : N |
 | Usuario → ComentarioLocal | 1 : N |
@@ -382,32 +173,28 @@ Las principales relaciones del modelo son:
 | Restaurante → Promoción | 1 : N |
 | Local → Promoción | 1 : N |
 
----
-
-# 6. Diagrama Entidad-Relación
+## 6. Diagrama Entidad-Relación
 
 El Diagrama Entidad-Relación (DER) fue definido durante la etapa de diseño del sistema y representa gráficamente todas las entidades, atributos y relaciones de CeliaConnect.
 
-El diagrama se encuentra disponible en el documento **06-DER** y en la carpeta **diagramas** del repositorio del proyecto.
+El diagrama se encuentra disponible en el documento 06-diagramas y en la carpeta `diagramas/` del repositorio del proyecto.
 
----
+> Pendiente: revisar que el diagrama gráfico existente refleje estos últimos cambios (motor MySQL, `TipoRestaurante` en vez de `TipoComida`, sin `CodigoDescuento` en Promoción).
 
-# 7. Consideraciones
+## 7. Consideraciones
 
 - Cada entidad posee una clave primaria.
 - Las relaciones se implementan mediante claves foráneas.
 - Las tablas de favoritos y características utilizan claves primarias compuestas.
-- La integridad referencial será garantizada mediante restricciones en Microsoft SQL Server.
+- La integridad referencial será garantizada mediante restricciones en **MySQL**.
 - El modelo está orientado al desarrollo de un MVP enfocado en la Ciudad Autónoma de Buenos Aires.
 
----
-
-# 8. Próximos pasos
+## 8. Próximos pasos
 
 Con el modelo de datos finalizado, las siguientes etapas del proyecto serán:
 
-- Implementación física de la base de datos en SQL Server.
-- Creación del script de base de datos.
+- Implementación física de la base de datos en MySQL.
+- Creación del script de base de datos (Sequelize + MySQL).
 - Desarrollo del Backend.
 - Desarrollo de la API REST.
 - Desarrollo del Frontend Web y Mobile.
