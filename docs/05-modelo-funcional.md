@@ -1,4 +1,15 @@
-# Modelo Funcional - CeliaConnect
+# 05 - Modelo Funcional - CeliaConnect
+
+## Información del documento
+
+| Campo | Valor |
+|---|---|
+| Proyecto | CeliaConnect |
+| Documento | Modelo Funcional |
+| Versión | 1.1 |
+| Fecha | 15/09/2026 |
+| Autor | Carelis Fagundez |
+| Estado | En desarrollo |
 
 ## Objetivo
 
@@ -73,7 +84,7 @@ Cada restaurante mostrará:
 
 - Imagen exterior
 - Imagen interior
-- Tipo de comida
+- Tipo de restaurante
 - Dirección
 - Barrio
 - Teléfono
@@ -95,7 +106,7 @@ Los usuarios podrán:
 
 ---
 
-## Locales
+## Locales (Tiendas)
 
 Permite consultar supermercados y dietéticas.
 
@@ -150,14 +161,13 @@ Los usuarios podrán agregar nutricionistas a favoritos.
 
 ## Promociones
 
-Los restaurantes y locales podrán publicar promociones.
+Los restaurantes y locales podrán publicar promociones, a modo de banner informativo (sin flujo de canje en este MVP).
 
 Cada promoción incluirá:
 
 - Imagen
 - Título
 - Descripción
-- Código de descuento (opcional)
 - Fecha de inicio
 - Fecha de finalización
 
@@ -182,8 +192,9 @@ Cada usuario podrá guardar como favoritos:
 - Los restaurantes y locales podrán recibir calificaciones de 1 a 5 estrellas.
 - La calificación promedio se calculará a partir de las opiniones de los usuarios.
 - Las características mostradas en restaurantes y locales serán información proporcionada por el establecimiento.
-- Cada restaurante pertenecerá a un único tipo de comida.
+- Cada restaurante pertenecerá a un único tipo de restaurante.
 - Cada local pertenecerá a un único tipo de local.
+- Las promociones no incluyen código de descuento ni flujo de canje en este MVP.
 - Los nutricionistas publicados estarán orientados a personas con celiaquía e intolerancias alimentarias.
 - La aplicación estará enfocada inicialmente en la Ciudad Autónoma de Buenos Aires (CABA).
 
@@ -191,6 +202,6 @@ Cada usuario podrá guardar como favoritos:
 
 # Estado del documento
 
-**Versión:** 1.0
+**Versión:** 1.1
 
 **Estado:** En desarrollo.
