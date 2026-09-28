@@ -1,0 +1,1296 @@
+/* =====================================================
+   CELIACONNECT - PANEL DE ADMINISTRACIÓN
+   Se carga DESPUÉS de style.css y reutiliza sus variables.
+
+   OJO con las reglas globales de style.css:
+   - No usar las etiquetas <header> / <footer> (tienen estilos globales).
+   - No usar .badge (fuerza fondo verde con !important) -> usar .status-pill / .admin-count.
+   - No usar .nav-link (tiene subrayado animado) -> usar .admin-nav-link.
+===================================================== */
+
+/* =====================================================
+   LAYOUT GENERAL
+===================================================== */
+
+.admin-layout{
+
+    display:flex;
+
+    min-height:100vh;
+
+    background:var(--background-light);
+
+}
+
+.admin-main{
+
+    flex:1;
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.admin-content{
+
+    padding:32px;
+
+}
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.admin-sidebar{
+
+    flex:0 0 264px;
+
+    width:264px;
+
+    background:#ffffff;
+
+    border-right:1px solid var(--border);
+
+    position:sticky;
+
+    top:0;
+
+    height:100vh;
+
+    overflow-y:auto;
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:20px 16px;
+
+}
+
+.admin-sidebar-head{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 8px 16px;
+
+}
+
+.admin-brand img{
+
+    display:block;
+
+    height:56px;
+
+    width:auto;
+
+}
+
+.admin-close{
+
+    background:none;
+
+    border:none;
+
+    font-size:1.2rem;
+
+    color:var(--text-light);
+
+    padding:8px;
+
+    line-height:1;
+
+    border-radius:10px;
+
+    transition:.25s;
+
+}
+
+.admin-close:hover{
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+}
+
+.admin-nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:4px;
+
+    flex:1;
+
+}
+
+.admin-nav-label{
+
+    font-size:.72rem;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+
+    color:var(--text-light);
+
+    padding:18px 12px 8px;
+
+}
+
+.admin-nav-label:first-child{
+
+    padding-top:4px;
+
+}
+
+.admin-nav-link{
+
+    position:relative;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:11px 14px;
+
+    border-radius:12px;
+
+    color:var(--text);
+
+    font-weight:600;
+
+    font-size:.93rem;
+
+    text-decoration:none;
+
+    transition:.25s;
+
+}
+
+.admin-nav-link i{
+
+    width:20px;
+
+    text-align:center;
+
+    font-size:1.1rem;
+
+    color:var(--text-light);
+
+    transition:.25s;
+
+}
+
+.admin-nav-link:hover{
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    transform:translateX(3px);
+
+}
+
+.admin-nav-link:hover i{
+
+    color:var(--primary);
+
+}
+
+.admin-nav-link.active{
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+}
+
+.admin-nav-link.active i{
+
+    color:var(--primary);
+
+}
+
+/* Indicador lateral del link activo */
+
+.admin-nav-link.active::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:-16px;
+
+    top:9px;
+
+    bottom:9px;
+
+    width:4px;
+
+    border-radius:0 4px 4px 0;
+
+    background:var(--primary);
+
+}
+
+.admin-count{
+
+    background:var(--secondary);
+
+    color:#3D2F00;
+
+    font-size:.72rem;
+
+    font-weight:700;
+
+    padding:2px 9px;
+
+    border-radius:20px;
+
+}
+
+.admin-nav-link .admin-count{
+
+    margin-left:auto;
+
+}
+
+.admin-sidebar-foot{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:4px;
+
+    margin-top:14px;
+
+    padding-top:14px;
+
+    border-top:1px solid var(--border);
+
+}
+
+/* =====================================================
+   OVERLAY (solo mobile)
+===================================================== */
+
+.admin-overlay{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(30,20,51,.45);
+
+    z-index:1040;
+
+}
+
+/* =====================================================
+   BARRA SUPERIOR
+===================================================== */
+
+.admin-topbar{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    height:72px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:16px;
+
+    padding:0 32px;
+
+    background:#ffffff;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.admin-topbar-left,
+.admin-topbar-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    min-width:0;
+
+}
+
+.admin-topbar-title{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    margin:0;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+.admin-menu-btn{
+
+    display:none;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:42px;
+
+    height:42px;
+
+    background:#ffffff;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    font-size:1.4rem;
+
+    color:var(--text);
+
+    transition:.25s;
+
+}
+
+.admin-menu-btn:hover{
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    border-color:transparent;
+
+}
+
+.icon-btn{
+
+    position:relative;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:40px;
+
+    height:40px;
+
+    background:#ffffff;
+
+    border:1px solid var(--border);
+
+    border-radius:12px;
+
+    color:var(--text-light);
+
+    font-size:1.05rem;
+
+    transition:.25s;
+
+}
+
+.icon-btn:hover{
+
+    background:var(--primary);
+
+    border-color:var(--primary);
+
+    color:#ffffff;
+
+}
+
+.icon-dot{
+
+    position:absolute;
+
+    top:9px;
+
+    right:10px;
+
+    width:9px;
+
+    height:9px;
+
+    border-radius:50%;
+
+    background:var(--secondary);
+
+    border:2px solid #ffffff;
+
+    transition:.25s;
+
+}
+
+.icon-btn:hover .icon-dot{
+
+    border-color:var(--primary);
+
+}
+
+.admin-user{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:5px 12px 5px 5px;
+
+    background:none;
+
+    border:none;
+
+    border-radius:30px;
+
+    transition:.25s;
+
+}
+
+.admin-user:hover{
+
+    background:var(--background-light);
+
+}
+
+.admin-user > i{
+
+    font-size:.75rem;
+
+    color:var(--text-light);
+
+}
+
+.admin-avatar{
+
+    width:38px;
+
+    height:38px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:var(--primary);
+
+    color:#ffffff;
+
+    font-weight:700;
+
+    font-size:.85rem;
+
+}
+
+.admin-user-info{
+
+    text-align:left;
+
+    line-height:1.25;
+
+}
+
+.admin-user-name{
+
+    display:block;
+
+    font-weight:700;
+
+    font-size:.88rem;
+
+    color:var(--text);
+
+}
+
+.admin-user-role{
+
+    display:block;
+
+    font-size:.75rem;
+
+    color:var(--text-light);
+
+}
+
+.admin-topbar .dropdown-menu{
+
+    border:1px solid var(--border);
+
+    border-radius:14px;
+
+    box-shadow:var(--shadow);
+
+    padding:8px;
+
+    margin-top:8px;
+
+}
+
+.admin-topbar .dropdown-item{
+
+    border-radius:10px;
+
+    font-size:.9rem;
+
+    padding:9px 12px;
+
+    transition:.2s;
+
+}
+
+.admin-topbar .dropdown-item:hover{
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+}
+
+/* =====================================================
+   ENCABEZADO DE PÁGINA
+===================================================== */
+
+.admin-page-head{
+
+    display:flex;
+
+    align-items:flex-end;
+
+    justify-content:space-between;
+
+    flex-wrap:wrap;
+
+    gap:16px;
+
+    margin-bottom:28px;
+
+}
+
+.admin-title{
+
+    font-size:1.6rem;
+
+    font-weight:700;
+
+    margin:0 0 4px;
+
+}
+
+.admin-subtitle{
+
+    margin:0;
+
+    color:var(--text-light);
+
+    font-size:.95rem;
+
+}
+
+.admin-page-actions{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+}
+
+.admin-page-actions .btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+/* Los inputs globales de style.css son grandes y en píldora: acá van más compactos */
+
+.admin-content .form-control,
+.admin-content .form-select{
+
+    border-radius:12px;
+
+    border-width:1px;
+
+    padding:10px 14px;
+
+    font-size:.92rem;
+
+}
+
+/* =====================================================
+   TARJETAS DE MÉTRICAS
+===================================================== */
+
+.stat-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    height:100%;
+
+    padding:22px;
+
+    background:#ffffff;
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+    transition:.30s;
+
+}
+
+.stat-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:var(--shadow);
+
+    border-color:transparent;
+
+}
+
+.stat-icon{
+
+    width:54px;
+
+    height:54px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:16px;
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    font-size:1.4rem;
+
+    transition:.30s;
+
+}
+
+.stat-card:hover .stat-icon{
+
+    background:var(--primary);
+
+    color:#ffffff;
+
+}
+
+.stat-value{
+
+    margin:0;
+
+    font-size:1.7rem;
+
+    font-weight:700;
+
+    line-height:1.1;
+
+}
+
+.stat-label{
+
+    margin:2px 0 0;
+
+    color:var(--text-light);
+
+    font-size:.88rem;
+
+}
+
+.stat-trend{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:4px;
+
+    margin-top:6px;
+
+    color:var(--primary);
+
+    font-size:.78rem;
+
+    font-weight:600;
+
+}
+
+/* =====================================================
+   PANELES Y TABLAS
+===================================================== */
+
+.admin-panel{
+
+    height:100%;
+
+    overflow:hidden;
+
+    background:#ffffff;
+
+    border:1px solid var(--border);
+
+    border-radius:20px;
+
+}
+
+.admin-panel-head{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    padding:20px 24px;
+
+    border-bottom:1px solid var(--border);
+
+}
+
+.admin-panel-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin:0;
+
+    font-size:1.02rem;
+
+    font-weight:700;
+
+}
+
+.admin-panel-link{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    color:var(--primary);
+
+    font-size:.88rem;
+
+    font-weight:600;
+
+    text-decoration:none;
+
+    white-space:nowrap;
+
+    transition:.25s;
+
+}
+
+.admin-panel-link i{
+
+    transition:.30s;
+
+}
+
+.admin-panel-link:hover{
+
+    color:var(--primary-dark);
+
+}
+
+.admin-panel-link:hover i{
+
+    transform:translateX(4px);
+
+}
+
+.admin-table{
+
+    width:100%;
+
+    margin:0;
+
+    border-collapse:collapse;
+
+}
+
+.admin-table th{
+
+    padding:14px 24px;
+
+    background:var(--background-light);
+
+    border:none;
+
+    color:var(--text-light);
+
+    font-size:.74rem;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.06em;
+
+    white-space:nowrap;
+
+}
+
+.admin-table td{
+
+    padding:16px 24px;
+
+    border-top:1px solid var(--border);
+
+    vertical-align:middle;
+
+    font-size:.92rem;
+
+    white-space:nowrap;
+
+}
+
+.admin-table tbody tr{
+
+    transition:.2s;
+
+}
+
+.admin-table tbody tr:hover{
+
+    background:var(--primary-light);
+
+}
+
+.admin-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.admin-item-icon{
+
+    width:38px;
+
+    height:38px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:12px;
+
+    background:var(--primary-light);
+
+    color:var(--primary);
+
+    transition:.2s;
+
+}
+
+.admin-table tbody tr:hover .admin-item-icon{
+
+    background:#ffffff;
+
+}
+
+.admin-item-name{
+
+    display:block;
+
+    font-weight:700;
+
+    line-height:1.25;
+
+}
+
+.admin-item-sub{
+
+    display:block;
+
+    color:var(--text-light);
+
+    font-size:.78rem;
+
+}
+
+/* Estados: el verde se reserva SOLO para "Verificado" (Sin TACC) */
+
+.status-pill{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:.78rem;
+
+    font-weight:700;
+
+    white-space:nowrap;
+
+}
+
+.status-ok{
+
+    background:#E7F5DF;
+
+    color:#3E7A1E;
+
+}
+
+.status-pending{
+
+    background:#FFF3D1;
+
+    color:#8A6300;
+
+}
+
+.status-rejected{
+
+    background:#FDE8EA;
+
+    color:#B02A37;
+
+}
+
+/* =====================================================
+   MODERACIÓN DE COMENTARIOS
+===================================================== */
+
+.mod-item{
+
+    padding:18px 24px;
+
+    border-top:1px solid var(--border);
+
+    transition:.2s;
+
+}
+
+.mod-item:first-child{
+
+    border-top:none;
+
+}
+
+.mod-item:hover{
+
+    background:var(--background-light);
+
+}
+
+.mod-head{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:10px;
+
+}
+
+.mod-avatar{
+
+    width:36px;
+
+    height:36px;
+
+    flex-shrink:0;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:var(--primary-soft);
+
+    color:var(--primary-dark);
+
+    font-size:.8rem;
+
+    font-weight:700;
+
+}
+
+.mod-who{
+
+    min-width:0;
+
+    line-height:1.25;
+
+}
+
+.mod-who strong{
+
+    display:block;
+
+    font-size:.9rem;
+
+}
+
+.mod-who span{
+
+    display:block;
+
+    color:var(--text-light);
+
+    font-size:.78rem;
+
+}
+
+.mod-stars{
+
+    margin-left:auto;
+
+    color:var(--secondary);
+
+    font-size:.8rem;
+
+    white-space:nowrap;
+
+}
+
+.mod-text{
+
+    margin:0 0 12px;
+
+    color:var(--text-light);
+
+    font-size:.88rem;
+
+    line-height:1.5;
+
+}
+
+.mod-actions{
+
+    display:flex;
+
+    gap:8px;
+
+}
+
+.mod-btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:6px 14px;
+
+    background:#ffffff;
+
+    border:1px solid var(--border);
+
+    border-radius:30px;
+
+    color:var(--text);
+
+    font-size:.8rem;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+.mod-btn:hover{
+
+    background:var(--primary);
+
+    border-color:var(--primary);
+
+    color:#ffffff;
+
+}
+
+.mod-btn.reject:hover{
+
+    background:var(--danger);
+
+    border-color:var(--danger);
+
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media(max-width:991px){
+
+    .admin-sidebar{
+
+        position:fixed;
+
+        top:0;
+
+        left:0;
+
+        bottom:0;
+
+        height:auto;
+
+        width:280px;
+
+        flex:none;
+
+        z-index:1050;
+
+        transform:translateX(-100%);
+
+        transition:transform .30s ease;
+
+        box-shadow:var(--shadow);
+
+    }
+
+    .admin-menu-open .admin-sidebar{
+
+        transform:none;
+
+    }
+
+    .admin-menu-open .admin-overlay{
+
+        display:block;
+
+    }
+
+    .admin-menu-btn{
+
+        display:flex;
+
+    }
+
+    .admin-topbar{
+
+        padding:0 20px;
+
+    }
+
+    .admin-content{
+
+        padding:24px 20px;
+
+    }
+
+}
+
+@media(max-width:575px){
+
+    .admin-user-info{
+
+        display:none;
+
+    }
+
+    .admin-topbar-title{
+
+        font-size:.92rem;
+
+    }
+
+    .admin-page-actions{
+
+        width:100%;
+
+    }
+
+    .admin-page-actions .btn{
+
+        flex:1;
+
+        justify-content:center;
+
+    }
+
+    .admin-panel-head,
+    .mod-item{
+
+        padding-left:18px;
+
+        padding-right:18px;
+
+    }
+
+}

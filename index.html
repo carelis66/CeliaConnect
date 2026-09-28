@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <div id="header-placeholder"></div>
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+        <!-- HERO -->
+
+        <section id="hero" class="py-5">
+
+            <div class="container">
+
+                <div class="row align-items-center">
+
+                    <!-- Texto -->
+
+                    <div class="col-lg-6">
+
+                        <span class="badge bg-success mb-3">
+                            🌾 100% Sin TACC
+                        </span>
+
+                        <h1 class="display-4 fw-bold">
+
+                            Todo el mundo
+                            <span class="text-primary">Sin TACC</span>,
+                            en un solo lugar.
+
+                        </h1>
+
+                        <p class="lead mt-4">
+
+                            Encontrá productos, restaurantes y profesionales
+                            especializados para vivir una vida sin gluten de
+                            forma más simple y segura.
+
+                        </p>
+
+                        <div class="search-box mt-4">
+
+    <i class="bi bi-search"></i>
+
+    <input
+        type="text"
+        class="form-control form-control-lg"
+        placeholder="Buscar productos, restaurantes o marcas...">
+
+</div>
+
+                        <div class="hero-links d-flex gap-4 mt-4 flex-wrap">
+
+    <a href="productos.html" class="hero-link">
+
+        <i class="bi bi-basket2-fill"></i>
+
+        <span>Productos</span>
+
+    </a>
+
+    <a href="restaurantes.html" class="hero-link">
+
+        <i class="bi bi-shop"></i>
+
+        <span>Restaurantes</span>
+
+    </a>
+
+    <a href="nutricionistas.html" class="hero-link">
+
+        <i class="bi bi-heart-pulse-fill"></i>
+
+        <span>Nutricionistas</span>
+
+    </a>
+
+</div>
+
+
+                    </div>
+
+                    <!-- Imagen -->
+
+                    <div class="col-lg-6 text-center">
+
+                        <img
+                            src="assets/images/hero.png"
+                            class="img-fluid hero-image"
+                            alt="Ilustración CeliaConnect">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- CATEGORÍAS -->
+
+        <section id="categorias" class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2 class="fw-bold">
+                Explorá CeliaConnect
+            </h2>
+
+            <p class="text-muted">
+                Todo lo que necesitás para una vida Sin TACC, en un solo lugar.
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            <!-- Productos -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <a href="productos.html" class="category-card">
+
+                    <div class="category-icon">
+                        <i class="bi bi-basket2-fill"></i>
+                    </div>
+
+                    <h4>Productos</h4>
+
+                    <p>
+                        Encontrá alimentos certificados
+                        Sin TACC de las mejores marcas.
+                    </p>
+
+                    <span>
+                        Explorar
+                        <i class="bi bi-arrow-right"></i>
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Restaurantes -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <a href="restaurantes.html" class="category-card">
+
+                    <div class="category-icon">
+                        <i class="bi bi-shop"></i>
+                    </div>
+
+                    <h4>Restaurantes</h4>
+
+                    <p>
+                        Descubrí restaurantes y cafés
+                        con opciones aptas.
+                    </p>
+
+                    <span>
+                        Explorar
+                        <i class="bi bi-arrow-right"></i>
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Nutricionistas -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <a href="nutricionistas.html" class="category-card">
+
+                    <div class="category-icon">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                    </div>
+
+                    <h4>Nutricionistas</h4>
+
+                    <p>
+                        Encontrá profesionales especializados
+                        en celiaquía.
+                    </p>
+
+                    <span>
+                        Explorar
+                        <i class="bi bi-arrow-right"></i>
+                    </span>
+
+                </a>
+
+            </div>
+
+            <!-- Comunidad -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <a href="#" class="category-card">
+
+                    <div class="category-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <h4>Comunidad</h4>
+
+                    <p>
+                        Compartí recetas, experiencias
+                        y consejos con otros usuarios.
+                    </p>
+
+                    <span>
+                        Explorar
+                        <i class="bi bi-arrow-right"></i>
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+        <!-- PRODUCTOS -->
+
+        <section id="productos" class="py-5">
+
+            <div class="container">
+
+                <div class="section-header mb-5">
+
+                    <div>
+                        <h2 class="fw-bold mb-2">Productos destacados</h2>
+                        <p class="text-muted mb-0">
+                            Las opciones Sin TACC mejor valoradas por la comunidad.
+                        </p>
+                    </div>
+
+                    <a href="productos.html" class="ver-todos">
+                        Ver todos
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- Producto 1 -->
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <div class="product-card">
+
+                            <div class="product-image">
+                                <i class="bi bi-basket2-fill"></i>
+                                <span class="product-tag">Sin TACC</span>
+                            </div>
+
+                            <div class="product-body">
+
+                                <span class="product-category">Harinas</span>
+
+                                <h5>Harina de Arroz</h5>
+
+                                <p class="product-brand">Pura Vida</p>
+
+                                <div class="product-footer">
+
+                                    <span class="product-rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        4.8
+                                    </span>
+
+                                    <button class="product-fav" aria-label="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Producto 2 -->
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <div class="product-card">
+
+                            <div class="product-image">
+                                <i class="bi bi-cup-straw"></i>
+                                <span class="product-tag">Sin TACC</span>
+                            </div>
+
+                            <div class="product-body">
+
+                                <span class="product-category">Galletitas</span>
+
+                                <h5>Galletitas Dulces</h5>
+
+                                <p class="product-brand">Natufoods</p>
+
+                                <div class="product-footer">
+
+                                    <span class="product-rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        4.6
+                                    </span>
+
+                                    <button class="product-fav" aria-label="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Producto 3 -->
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <div class="product-card">
+
+                            <div class="product-image">
+                                <i class="bi bi-egg-fried"></i>
+                                <span class="product-tag">Sin TACC</span>
+                            </div>
+
+                            <div class="product-body">
+
+                                <span class="product-category">Panificados</span>
+
+                                <h5>Pan de Molde</h5>
+
+                                <p class="product-brand">Celisabor</p>
+
+                                <div class="product-footer">
+
+                                    <span class="product-rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        4.9
+                                    </span>
+
+                                    <button class="product-fav" aria-label="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Producto 4 -->
+
+                    <div class="col-lg-3 col-md-6">
+
+                        <div class="product-card">
+
+                            <div class="product-image">
+                                <i class="bi bi-cookie"></i>
+                                <span class="product-tag">Sin TACC</span>
+                            </div>
+
+                            <div class="product-body">
+
+                                <span class="product-category">Snacks</span>
+
+                                <h5>Barritas de Cereal</h5>
+
+                                <p class="product-brand">GlutenFree Co.</p>
+
+                                <div class="product-footer">
+
+                                    <span class="product-rating">
+                                        <i class="bi bi-star-fill"></i>
+                                        4.7
+                                    </span>
+
+                                    <button class="product-fav" aria-label="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- RESTAURANTES -->
+
+        <section id="restaurantes" class="py-5">
+
+            <div class="container">
+
+                <div class="section-header mb-5">
+
+                    <div>
+                        <h2 class="fw-bold mb-2">Restaurantes destacados</h2>
+                        <p class="text-muted mb-0">
+                            Lugares verificados por la comunidad, con opciones 100% aptas.
+                        </p>
+                    </div>
+
+                    <a href="restaurantes.html" class="ver-todos">
+                        Ver todos
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+
+                </div>
+
+                <div class="row g-4">
+
+                    <!-- Restaurante 1 -->
+
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="restaurant-card">
+
+                            <div class="restaurant-image">
+                                <i class="bi bi-shop"></i>
+                                <span class="restaurant-rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    4.7
+                                </span>
+                            </div>
+
+                            <div class="restaurant-body">
+
+                                <div class="restaurant-heading">
+
+                                    <h5>Verde Oliva Bistró</h5>
+
+                                    <button class="product-fav" aria-label="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
+                                </div>
+
+                                <p class="restaurant-meta">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Palermo
+                                    <span class="dot">•</span>
+                                    Bistró
+                                </p>
+
+                                <div class="restaurant-tags">
+                                    <span class="restaurant-tag">Apto Celíaco</span>
+                                    <span class="restaurant-tag">Delivery</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Restaurante 2 -->
+
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="restaurant-card">
+
+                            <div class="restaurant-image">
+                                <i class="bi bi-cup-hot-fill"></i>
+                                <span class="restaurant-rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    4.9
+                                </span>
+                            </div>
+
+                            <div class="restaurant-body">
+
+                                <div class="restaurant-heading">
+
+                                    <h5>Café Trigo Cero</h5>
+
+                                    <button class="product-fav" aria-label="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
+                                </div>
+
+                                <p class="restaurant-meta">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Belgrano
+                                    <span class="dot">•</span>
+                                    Cafetería
+                                </p>
+
+                                <div class="restaurant-tags">
+                                    <span class="restaurant-tag">Sin Gluten Certificado</span>
+                                    <span class="restaurant-tag">Vegano</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Restaurante 3 -->
+
+                    <div class="col-lg-4 col-md-6">
+
+                        <div class="restaurant-card">
+
+                            <div class="restaurant-image">
+                                <i class="bi bi-egg-fried"></i>
+                                <span class="restaurant-rating">
+                                    <i class="bi bi-star-fill"></i>
+                                    4.6
+                                </span>
+                            </div>
+
+                            <div class="restaurant-body">
+
+                                <div class="restaurant-heading">
+
+                                    <h5>La Espiga Libre</h5>
+
+                                    <button class="product-fav" aria-label="Agregar a favoritos">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+
+                                </div>
+
+                                <p class="restaurant-meta">
+                                    <i class="bi bi-geo-alt"></i>
+                                    Villa Crespo
+                                    <span class="dot">•</span>
+                                    Parrilla
+                                </p>
+
+                                <div class="restaurant-tags">
+                                    <span class="restaurant-tag">Apto Celíaco</span>
+                                    <span class="restaurant-tag">Apto Celebraciones</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- PROMOCIONES -->
+
+        <section id="promociones">
+
+        </section>
+
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript propio -->
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>
