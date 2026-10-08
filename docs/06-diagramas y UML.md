@@ -1,11 +1,11 @@
-# 06 - Diagramas
+# 06 - Diagramas y UML
 
 ## Información del documento
 
 | Campo | Valor |
 |---|---|
 | Proyecto | CeliaConnect |
-| Documento | Diagramas |
+| Documento | Diagramas y UML |
 | Versión | 2.0 |
 | Fecha | 08/10/2026 |
 | Autor | Carelis Fagundez |
@@ -13,7 +13,7 @@
 
 ## 1. Introducción
 
-El presente documento reúne los principales diagramas desarrollados durante las etapas de análisis y diseño de CeliaConnect. Cada uno representa una perspectiva distinta del sistema (datos y planificación; el UML está en el documento 07) y sirve de guía para la construcción, las pruebas y el mantenimiento.
+El presente documento reúne los principales diagramas desarrollados durante las etapas de análisis y diseño de CeliaConnect. Cada uno representa una perspectiva distinta del sistema (datos, funcionalidades, clases, arquitectura y planificación) y sirve de guía para la construcción, las pruebas y el mantenimiento.
 
 **Cambios de la versión 2.0:** la base de datos pasa a MySQL (antes se mencionaba SQL Server), se elimina el módulo de promociones, se incorporan favoritos y comentarios para los cuatro tipos de ítem (producto, restaurante, local y nutricionista), y la versión móvil se resuelve como PWA.
 
@@ -34,20 +34,53 @@ Versión simplificada (solo tablas y relaciones):
 
 ![DER general](diagramas/er_general.png)
 
-## 3. Diagramas UML
+## 3. Diagrama de Casos de Uso
 
-Los diagramas UML de CeliaConnect (casos de uso, clases y componentes) se encuentran en un documento aparte: [07 - Diagramas UML](07-UML.md).
+Actores del sistema:
 
-## 4. Diagrama de Gantt
+| Actor | Descripción |
+|---|---|
+| Visitante | Persona que navega la plataforma sin iniciar sesión. |
+| Usuario registrado | Visitante con cuenta e inicio de sesión. Hereda todo lo del visitante. |
+| Administrador | Usuario con rol de administrador. Hereda lo del usuario registrado y gestiona el sistema. |
+
+Funcionalidades por actor:
+
+- **Visitante:** ver inicio; consultar productos, restaurantes, locales y nutricionistas; buscar y filtrar; ver detalle y reseñas; registrarse; iniciar sesión.
+- **Usuario registrado:** gestionar favoritos; comentar y calificar; editar perfil; cerrar sesión.
+- **Administrador:** ver el panel; gestionar productos, restaurantes, locales, nutricionistas, catálogos y usuarios; moderar comentarios; verificar comercios y nutricionistas.
+
+![Casos de uso](diagramas/casos_uso.png)
+
+## 4. Diagrama de Clases
+
+Las clases corresponden a las entidades del modelo de datos (`database/schema.sql`). `Comentario` y `Favorito` se representan como una sola clase cada una, asociada a `Usuario` y a los cuatro tipos de ítem (producto, restaurante, local y nutricionista); en la base se guardan en cuatro tablas por tipo. Las clases en gris son catálogos.
+
+![Clases](diagramas/clases.png)
+
+## 5. Diagrama de Componentes
+
+Arquitectura cliente-servidor desacoplada y en capas:
+
+- **Cliente web** (HTML, CSS, Bootstrap 5, JavaScript) con capa `services/`.
+- **App móvil instalable (PWA)**, empaquetada para Android con PWABuilder.
+- **API REST** (Node.js + Express) que responde en JSON.
+- **Autenticación y autorización** con JWT y bcrypt, con control por rol.
+- **Lógica de negocio** y **acceso a datos** con Sequelize.
+- **Base de datos MySQL** y almacenamiento de imágenes en el servidor.
+
+![Componentes](diagramas/componentes.png)
+
+## 6. Diagrama de Gantt
 
 La planificación toma como hito final el **18 de diciembre**, fecha de la entrega del trabajo y de la exposición. El desarrollo y la documentación principal se concentran hasta la última semana de noviembre, y el tiempo restante se usa para ajustes y la preparación de la exposición. La documentación se desarrolla en paralelo desde el inicio y ya tiene un avance importante; además, el análisis, el diseño de base de datos y las primeras pantallas del front ya están realizados. Quedan por delante: front restante, backend, integración, PWA, publicación, pruebas y documentación, y luego la preparación de la exposición.
 
 ![Gantt](diagramas/gantt.png)
 
-## 5. Próximos diagramas
+## 7. Próximos diagramas
 
-Según las necesidades de la implementación podrán sumarse diagramas UML adicionales de secuencia (por ejemplo, inicio de sesión y publicación de un comentario), de actividad y de despliegue.
+Según las necesidades de la implementación podrán sumarse diagramas de secuencia (por ejemplo, inicio de sesión y publicación de un comentario), de actividad y de despliegue.
 
-## 6. Consideraciones finales
+## 8. Consideraciones finales
 
 Los diagramas son una representación del diseño actual y se actualizan si el sistema cambia. La fuente de verdad del modelo de datos es `database/schema.sql`.
