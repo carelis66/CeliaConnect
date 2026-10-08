@@ -1,0 +1,295 @@
+# 12. Requisitos Funcionales APK
+
+## Versión
+
+1.0
+
+## Objetivo
+
+Este documento describe los requisitos funcionales específicos de la aplicación móvil (APK Android) de CeliaConnect.
+
+La aplicación permitirá a los usuarios acceder a las principales funcionalidades del sistema desde dispositivos móviles, proporcionando una experiencia rápida, intuitiva y optimizada para personas con enfermedad celíaca o que siguen una alimentación libre de gluten.
+
+---
+
+# RFAPK-01 - Inicio de sesión
+
+**Descripción**
+
+La aplicación deberá permitir que un usuario registrado inicie sesión utilizando su correo electrónico y contraseña.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-02 - Registro de usuario
+
+**Descripción**
+
+La aplicación deberá permitir el registro de nuevos usuarios solicitando la información necesaria para crear una cuenta.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-03 - Recuperación de contraseña
+
+**Descripción**
+
+La aplicación deberá permitir solicitar el restablecimiento de contraseña mediante correo electrónico.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-04 - Mantener sesión iniciada
+
+**Descripción**
+
+La aplicación deberá conservar la sesión iniciada del usuario hasta que éste decida cerrarla manualmente.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-05 - Buscar productos
+
+**Descripción**
+
+La aplicación deberá permitir buscar productos Sin TACC mediante nombre, marca o categoría.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-06 - Filtrar productos
+
+**Descripción**
+
+La aplicación deberá permitir aplicar filtros sobre los resultados de búsqueda.
+
+Entre ellos:
+
+- Categoría
+- Marca
+- Certificación Sin TACC
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-07 - Visualizar detalle del producto
+
+**Descripción**
+
+La aplicación deberá mostrar la información completa de cada producto.
+
+Incluyendo:
+
+- Imagen
+- Nombre
+- Marca
+- Categoría
+- Descripción
+- Información nutricional
+- Certificación Sin TACC
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-08 - Buscar restaurantes
+
+**Descripción**
+
+La aplicación deberá permitir buscar restaurantes aptos para personas celíacas.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-09 - Visualizar restaurante
+
+**Descripción**
+
+La aplicación deberá mostrar:
+
+- Nombre
+- Dirección
+- Barrio
+- Horarios
+- Calificación
+- Fotografías
+- Tipo de restaurante
+- Información de contacto
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-10 - Buscar tiendas
+
+**Descripción**
+
+La aplicación deberá permitir buscar supermercados, dietéticas y comercios donde adquirir productos Sin TACC.
+
+**Prioridad**
+
+Media
+
+---
+
+# RFAPK-11 - Visualizar tienda
+
+**Descripción**
+
+La aplicación deberá mostrar la información completa del comercio.
+
+**Prioridad**
+
+Media
+
+---
+
+# RFAPK-12 - Buscar nutricionistas
+
+**Descripción**
+
+La aplicación deberá permitir buscar profesionales especializados en enfermedad celíaca.
+
+**Prioridad**
+
+Media
+
+---
+
+# RFAPK-13 - Visualizar perfil del nutricionista
+
+**Descripción**
+
+La aplicación deberá mostrar:
+
+- Nombre
+- Especialidad
+- Dirección
+- Contacto
+- Redes sociales
+- Descripción profesional
+
+**Prioridad**
+
+Media
+
+---
+
+# RFAPK-14 - Gestionar favoritos
+
+**Descripción**
+
+La aplicación deberá permitir agregar y eliminar productos, restaurantes, tiendas y nutricionistas de la lista de favoritos.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-15 - Visualizar promociones
+
+**Descripción**
+
+La aplicación deberá mostrar promociones y banners publicados por el administrador.
+
+**Prioridad**
+
+Media
+
+---
+
+# RFAPK-16 - Editar perfil
+
+**Descripción**
+
+La aplicación deberá permitir modificar los datos personales del usuario.
+
+**Prioridad**
+
+Media
+
+---
+
+# RFAPK-17 - Cerrar sesión
+
+**Descripción**
+
+La aplicación deberá permitir finalizar la sesión del usuario.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-18 - Navegación móvil
+
+**Descripción**
+
+La aplicación deberá proporcionar una navegación optimizada para dispositivos móviles mediante menús e interfaces táctiles.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-19 - Compatibilidad Android
+
+**Descripción**
+
+La aplicación deberá ejecutarse correctamente en dispositivos Android compatibles con la versión mínima definida por el proyecto.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-20 - Consumo de API REST
+
+**Descripción**
+
+La aplicación deberá obtener toda la información desde la API REST de CeliaConnect, evitando el acceso directo a la base de datos.
+
+**Prioridad**
+
+Alta
+
+---
+
+# RFAPK-21 - Sincronización de datos
+
+**Descripción**
+
+La aplicación deberá reflejar automáticamente los cambios realizados desde el sistema web una vez obtenidos nuevamente los datos desde la API.
+
+**Prioridad**
+
+Alta
