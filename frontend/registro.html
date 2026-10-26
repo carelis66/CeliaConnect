@@ -61,8 +61,12 @@
                         <div class="auth-bottom">
 
                             <svg class="auth-leaf" viewBox="0 0 140 140" aria-hidden="true">
-                                <path d="M15,130 C15,80 50,45 95,35 C75,80 55,110 25,132 Z" fill="var(--primary)" opacity="0.18"/>
-                                <path d="M5,138 C25,85 68,55 110,48 C85,95 55,125 20,140 Z" fill="var(--primary)" opacity="0.28"/>
+                                <path d="M15,130 C15,80 50,45 95,35 C75,80 55,110 25,132 Z"
+                                    fill="var(--primary)"
+                                    opacity="0.18"/>
+                                <path d="M5,138 C25,85 68,55 110,48 C85,95 55,125 20,140 Z"
+                                    fill="var(--primary)"
+                                    opacity="0.28"/>
                             </svg>
 
                             <p class="auth-tagline">
@@ -90,22 +94,34 @@
 
                         </div>
 
-                        <form>
+                        <!-- Mensajes del registro -->
+
+                        <div
+                            id="registro-mensaje"
+                            class="alert d-none"
+                            role="alert">
+                        </div>
+
+                        <form id="registro-form">
 
                             <div class="row">
 
                                 <div class="col-sm-6 mb-3">
 
-                                    <label for="nombre" class="form-label">Nombre</label>
+                                    <label for="nombre" class="form-label">
+                                        Nombre
+                                    </label>
 
                                     <div class="input-icon-field">
 
                                         <i class="bi bi-person"></i>
 
-                                        <input type="text"
+                                        <input
+                                            type="text"
                                             class="form-control"
                                             id="nombre"
                                             placeholder="Tu nombre"
+                                            autocomplete="given-name"
                                             required>
 
                                     </div>
@@ -114,16 +130,20 @@
 
                                 <div class="col-sm-6 mb-3">
 
-                                    <label for="apellido" class="form-label">Apellido</label>
+                                    <label for="apellido" class="form-label">
+                                        Apellido
+                                    </label>
 
                                     <div class="input-icon-field">
 
                                         <i class="bi bi-person"></i>
 
-                                        <input type="text"
+                                        <input
+                                            type="text"
                                             class="form-control"
                                             id="apellido"
                                             placeholder="Tu apellido"
+                                            autocomplete="family-name"
                                             required>
 
                                     </div>
@@ -133,17 +153,43 @@
                             </div>
 
                             <div class="mb-3">
+                                                            <div class="mb-3">
 
-                                <label for="email" class="form-label">Correo electrónico</label>
+                                <label for="documento" class="form-label">
+                                    Documento
+                                </label>
+
+                                <div class="input-icon-field">
+
+                                    <i class="bi bi-card-text"></i>
+
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="documento"
+                                        placeholder="Número de documento"
+                                        autocomplete="off"
+                                        maxlength="20"
+                                        required>
+
+                                </div>
+
+                            </div>
+
+                                <label for="email" class="form-label">
+                                    Correo electrónico
+                                </label>
 
                                 <div class="input-icon-field">
 
                                     <i class="bi bi-envelope"></i>
 
-                                    <input type="email"
+                                    <input
+                                        type="email"
                                         class="form-control"
                                         id="email"
                                         placeholder="tu@email.com"
+                                        autocomplete="email"
                                         required>
 
                                 </div>
@@ -152,20 +198,30 @@
 
                             <div class="mb-3">
 
-                                <label for="password" class="form-label">Contraseña</label>
+                                <label for="password" class="form-label">
+                                    Contraseña
+                                </label>
 
                                 <div class="password-field">
 
                                     <i class="bi bi-lock"></i>
 
-                                    <input type="password"
+                                    <input
+                                        type="password"
                                         class="form-control"
                                         id="password"
                                         placeholder="Mínimo 8 caracteres"
+                                        autocomplete="new-password"
+                                        minlength="8"
                                         required>
 
-                                    <button type="button" class="password-toggle" aria-label="Mostrar contraseña">
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        aria-label="Mostrar contraseña">
+
                                         <i class="bi bi-eye"></i>
+
                                     </button>
 
                                 </div>
@@ -174,20 +230,30 @@
 
                             <div class="mb-4">
 
-                                <label for="password2" class="form-label">Repetir contraseña</label>
+                                <label for="password2" class="form-label">
+                                    Repetir contraseña
+                                </label>
 
                                 <div class="password-field">
 
                                     <i class="bi bi-lock"></i>
 
-                                    <input type="password"
+                                    <input
+                                        type="password"
                                         class="form-control"
                                         id="password2"
                                         placeholder="Repetí tu contraseña"
+                                        autocomplete="new-password"
+                                        minlength="8"
                                         required>
 
-                                    <button type="button" class="password-toggle" aria-label="Mostrar contraseña">
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        aria-label="Mostrar contraseña">
+
                                         <i class="bi bi-eye"></i>
+
                                     </button>
 
                                 </div>
@@ -196,18 +262,39 @@
 
                             <div class="form-check mb-4">
 
-                                <input class="form-check-input" type="checkbox" id="terminos" required>
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="terminos"
+                                    required>
 
-                                <label class="form-check-label" for="terminos">
-                                    Acepto los <a href="#" class="auth-link">Términos y condiciones</a>
-                                    y la <a href="#" class="auth-link">Política de privacidad</a>.
+                                <label
+                                    class="form-check-label"
+                                    for="terminos">
+
+                                    Acepto los
+                                    <a href="#" class="auth-link">
+                                        Términos y condiciones
+                                    </a>
+
+                                    y la
+
+                                    <a href="#" class="auth-link">
+                                        Política de privacidad
+                                    </a>.
+
                                 </label>
 
                             </div>
 
-                            <button type="submit" class="btn btn-warning w-100">
+                            <button
+                                type="submit"
+                                class="btn btn-warning w-100"
+                                id="btn-registro">
+
                                 Crear cuenta
                                 <i class="bi bi-arrow-right ms-1"></i>
+
                             </button>
 
                         </form>
@@ -217,8 +304,17 @@
                         </div>
 
                         <p class="text-center mb-0">
+
                             ¿Ya tenés cuenta?
-                            <a href="login.html" class="auth-link fw-semibold">Iniciá sesión</a>
+
+                            <a
+                                href="login.html"
+                                class="auth-link fw-semibold">
+
+                                Iniciá sesión
+
+                            </a>
+
                         </p>
 
                     </div>
@@ -240,6 +336,7 @@
 
     <!-- JavaScript propio -->
     <script src="js/app.js"></script>
+    <script src="js/registro.js"></script>
 
 </body>
 

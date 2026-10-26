@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Detalle del producto | CeliaConnect</title>
+
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+
+    <!-- Estilos propios -->
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= HEADER ================= -->
+
+    <div id="header-placeholder"></div>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+
+        <!-- ================= ENCABEZADO ================= -->
+
+        <section id="page-header">
+
+            <div class="container">
+
+
+                <!-- Breadcrumb -->
+
+                <nav aria-label="breadcrumb">
+
+                    <ol class="breadcrumb mb-3">
+
+                        <li class="breadcrumb-item">
+
+                            <a href="index.html">
+                                Inicio
+                            </a>
+
+                        </li>
+
+
+                        <li class="breadcrumb-item">
+
+                            <a href="productos.html">
+                                Productos
+                            </a>
+
+                        </li>
+
+
+                        <li
+                            class="breadcrumb-item active"
+                            aria-current="page"
+                            id="breadcrumb-producto"
+                        >
+                            Detalle
+                        </li>
+
+                    </ol>
+
+                </nav>
+
+
+                <h1 class="fw-bold mb-2">
+                    Detalle del producto
+                </h1>
+
+
+                <p class="text-muted mb-0">
+                    Información del producto Sin TACC.
+                </p>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= DETALLE ================= -->
+
+        <section class="py-5">
+
+            <div class="container">
+
+
+                <!-- Mensaje de carga -->
+
+                <div
+                    id="producto-cargando"
+                    class="text-center py-5"
+                >
+
+                    <div
+                        class="spinner-border text-warning"
+                        role="status"
+                    >
+
+                        <span class="visually-hidden">
+                            Cargando...
+                        </span>
+
+                    </div>
+
+
+                    <p class="text-muted mt-3">
+                        Cargando producto...
+                    </p>
+
+                </div>
+
+
+
+                <!-- Mensaje de error -->
+
+                <div
+                    id="producto-error"
+                    class="alert alert-danger d-none"
+                    role="alert"
+                >
+                    No se pudo cargar el producto.
+                </div>
+
+
+
+                <!-- Contenido del producto -->
+
+                <div
+                    id="producto-detalle"
+                    class="d-none"
+                >
+
+
+                    <div class="row g-5">
+
+
+                        <!-- ================= IMAGEN ================= -->
+
+                        <div class="col-lg-5">
+
+                            <div
+                                class="product-image d-flex align-items-center justify-content-center"
+                                style="min-height: 350px;"
+                            >
+
+                                <i
+                                    class="bi bi-basket2-fill"
+                                    style="font-size: 6rem;"
+                                ></i>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ================= INFORMACIÓN ================= -->
+
+                        <div class="col-lg-7">
+
+
+                            <!-- Categoría -->
+
+                            <span
+                                class="product-category"
+                                id="producto-categoria"
+                            >
+                            </span>
+
+
+
+                            <!-- Nombre -->
+
+                            <h2
+                                class="fw-bold mt-2 mb-2"
+                                id="producto-nombre"
+                            >
+                            </h2>
+
+
+
+                            <!-- Marca -->
+
+                            <p
+                                class="product-brand fs-5"
+                                id="producto-marca"
+                            >
+                            </p>
+
+
+
+                            <!-- Certificación -->
+
+                            <div class="mb-4">
+
+                                <span
+                                    class="producto-certificacion"
+                                    id="producto-certificacion"
+                                >
+                                </span>
+
+                            </div>
+
+
+
+                            <!-- Descripción -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Descripción
+                                </h5>
+
+                                <p
+                                    class="text-muted"
+                                    id="producto-descripcion"
+                                >
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Ingredientes -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Ingredientes
+                                </h5>
+
+                                <p
+                                    class="text-muted"
+                                    id="producto-ingredientes"
+                                >
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Información nutricional -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Información nutricional
+                                </h5>
+
+                                <p
+                                    class="text-muted"
+                                    id="producto-informacion-nutricional"
+                                >
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Código de barras -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Código de barras
+                                </h5>
+
+                                <p
+                                    class="text-muted"
+                                    id="producto-codigo-barras"
+                                >
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Volver -->
+
+                            <a
+                                href="productos.html"
+                                class="btn btn-outline-secondary"
+                            >
+
+                                <i class="bi bi-arrow-left"></i>
+
+                                Volver a productos
+
+                            </a>
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ================= OPINIONES ================= -->
+
+                    <div class="mt-5 pt-4 border-top">
+
+                        <div class="mb-4">
+
+                            <h3 class="fw-bold mb-2">
+                                Opiniones de la comunidad
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Experiencias compartidas por otros usuarios.
+                            </p>
+
+                        </div>
+
+                        <!-- ================= DEJAR OPINIÓN ================= -->
+
+<div
+    id="opinion-formulario-container"
+    class="card border-0 shadow-sm mb-5"
+>
+    <div class="card-body p-4">
+
+        <h4 class="fw-bold mb-2">
+            Dejá tu opinión
+        </h4>
+
+        <p class="text-muted mb-4">
+            Compartí tu experiencia con este producto.
+        </p>
+
+
+        <!-- Mensaje -->
+
+        <div
+            id="opinion-mensaje"
+            class="alert d-none"
+            role="alert"
+        >
+        </div>
+
+
+        <!-- Formulario -->
+
+        <form id="opinion-formulario">
+
+
+            <!-- Calificación -->
+
+            <div class="mb-3">
+
+                <label
+                    for="opinion-calificacion"
+                    class="form-label fw-semibold"
+                >
+                    Calificación
+                </label>
+
+                <select
+                    class="form-select"
+                    id="opinion-calificacion"
+                    required
+                >
+                    <option value="">
+                        Seleccioná una calificación
+                    </option>
+
+                    <option value="5">
+                        ★★★★★ - Excelente
+                    </option>
+
+                    <option value="4">
+                        ★★★★☆ - Muy bueno
+                    </option>
+
+                    <option value="3">
+                        ★★★☆☆ - Bueno
+                    </option>
+
+                    <option value="2">
+                        ★★☆☆☆ - Regular
+                    </option>
+
+                    <option value="1">
+                        ★☆☆☆☆ - Malo
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Título -->
+
+            <div class="mb-3">
+
+                <label
+                    for="opinion-titulo"
+                    class="form-label fw-semibold"
+                >
+                    Título
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    id="opinion-titulo"
+                    maxlength="150"
+                    placeholder="Ej: Muy buen producto"
+                    required
+                >
+
+            </div>
+
+
+            <!-- Comentario -->
+
+            <div class="mb-3">
+
+                <label
+                    for="opinion-comentario"
+                    class="form-label fw-semibold"
+                >
+                    Comentario
+                </label>
+
+                <textarea
+                    class="form-control"
+                    id="opinion-comentario"
+                    rows="4"
+                    placeholder="Contanos tu experiencia..."
+                    required
+                ></textarea>
+
+            </div>
+
+
+            <!-- Botón -->
+
+            <button
+                type="submit"
+                class="btn btn-warning"
+                id="btn-enviar-opinion"
+            >
+                <i class="bi bi-send me-1"></i>
+                Enviar opinión
+            </button>
+
+        </form>
+
+    </div>
+</div>
+
+
+                        <!-- Cargando comentarios -->
+
+                        <div
+                            id="comentarios-cargando"
+                            class="text-muted"
+                        >
+                            Cargando opiniones...
+                        </div>
+
+
+                        <!-- Error de comentarios -->
+
+                        <div
+                            id="comentarios-error"
+                            class="alert alert-danger d-none"
+                            role="alert"
+                        >
+                            No se pudieron cargar las opiniones.
+                        </div>
+
+
+                        <!-- Sin comentarios -->
+
+                        <div
+                            id="comentarios-vacio"
+                            class="alert alert-light border d-none"
+                        >
+                            Este producto todavía no tiene opiniones.
+                        </div>
+
+
+                        <!-- Lista de comentarios -->
+
+                        <div
+                            id="comentarios-container"
+                            class="row g-4"
+                        >
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <div id="footer-placeholder"></div>
+
+
+
+    <!-- Bootstrap JS -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+
+    <!-- JavaScript general de CeliaConnect -->
+
+    <script src="js/app.js"></script>
+
+
+
+    <!-- JavaScript del detalle del producto -->
+
+    <script src="js/producto-detalle.js"></script>
+
+
+</body>
+
+</html>

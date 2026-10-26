@@ -2,58 +2,79 @@
 <html lang="es">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Productos Sin TACC | CeliaConnect</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
 
     <!-- Estilos propios -->
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
 
     <!-- ================= HEADER ================= -->
-
     <div id="header-placeholder"></div>
 
-    <!-- ================= MAIN ================= -->
 
+    <!-- ================= MAIN ================= -->
     <main>
 
-        <!-- ENCABEZADO DE PANTALLA -->
-
+        <!-- ================= ENCABEZADO ================= -->
         <section id="page-header">
 
             <div class="container">
 
+                <!-- Breadcrumb -->
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-3">
-                        <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Productos</li>
+                        <li class="breadcrumb-item">
+                            <a href="index.html">Inicio</a>
+                        </li>
+
+                        <li
+                            class="breadcrumb-item active"
+                            aria-current="page"
+                        >
+                            Productos
+                        </li>
                     </ol>
                 </nav>
 
-                <h1 class="fw-bold mb-2">Productos Sin TACC</h1>
+
+                <h1 class="fw-bold mb-2">
+                    Productos Sin TACC
+                </h1>
 
                 <p class="text-muted mb-4">
                     Alimentos certificados, filtrados por categoría y marca.
                 </p>
 
+
+                <!-- Buscador -->
                 <div class="search-box">
 
                     <i class="bi bi-search"></i>
 
                     <input
                         type="text"
+                        id="buscar-producto"
                         class="form-control form-control-lg"
-                        placeholder="Buscar productos o marcas...">
+                        placeholder="Buscar productos o marcas..."
+                        aria-label="Buscar productos o marcas"
+                    >
 
                 </div>
 
@@ -61,304 +82,330 @@
 
         </section>
 
-        <!-- LISTADO + FILTROS -->
 
+        <!-- ================= LISTADO + FILTROS ================= -->
         <section id="listado" class="py-5">
 
             <div class="container">
 
                 <div class="row g-4">
 
-                    <!-- FILTROS (desktop) -->
 
+                    <!-- ================= FILTROS DESKTOP ================= -->
                     <aside class="col-lg-3 d-none d-lg-block">
 
                         <div class="filters-card">
 
-                            <h6 class="filters-title">Categoría</h6>
+                            <!-- Categorías -->
+                            <h6 class="filters-title">
+                                Categoría
+                            </h6>
 
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="cat-harinas">
-                                <label class="form-check-label" for="cat-harinas">Harinas</label>
+                                <input
+                                    class="form-check-input filtro-categoria"
+                                    type="checkbox"
+                                    id="cat-harinas"
+                                    value="Harinas"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="cat-harinas"
+                                >
+                                    Harinas
+                                </label>
                             </div>
+
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="cat-panificados">
-                                <label class="form-check-label" for="cat-panificados">Panificados</label>
+                                <input
+                                    class="form-check-input filtro-categoria"
+                                    type="checkbox"
+                                    id="cat-panificados"
+                                    value="Panificados"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="cat-panificados"
+                                >
+                                    Panificados
+                                </label>
                             </div>
+
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="cat-galletitas">
-                                <label class="form-check-label" for="cat-galletitas">Galletitas</label>
+                                <input
+                                    class="form-check-input filtro-categoria"
+                                    type="checkbox"
+                                    id="cat-galletitas"
+                                    value="Galletitas"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="cat-galletitas"
+                                >
+                                    Galletitas
+                                </label>
                             </div>
+
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="cat-snacks">
-                                <label class="form-check-label" for="cat-snacks">Snacks</label>
+                                <input
+                                    class="form-check-input filtro-categoria"
+                                    type="checkbox"
+                                    id="cat-snacks"
+                                    value="Snacks"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="cat-snacks"
+                                >
+                                    Snacks
+                                </label>
                             </div>
+
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="cat-lacteos">
-                                <label class="form-check-label" for="cat-lacteos">Lácteos</label>
+                                <input
+                                    class="form-check-input filtro-categoria"
+                                    type="checkbox"
+                                    id="cat-lacteos"
+                                    value="Lácteos"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="cat-lacteos"
+                                >
+                                    Lácteos
+                                </label>
                             </div>
+
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="cat-bebidas">
-                                <label class="form-check-label" for="cat-bebidas">Bebidas</label>
+                                <input
+                                    class="form-check-input filtro-categoria"
+                                    type="checkbox"
+                                    id="cat-bebidas"
+                                    value="Bebidas"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="cat-bebidas"
+                                >
+                                    Bebidas
+                                </label>
                             </div>
+
 
                             <hr class="filters-divider">
 
-                            <h6 class="filters-title">Marca</h6>
+
+                            <!-- Marcas -->
+                            <h6 class="filters-title">
+                                Marca
+                            </h6>
 
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="marca-puravida">
-                                <label class="form-check-label" for="marca-puravida">Pura Vida</label>
+                                <input
+                                    class="form-check-input filtro-marca"
+                                    type="checkbox"
+                                    id="marca-puravida"
+                                    value="Pura Vida"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="marca-puravida"
+                                >
+                                    Pura Vida
+                                </label>
                             </div>
+
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="marca-natufoods">
-                                <label class="form-check-label" for="marca-natufoods">Natufoods</label>
+                                <input
+                                    class="form-check-input filtro-marca"
+                                    type="checkbox"
+                                    id="marca-natufoods"
+                                    value="Natufoods"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="marca-natufoods"
+                                >
+                                    Natufoods
+                                </label>
                             </div>
+
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="marca-celisabor">
-                                <label class="form-check-label" for="marca-celisabor">Celisabor</label>
+                                <input
+                                    class="form-check-input filtro-marca"
+                                    type="checkbox"
+                                    id="marca-celisabor"
+                                    value="Celisabor"
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="marca-celisabor"
+                                >
+                                    Celisabor
+                                </label>
                             </div>
+
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="marca-glutenfreeco">
-                                <label class="form-check-label" for="marca-glutenfreeco">GlutenFree Co.</label>
+                                <input
+                                    class="form-check-input filtro-marca"
+                                    type="checkbox"
+                                    id="marca-glutenfreeco"
+                                    value="GlutenFree Co."
+                                >
+                                <label
+                                    class="form-check-label"
+                                    for="marca-glutenfreeco"
+                                >
+                                    GlutenFree Co.
+                                </label>
                             </div>
+
 
                             <hr class="filters-divider">
 
+
+                            <!-- Certificación -->
                             <div class="form-check form-switch mb-4">
-                                <input class="form-check-input" type="checkbox" id="cert-sintacc" checked>
-                                <label class="form-check-label" for="cert-sintacc">Solo certificados Sin TACC</label>
+
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id="cert-sintacc"
+                                    checked
+                                >
+
+                                <label
+                                    class="form-check-label"
+                                    for="cert-sintacc"
+                                >
+                                    Solo certificados Sin TACC
+                                </label>
+
                             </div>
 
-                            <button type="button" class="btn btn-warning w-100 mb-2">Aplicar filtros</button>
-                            <button type="button" class="btn btn-link w-100 text-decoration-none">Limpiar filtros</button>
+
+                            <button
+                                type="button"
+                                id="btn-aplicar-filtros"
+                                class="btn btn-warning w-100 mb-2"
+                            >
+                                Aplicar filtros
+                            </button>
+
+                            <button
+                                type="button"
+                                id="btn-limpiar-filtros"
+                                class="btn btn-link w-100 text-decoration-none"
+                            >
+                                Limpiar filtros
+                            </button>
 
                         </div>
 
                     </aside>
 
-                    <!-- RESULTADOS -->
 
+                    <!-- ================= RESULTADOS ================= -->
                     <div class="col-lg-9">
 
+
+                        <!-- Toolbar -->
                         <div class="listado-toolbar">
 
-                            <span class="listado-count">24 productos encontrados</span>
+                            <!--
+                                Este valor se actualizará automáticamente
+                                según los productos obtenidos de la API.
+                            -->
+                            <span
+                                class="listado-count"
+                                id="productos-count"
+                            >
+                                Cargando productos...
+                            </span>
+
 
                             <div class="listado-toolbar-actions">
 
-                                <button type="button"
+                                <!-- Botón filtros mobile -->
+                                <button
+                                    type="button"
                                     class="btn btn-outline-secondary d-lg-none"
                                     data-bs-toggle="offcanvas"
-                                    data-bs-target="#filtrosOffcanvas">
+                                    data-bs-target="#filtrosOffcanvas"
+                                >
                                     <i class="bi bi-sliders"></i>
                                     Filtros
                                 </button>
 
-                                <select class="form-select listado-sort" aria-label="Ordenar por">
-                                    <option selected>Más relevantes</option>
-                                    <option>Mejor calificados</option>
-                                    <option>Nombre (A-Z)</option>
-                                    <option>Marca (A-Z)</option>
+
+                                <!-- Ordenamiento -->
+                                <select
+                                    id="orden-productos"
+                                    class="form-select listado-sort"
+                                    aria-label="Ordenar productos"
+                                >
+                                    <option value="relevantes" selected>
+                                        Más relevantes
+                                    </option>
+
+                                    <option value="calificacion">
+                                        Mejor calificados
+                                    </option>
+
+                                    <option value="nombre">
+                                        Nombre (A-Z)
+                                    </option>
+
+                                    <option value="marca">
+                                        Marca (A-Z)
+                                    </option>
                                 </select>
 
                             </div>
 
                         </div>
 
-                        <div class="row g-4">
 
-                            <!-- Producto 1 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-basket2-fill"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Harinas</span>
-                                        <h5>Harina de Arroz</h5>
-                                        <p class="product-brand">Pura Vida</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.8</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <!--
+                            ================= PRODUCTOS =================
 
-                            <!-- Producto 2 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-cup-straw"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Galletitas</span>
-                                        <h5>Galletitas Dulces</h5>
-                                        <p class="product-brand">Natufoods</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.6</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            IMPORTANTE:
+                            Ya no escribimos las tarjetas manualmente.
 
-                            <!-- Producto 3 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-egg-fried"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Panificados</span>
-                                        <h5>Pan de Molde</h5>
-                                        <p class="product-brand">Celisabor</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.9</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            JavaScript consultará:
+                            http://localhost:3000/api/productos
 
-                            <!-- Producto 4 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-cookie"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Snacks</span>
-                                        <h5>Barritas de Cereal</h5>
-                                        <p class="product-brand">GlutenFree Co.</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.7</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Producto 5 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-cup-hot-fill"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Bebidas</span>
-                                        <h5>Mezcla para Panqueques</h5>
-                                        <p class="product-brand">Pura Vida</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.5</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Producto 6 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-egg-fill"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Lácteos</span>
-                                        <h5>Yogur Natural</h5>
-                                        <p class="product-brand">Natufoods</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.4</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Producto 7 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-basket3-fill"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Harinas</span>
-                                        <h5>Premezcla para Pizza</h5>
-                                        <p class="product-brand">Celisabor</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.8</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Producto 8 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-cup-fill"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Panificados</span>
-                                        <h5>Medialunas Congeladas</h5>
-                                        <p class="product-brand">GlutenFree Co.</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.6</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Producto 9 -->
-                            <div class="col-md-6 col-xl-4">
-                                <div class="product-card">
-                                    <div class="product-image">
-                                        <i class="bi bi-cookie"></i>
-                                        <span class="product-tag">Sin TACC</span>
-                                    </div>
-                                    <div class="product-body">
-                                        <span class="product-category">Snacks</span>
-                                        <h5>Chips de Maíz</h5>
-                                        <p class="product-brand">Pura Vida</p>
-                                        <div class="product-footer">
-                                            <span class="product-rating"><i class="bi bi-star-fill"></i> 4.3</span>
-                                            <button class="product-fav" aria-label="Agregar a favoritos"><i class="bi bi-heart"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
+                            y generará las tarjetas dentro de este contenedor.
+                        -->
+                        <div
+                            class="row g-4"
+                            id="productos-container"
+                        >
+                            <!-- Productos cargados dinámicamente -->
                         </div>
 
-                        <!-- PAGINACIÓN -->
 
-                        <nav aria-label="Paginación de resultados" class="mt-5">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">
-                                        <i class="bi bi-chevron-left"></i>
-                                    </a>
-                                </li>
-                                <li class="page-item active" aria-current="page"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">
-                                        <i class="bi bi-chevron-right"></i>
-                                    </a>
-                                </li>
+                        <!-- ================= PAGINACIÓN ================= -->
+
+                        <!--
+                            Por ahora conservamos la estructura visual.
+
+                            Más adelante JavaScript generará automáticamente
+                            la cantidad de páginas según la cantidad de
+                            productos disponibles.
+                        -->
+                        <nav
+                            aria-label="Paginación de productos"
+                            class="mt-5"
+                        >
+
+                            <ul
+                                class="pagination justify-content-center"
+                                id="productos-paginacion"
+                            >
+                                <!-- Paginación generada por JavaScript -->
                             </ul>
+
                         </nav>
 
                     </div>
@@ -371,88 +418,258 @@
 
     </main>
 
-    <!-- OFFCANVAS DE FILTROS (mobile) -->
 
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="filtrosOffcanvas">
+    <!-- ================= FILTROS MOBILE ================= -->
+    <div
+        class="offcanvas offcanvas-start"
+        tabindex="-1"
+        id="filtrosOffcanvas"
+    >
 
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Filtros</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+
+            <h5 class="offcanvas-title">
+                Filtros
+            </h5>
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Cerrar"
+            ></button>
+
         </div>
+
 
         <div class="offcanvas-body">
 
-            <h6 class="filters-title">Categoría</h6>
+
+            <!-- Categorías -->
+            <h6 class="filters-title">
+                Categoría
+            </h6>
 
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-cat-harinas">
-                <label class="form-check-label" for="m-cat-harinas">Harinas</label>
+                <input
+                    class="form-check-input filtro-categoria-mobile"
+                    type="checkbox"
+                    id="m-cat-harinas"
+                    value="Harinas"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-cat-harinas"
+                >
+                    Harinas
+                </label>
             </div>
+
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-cat-panificados">
-                <label class="form-check-label" for="m-cat-panificados">Panificados</label>
+                <input
+                    class="form-check-input filtro-categoria-mobile"
+                    type="checkbox"
+                    id="m-cat-panificados"
+                    value="Panificados"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-cat-panificados"
+                >
+                    Panificados
+                </label>
             </div>
+
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-cat-galletitas">
-                <label class="form-check-label" for="m-cat-galletitas">Galletitas</label>
+                <input
+                    class="form-check-input filtro-categoria-mobile"
+                    type="checkbox"
+                    id="m-cat-galletitas"
+                    value="Galletitas"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-cat-galletitas"
+                >
+                    Galletitas
+                </label>
             </div>
+
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-cat-snacks">
-                <label class="form-check-label" for="m-cat-snacks">Snacks</label>
+                <input
+                    class="form-check-input filtro-categoria-mobile"
+                    type="checkbox"
+                    id="m-cat-snacks"
+                    value="Snacks"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-cat-snacks"
+                >
+                    Snacks
+                </label>
             </div>
+
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-cat-lacteos">
-                <label class="form-check-label" for="m-cat-lacteos">Lácteos</label>
+                <input
+                    class="form-check-input filtro-categoria-mobile"
+                    type="checkbox"
+                    id="m-cat-lacteos"
+                    value="Lácteos"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-cat-lacteos"
+                >
+                    Lácteos
+                </label>
             </div>
+
             <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="m-cat-bebidas">
-                <label class="form-check-label" for="m-cat-bebidas">Bebidas</label>
+                <input
+                    class="form-check-input filtro-categoria-mobile"
+                    type="checkbox"
+                    id="m-cat-bebidas"
+                    value="Bebidas"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-cat-bebidas"
+                >
+                    Bebidas
+                </label>
             </div>
+
 
             <hr class="filters-divider">
 
-            <h6 class="filters-title">Marca</h6>
+
+            <!-- Marcas -->
+            <h6 class="filters-title">
+                Marca
+            </h6>
 
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-marca-puravida">
-                <label class="form-check-label" for="m-marca-puravida">Pura Vida</label>
+                <input
+                    class="form-check-input filtro-marca-mobile"
+                    type="checkbox"
+                    id="m-marca-puravida"
+                    value="Pura Vida"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-marca-puravida"
+                >
+                    Pura Vida
+                </label>
             </div>
+
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-marca-natufoods">
-                <label class="form-check-label" for="m-marca-natufoods">Natufoods</label>
+                <input
+                    class="form-check-input filtro-marca-mobile"
+                    type="checkbox"
+                    id="m-marca-natufoods"
+                    value="Natufoods"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-marca-natufoods"
+                >
+                    Natufoods
+                </label>
             </div>
+
             <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="m-marca-celisabor">
-                <label class="form-check-label" for="m-marca-celisabor">Celisabor</label>
+                <input
+                    class="form-check-input filtro-marca-mobile"
+                    type="checkbox"
+                    id="m-marca-celisabor"
+                    value="Celisabor"
+                >
+                <label
+                    class="form-check-label"
+                    for="m-marca-celisabor"
+                >
+                    Celisabor
+                </label>
             </div>
+
             <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="m-marca-glutenfreeco">
-                <label class="form-check-label" for="m-marca-glutenfreeco">GlutenFree Co.</label>
+                <input
+                    class="form-check-input filtro-marca-mobile"
+                    type="checkbox"
+                    id="m-marca-glutenfreeco"
+                    value="GlutenFree Co."
+                >
+                <label
+                    class="form-check-label"
+                    for="m-marca-glutenfreeco"
+                >
+                    GlutenFree Co.
+                </label>
             </div>
+
 
             <hr class="filters-divider">
 
+
+            <!-- Certificación -->
             <div class="form-check form-switch mb-4">
-                <input class="form-check-input" type="checkbox" id="m-cert-sintacc" checked>
-                <label class="form-check-label" for="m-cert-sintacc">Solo certificados Sin TACC</label>
+
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="m-cert-sintacc"
+                    checked
+                >
+
+                <label
+                    class="form-check-label"
+                    for="m-cert-sintacc"
+                >
+                    Solo certificados Sin TACC
+                </label>
+
             </div>
 
-            <button type="button" class="btn btn-warning w-100 mb-2" data-bs-dismiss="offcanvas">Aplicar filtros</button>
-            <button type="button" class="btn btn-link w-100 text-decoration-none">Limpiar filtros</button>
+
+            <button
+                type="button"
+                id="btn-aplicar-filtros-mobile"
+                class="btn btn-warning w-100 mb-2"
+                data-bs-dismiss="offcanvas"
+            >
+                Aplicar filtros
+            </button>
+
+            <button
+                type="button"
+                id="btn-limpiar-filtros-mobile"
+                class="btn btn-link w-100 text-decoration-none"
+            >
+                Limpiar filtros
+            </button>
 
         </div>
 
     </div>
 
-    <!-- ================= FOOTER ================= -->
 
+    <!-- ================= FOOTER ================= -->
     <div id="footer-placeholder"></div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- JavaScript propio -->
+    <!-- Bootstrap JS -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+    <!-- JavaScript general de CeliaConnect -->
     <script src="js/app.js"></script>
+
+    <!-- JavaScript exclusivo de Productos -->
+    <script src="js/productos.js"></script>
 
 </body>
 

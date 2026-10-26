@@ -1751,8 +1751,11 @@ footer{
 
 }
 
-.input-icon-field i,
-.password-field i{
+
+/* Icono de correo y candado */
+
+.input-icon-field > i,
+.password-field > i{
 
     position:absolute;
 
@@ -1770,6 +1773,7 @@ footer{
 
 }
 
+
 .input-icon-field input,
 .password-field input{
 
@@ -1777,11 +1781,15 @@ footer{
 
 }
 
+
 .password-field input{
 
-    padding-right:46px;
+    padding-right:50px;
 
 }
+
+
+/* Botón del ojo */
 
 .password-toggle{
 
@@ -1805,7 +1813,27 @@ footer{
 
     line-height:1;
 
+    cursor:pointer;
+
 }
+
+
+/* Evita que el ojo tome la posición del candado */
+
+.password-toggle i{
+
+    position:static;
+
+    transform:none;
+
+    color:inherit;
+
+    font-size:1.05rem;
+
+    pointer-events:none;
+
+}
+
 
 .password-toggle:hover{
 
@@ -2160,4 +2188,30 @@ footer{
 
     }
 
+}
+/* ==========================================
+   TARJETAS DE PRODUCTOS CLICKEABLES
+========================================== */
+
+.product-card {
+    cursor: pointer;
+}
+
+.product-card:focus {
+    outline: 2px solid #ffc107;
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   CERTIFICACIÓN - DETALLE DE PRODUCTO
+========================================== */
+
+.producto-certificacion {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background-color: green;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
