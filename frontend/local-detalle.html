@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Detalle del local | CeliaConnect</title>
+
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+
+    <!-- Estilos propios -->
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= HEADER ================= -->
+
+    <div id="header-placeholder"></div>
+
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+
+        <!-- ================= ENCABEZADO ================= -->
+
+        <section id="page-header">
+
+            <div class="container">
+
+
+                <!-- Breadcrumb -->
+
+                <nav aria-label="breadcrumb">
+
+                    <ol class="breadcrumb mb-3">
+
+                        <li class="breadcrumb-item">
+
+                            <a href="index.html">
+                                Inicio
+                            </a>
+
+                        </li>
+
+
+                        <li class="breadcrumb-item">
+
+                            <a href="locales.html">
+                                Locales
+                            </a>
+
+                        </li>
+
+
+                        <li
+                            class="breadcrumb-item active"
+                            aria-current="page"
+                            id="breadcrumb-local"
+                        >
+                            Detalle
+                        </li>
+
+                    </ol>
+
+                </nav>
+
+
+                <h1 class="fw-bold mb-2">
+                    Detalle del local
+                </h1>
+
+
+                <p class="text-muted mb-0">
+                    Información, ubicación y opiniones del local.
+                </p>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= DETALLE ================= -->
+
+        <section class="py-5">
+
+            <div class="container">
+
+
+                <!-- Mensaje de carga -->
+
+                <div
+                    id="local-cargando"
+                    class="text-center py-5"
+                >
+
+                    <div
+                        class="spinner-border text-warning"
+                        role="status"
+                    >
+
+                        <span class="visually-hidden">
+                            Cargando...
+                        </span>
+
+                    </div>
+
+
+                    <p class="text-muted mt-3">
+                        Cargando local...
+                    </p>
+
+                </div>
+
+
+
+                <!-- Mensaje de error -->
+
+                <div
+                    id="local-error"
+                    class="alert alert-danger d-none"
+                    role="alert"
+                >
+                    No se pudo cargar el local.
+                </div>
+
+
+
+                <!-- Contenido -->
+
+                <div
+                    id="local-detalle"
+                    class="d-none"
+                >
+
+
+                    <div class="row g-5">
+
+
+                        <!-- ================= IMAGEN ================= -->
+
+                        <div class="col-lg-5">
+
+                            <div
+                                id="local-imagen"
+                                class="product-image d-flex align-items-center justify-content-center overflow-hidden"
+                                style="min-height: 350px;"
+                            >
+
+                                <i
+                                    class="bi bi-shop"
+                                    style="font-size: 6rem;"
+                                ></i>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- ================= INFORMACIÓN ================= -->
+
+                        <div class="col-lg-7">
+
+
+                            <!-- Tipo -->
+
+                            <span
+                                class="badge text-bg-success text-white"
+                                id="local-tipo"
+                            >
+                            </span>
+
+
+
+                            <!-- Nombre -->
+
+                            <h2
+                                class="fw-bold mt-2 mb-2"
+                                id="local-nombre"
+                            >
+                            </h2>
+
+
+
+                            <!-- Calificación -->
+
+                            <div
+                                class="mb-4"
+                                id="local-calificacion"
+                            >
+                            </div>
+
+
+
+                            <!-- Descripción -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Descripción
+                                </h5>
+
+                                <p
+                                    class="text-muted"
+                                    id="local-descripcion"
+                                >
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Dirección -->
+
+                            <div class="mb-3">
+
+                                <h5>
+                                    Ubicación
+                                </h5>
+
+                                <p class="text-muted mb-1">
+
+                                    <i class="bi bi-geo-alt me-1"></i>
+
+                                    <span id="local-direccion"></span>
+
+                                </p>
+
+                                <p
+                                    class="text-muted"
+                                    id="local-barrio"
+                                >
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Horario -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Horarios
+                                </h5>
+
+                                <p class="text-muted">
+
+                                    <i class="bi bi-clock me-1"></i>
+
+                                    <span id="local-horario"></span>
+
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Contacto -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Contacto
+                                </h5>
+
+
+                                <p
+                                    class="mb-2"
+                                    id="local-telefono-container"
+                                >
+
+                                    <i class="bi bi-telephone me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="local-telefono"
+                                        class="text-decoration-none"
+                                    >
+                                    </a>
+
+                                </p>
+
+
+                                <p
+                                    class="mb-2"
+                                    id="local-email-container"
+                                >
+
+                                    <i class="bi bi-envelope me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="local-email"
+                                        class="text-decoration-none"
+                                    >
+                                    </a>
+
+                                </p>
+
+
+                                <p
+                                    class="mb-2"
+                                    id="local-web-container"
+                                >
+
+                                    <i class="bi bi-globe me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="local-web"
+                                        class="text-decoration-none"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Sitio web
+                                    </a>
+
+                                </p>
+
+
+                                <p
+                                    class="mb-0"
+                                    id="local-instagram-container"
+                                >
+
+                                    <i class="bi bi-instagram me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="local-instagram"
+                                        class="text-decoration-none"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                    </a>
+
+                                </p>
+
+                            </div>
+
+
+
+                            <!-- Volver -->
+
+                            <a
+                                href="locales.html"
+                                class="btn btn-outline-secondary"
+                            >
+
+                                <i class="bi bi-arrow-left"></i>
+
+                                Volver a locales
+
+                            </a>
+
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ================= MAPA ================= -->
+
+                    <div class="mt-5 pt-4 border-top">
+
+                        <div class="mb-4">
+
+                            <h3 class="fw-bold mb-2">
+                                Ubicación
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Consultá la ubicación del local y cómo llegar.
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            id="local-mapa-container"
+                            class="d-none"
+                        >
+
+                            <div
+                                class="ratio ratio-21x9 rounded overflow-hidden border mb-3"
+                            >
+
+                                <iframe
+                                    id="local-mapa"
+                                    title="Ubicación del local"
+                                    loading="lazy"
+                                    allowfullscreen
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                ></iframe>
+
+                            </div>
+
+
+                            <a
+                                href="#"
+                                id="local-como-llegar"
+                                class="btn btn-warning"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+
+                                <i class="bi bi-geo-alt-fill me-1"></i>
+
+                                Cómo llegar
+
+                            </a>
+
+                        </div>
+
+
+                        <div
+                            id="local-mapa-vacio"
+                            class="alert alert-light border d-none"
+                        >
+                            La ubicación en el mapa no está disponible.
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ================= OPINIONES ================= -->
+
+                    <div class="mt-5 pt-4 border-top">
+
+                        <div class="mb-4">
+
+                            <h3 class="fw-bold mb-2">
+                                Opiniones de la comunidad
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Experiencias compartidas por otros usuarios.
+                            </p>
+
+                        </div>
+
+
+                        <!-- ================= DEJAR OPINIÓN ================= -->
+
+                        <div
+                            id="opinion-formulario-container"
+                            class="card border-0 shadow-sm mb-5"
+                        >
+
+                            <div class="card-body p-4">
+
+                                <h4 class="fw-bold mb-2">
+                                    Dejá tu opinión
+                                </h4>
+
+                                <p class="text-muted mb-4">
+                                    Compartí tu experiencia con este local.
+                                </p>
+
+
+                                <!-- Mensaje -->
+
+                                <div
+                                    id="opinion-mensaje"
+                                    class="alert d-none"
+                                    role="alert"
+                                >
+                                </div>
+
+
+                                <!-- Formulario -->
+
+                                <form id="opinion-formulario">
+
+
+                                    <!-- Calificación -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="opinion-calificacion"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Calificación
+                                        </label>
+
+                                        <select
+                                            class="form-select"
+                                            id="opinion-calificacion"
+                                            required
+                                        >
+
+                                            <option value="">
+                                                Seleccioná una calificación
+                                            </option>
+
+                                            <option value="5">
+                                                ★★★★★ - Excelente
+                                            </option>
+
+                                            <option value="4">
+                                                ★★★★☆ - Muy bueno
+                                            </option>
+
+                                            <option value="3">
+                                                ★★★☆☆ - Bueno
+                                            </option>
+
+                                            <option value="2">
+                                                ★★☆☆☆ - Regular
+                                            </option>
+
+                                            <option value="1">
+                                                ★☆☆☆☆ - Malo
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <!-- Título -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="opinion-titulo"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Título
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="opinion-titulo"
+                                            maxlength="150"
+                                            placeholder="Ej: Excelente atención"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- Comentario -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="opinion-comentario"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Comentario
+                                        </label>
+
+                                        <textarea
+                                            class="form-control"
+                                            id="opinion-comentario"
+                                            rows="4"
+                                            placeholder="Contanos tu experiencia..."
+                                            required
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <!-- Botón -->
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-warning"
+                                        id="btn-enviar-opinion"
+                                    >
+
+                                        <i class="bi bi-send me-1"></i>
+
+                                        Enviar opinión
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Cargando comentarios -->
+
+                        <div
+                            id="comentarios-cargando"
+                            class="text-muted d-none"
+                        >
+                            Cargando opiniones...
+                        </div>
+
+
+                        <!-- Error -->
+
+                        <div
+                            id="comentarios-error"
+                            class="alert alert-danger d-none"
+                            role="alert"
+                        >
+                            No se pudieron cargar las opiniones.
+                        </div>
+
+
+                        <!-- Sin comentarios -->
+
+                        <div
+                            id="comentarios-vacio"
+                            class="alert alert-light border"
+                        >
+                            Este local todavía no tiene opiniones.
+                        </div>
+
+
+                        <!-- Lista -->
+
+                        <div
+                            id="comentarios-container"
+                            class="row g-4"
+                        >
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <div id="footer-placeholder"></div>
+
+
+
+    <!-- Bootstrap JS -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+
+    <!-- JavaScript general -->
+
+    <script src="js/app.js"></script>
+
+
+
+    <!-- JavaScript del detalle del local -->
+
+    <script src="js/local-detalle.js"></script>
+
+
+</body>
+
+</html>

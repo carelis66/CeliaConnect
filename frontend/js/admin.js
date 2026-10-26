@@ -1,14 +1,23 @@
 /* =====================================================
    CELIACONNECT - ADMIN.JS
-   Lógica del panel de administración.
-   Requiere cargar ../js/app.js ANTES.
+  panel de administración.
 ===================================================== */
 
-const API_ADMIN_COMENTARIOS =
+const API_ADMIN_PRODUCTOS =
     'http://localhost:3000/api/admin/comentarios/productos';
+
+const API_ADMIN_RESTAURANTES =
+    'http://localhost:3000/api/admin/comentarios/restaurantes';
+
+const API_ADMIN_LOCALES =
+    'http://localhost:3000/api/admin/comentarios/locales';
+
+const API_ADMIN_NUTRICIONISTAS =
+'http://localhost:3000/api/admin/comentarios/nutricionistas';
 
 let comentarioSeleccionado = null;
 let estadoSeleccionado = null;
+let tipoComentarioSeleccionado = null;
 
 
 // ==========================================
@@ -18,12 +27,8 @@ let estadoSeleccionado = null;
 function obtenerTokenAdmin() {
 
     return (
-        sessionStorage.getItem(
-            'celiaToken'
-        ) ||
-        localStorage.getItem(
-            'celiaToken'
-        )
+        sessionStorage.getItem('celiaToken') ||
+        localStorage.getItem('celiaToken')
     );
 }
 
@@ -35,22 +40,18 @@ function obtenerTokenAdmin() {
 function obtenerUsuarioAdmin() {
 
     const usuarioGuardado =
-        sessionStorage.getItem(
-            'celiaUsuario'
-        ) ||
-        localStorage.getItem(
-            'celiaUsuario'
-        );
+        sessionStorage.getItem('celiaUsuario') ||
+        localStorage.getItem('celiaUsuario');
+
 
     if (!usuarioGuardado) {
         return null;
     }
 
+
     try {
 
-        return JSON.parse(
-            usuarioGuardado
-        );
+        return JSON.parse(usuarioGuardado);
 
     } catch (error) {
 
@@ -66,21 +67,11 @@ function obtenerUsuarioAdmin() {
 
 function limpiarSesionAdmin() {
 
-    sessionStorage.removeItem(
-        'celiaToken'
-    );
+    sessionStorage.removeItem('celiaToken');
+    sessionStorage.removeItem('celiaUsuario');
 
-    sessionStorage.removeItem(
-        'celiaUsuario'
-    );
-
-    localStorage.removeItem(
-        'celiaToken'
-    );
-
-    localStorage.removeItem(
-        'celiaUsuario'
-    );
+    localStorage.removeItem('celiaToken');
+    localStorage.removeItem('celiaUsuario');
 }
 
 
@@ -96,10 +87,8 @@ function verificarAccesoAdmin() {
     const usuario =
         obtenerUsuarioAdmin();
 
-    // --------------------------------------
-    // NO HAY SESIÓN
-    // --------------------------------------
 
+    // NO HAY SESIÓN
     if (
         !token ||
         !usuario
@@ -115,10 +104,7 @@ function verificarAccesoAdmin() {
     }
 
 
-    // --------------------------------------
-    // HAY SESIÓN PERO NO ES ADMIN
-    // --------------------------------------
-
+    // NO ES ADMIN
     if (
         Number(usuario.rolId) !== 1
     ) {
@@ -143,10 +129,6 @@ document.addEventListener(
     'DOMContentLoaded',
     () => {
 
-        // Primero validamos el acceso.
-        // Si no corresponde, no cargamos
-        // ninguna parte del panel.
-
         if (!verificarAccesoAdmin()) {
             return;
         }
@@ -154,22 +136,20 @@ document.addEventListener(
 
         cargarComponente(
             '#admin-sidebar-placeholder',
-    '../components/admin-sidebar.html',
-    () => {
+            '../components/admin-sidebar.html',
+            () => {
 
-        marcarLinkActivoAdmin();
+                marcarLinkActivoAdmin();
 
-        inicializarCerrarSesionAdmin();
+                inicializarCerrarSesionAdmin();
 
-    }
+            }
         );
 
 
         inicializarMenuMobileAdmin();
 
-
         inicializarModalModeracion();
-
 
         cargarComentariosPendientes();
 
@@ -300,6 +280,7 @@ function inicializarMenuMobileAdmin() {
     );
 }
 
+
 // ==========================================
 // CERRAR SESIÓN ADMIN
 // ==========================================
@@ -311,9 +292,11 @@ function inicializarCerrarSesionAdmin() {
             'adminCerrarSesion'
         );
 
+
     if (!botonCerrarSesion) {
         return;
     }
+
 
     botonCerrarSesion.addEventListener(
         'click',
@@ -330,6 +313,7 @@ function inicializarCerrarSesionAdmin() {
         }
     );
 }
+
 
 // ==========================================
 // GENERAR INICIALES
@@ -359,7 +343,73 @@ function generarIniciales(
 
 
 // ==========================================
+// PETICIÓN ADMIN
+// ==========================================
+
+async function obtenerComentariosAPI(
+    url,
+    token
+) {
+
+    const respuesta =
+        await fetch(
+            url,
+            {
+                headers: {
+                    Authorization:
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+
+    // SESIÓN VENCIDA
+    if (
+        respuesta.status === 401
+    ) {
+
+        limpiarSesionAdmin();
+
+        window.location.replace(
+            '../login.html'
+        );
+
+        throw new Error(
+            'Sesión vencida'
+        );
+    }
+
+
+    // SIN PERMISOS
+    if (
+        respuesta.status === 403
+    ) {
+
+        window.location.replace(
+            '../index.html'
+        );
+
+        throw new Error(
+            'Sin permisos'
+        );
+    }
+
+
+    if (!respuesta.ok) {
+
+        throw new Error(
+            'No se pudieron obtener los comentarios'
+        );
+    }
+
+
+    return await respuesta.json();
+}
+
+
+// ==========================================
 // CARGAR COMENTARIOS PENDIENTES
+// PRODUCTOS + RESTAURANTES
 // ==========================================
 
 async function cargarComentariosPendientes() {
@@ -391,65 +441,96 @@ async function cargarComentariosPendientes() {
     }
 
 
+    contenedor.innerHTML = `
+        <div class="p-4 text-muted">
+            Cargando comentarios pendientes...
+        </div>
+    `;
+
+
     try {
 
-        const respuesta =
-            await fetch(
-                API_ADMIN_COMENTARIOS,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
+        const [
+    comentariosProductos,
+    comentariosRestaurantes,
+    comentariosLocales,
+    comentariosNutricionistas
+] = await Promise.all([
+
+    obtenerComentariosAPI(
+        API_ADMIN_PRODUCTOS,
+        token
+    ),
+
+    obtenerComentariosAPI(
+        API_ADMIN_RESTAURANTES,
+        token
+    ),
+
+    obtenerComentariosAPI(
+        API_ADMIN_LOCALES,
+        token
+    ),
+
+    obtenerComentariosAPI(
+        API_ADMIN_NUTRICIONISTAS,
+        token
+    )
+
+]);
+
+
+        // AGREGAMOS EL TIPO A CADA COMENTARIO
+
+        const productos =
+            comentariosProductos.map(
+                comentario => ({
+                    ...comentario,
+                    tipoComentario: 'producto'
+                })
             );
 
 
-        // ==================================
-        // SESIÓN INVÁLIDA O VENCIDA
-        // ==================================
-
-        if (
-            respuesta.status === 401
-        ) {
-
-            limpiarSesionAdmin();
-
-            window.location.replace(
-                '../login.html'
+        const restaurantes =
+            comentariosRestaurantes.map(
+                comentario => ({
+                    ...comentario,
+                    tipoComentario: 'restaurante'
+                })
             );
 
-            return;
-        }
+        const locales =
+    comentariosLocales.map(
+        comentario => ({
+            ...comentario,
+            tipoComentario: 'local'
+        })
+    );
+
+    const nutricionistas =
+    comentariosNutricionistas.map(
+        comentario => ({
+            ...comentario,
+            tipoComentario: 'nutricionista'
+        })
+    );
 
 
-        // ==================================
-        // USUARIO SIN PERMISO ADMIN
-        // ==================================
-
-        if (
-            respuesta.status === 403
-        ) {
-
-            window.location.replace(
-                '../index.html'
-            );
-
-            return;
-        }
+        const comentarios = [
+            ...productos,
+            ...restaurantes,
+            ...locales,
+            ...nutricionistas
+        ];
 
 
-        if (!respuesta.ok) {
+        // ORDENAR POR FECHA MÁS RECIENTE
 
-            throw new Error(
-                'No se pudieron obtener los comentarios'
-            );
-
-        }
-
-
-        const comentarios =
-            await respuesta.json();
+        comentarios.sort(
+            (a, b) =>
+                new Date(b.fechaComentario) -
+                new Date(a.fechaComentario)
+        );
 
 
         contenedor.innerHTML = '';
@@ -506,10 +587,67 @@ async function cargarComentariosPendientes() {
                     `${comentario.usuarioNombre} ${comentario.usuarioApellido}`;
 
 
-                const producto =
-                    comentario.marca
-                        ? `${comentario.productoNombre} · ${comentario.marca}`
-                        : comentario.productoNombre;
+                let destino = '';
+                let etiquetaTipo = '';
+
+
+                // PRODUCTO
+                if (
+                    comentario.tipoComentario ===
+                    'producto'
+                ) {
+
+                    destino =
+                        comentario.marca
+                            ? `${comentario.productoNombre} · ${comentario.marca}`
+                            : comentario.productoNombre;
+
+                    etiquetaTipo =
+                        'Producto';
+
+                }
+
+
+                // RESTAURANTE
+                if (
+                    comentario.tipoComentario ===
+                    'restaurante'
+                ) {
+
+                    destino =
+                        comentario.restauranteNombre;
+
+                    etiquetaTipo =
+                        'Restaurante';
+                // LOCAL
+if (
+    comentario.tipoComentario ===
+    'local'
+) {
+
+    destino =
+        comentario.localNombre;
+
+    etiquetaTipo =
+        'Local';
+
+}
+
+// NUTRICIONISTA
+if (
+    comentario.tipoComentario ===
+    'nutricionista'
+) {
+
+    destino =
+        comentario.nutricionistaNombre;
+
+    etiquetaTipo =
+        'Nutricionista';
+
+}
+
+                }
 
 
                 item.innerHTML = `
@@ -528,7 +666,7 @@ async function cargarComentariosPendientes() {
                             </strong>
 
                             <span>
-                                en ${producto}
+                                ${etiquetaTipo}: ${destino}
                             </span>
 
                         </div>
@@ -545,6 +683,17 @@ async function cargarComentariosPendientes() {
                     </div>
 
 
+                    ${
+                        comentario.titulo
+                            ? `
+                                <strong class="d-block mb-1">
+                                    ${comentario.titulo}
+                                </strong>
+                            `
+                            : ''
+                    }
+
+
                     <p class="mod-text">
                         ${comentario.comentario}
                     </p>
@@ -557,6 +706,7 @@ async function cargarComentariosPendientes() {
                             class="mod-btn"
                             data-comentario-id="${comentario.id}"
                             data-estado="aprobado"
+                            data-tipo="${comentario.tipoComentario}"
                         >
 
                             <i class="bi bi-check-lg"></i>
@@ -571,6 +721,7 @@ async function cargarComentariosPendientes() {
                             class="mod-btn reject"
                             data-comentario-id="${comentario.id}"
                             data-estado="rechazado"
+                            data-tipo="${comentario.tipoComentario}"
                         >
 
                             <i class="bi bi-x-lg"></i>
@@ -600,7 +751,8 @@ async function cargarComentariosPendientes() {
                                     Number(
                                         boton.dataset.comentarioId
                                     ),
-                                    boton.dataset.estado
+                                    boton.dataset.estado,
+                                    boton.dataset.tipo
                                 );
 
                             }
@@ -644,11 +796,11 @@ function actualizarContadorComentarios(
     cantidad
 ) {
 
-    // Contador del panel "Por moderar"
     const contadorPanel =
         document.querySelector(
             '.admin-panel-title .admin-count'
         );
+
 
     if (contadorPanel) {
 
@@ -658,11 +810,11 @@ function actualizarContadorComentarios(
     }
 
 
-    // Contador del menú lateral
     const contadorSidebar =
         document.getElementById(
             'adminComentariosCount'
         );
+
 
     if (contadorSidebar) {
 
@@ -703,7 +855,8 @@ function inicializarModalModeracion() {
 
 function abrirModalModeracion(
     comentarioId,
-    estado
+    estado,
+    tipo
 ) {
 
     comentarioSeleccionado =
@@ -711,6 +864,9 @@ function abrirModalModeracion(
 
     estadoSeleccionado =
         estado;
+
+    tipoComentarioSeleccionado =
+        tipo;
 
 
     const titulo =
@@ -797,7 +953,8 @@ async function confirmarModeracion() {
 
     if (
         !comentarioSeleccionado ||
-        !estadoSeleccionado
+        !estadoSeleccionado ||
+        !tipoComentarioSeleccionado
     ) {
         return;
     }
@@ -824,6 +981,48 @@ async function confirmarModeracion() {
     }
 
 
+
+   let apiModeracion = '';
+
+if (
+    tipoComentarioSeleccionado ===
+    'producto'
+) {
+
+    apiModeracion =
+        API_ADMIN_PRODUCTOS;
+
+} else if (
+    tipoComentarioSeleccionado ===
+    'restaurante'
+) {
+
+    apiModeracion =
+        API_ADMIN_RESTAURANTES;
+
+} else if (
+    tipoComentarioSeleccionado ===
+    'local'
+) {
+
+    apiModeracion =
+        API_ADMIN_LOCALES;
+
+} else if (
+    tipoComentarioSeleccionado ===
+    'nutricionista'
+) {
+
+    apiModeracion =
+        API_ADMIN_NUTRICIONISTAS;
+
+} else {
+
+    return;
+
+}
+
+
     boton.disabled = true;
 
     boton.innerHTML = `
@@ -839,7 +1038,7 @@ async function confirmarModeracion() {
 
         const respuesta =
             await fetch(
-                `${API_ADMIN_COMENTARIOS}/${comentarioSeleccionado}`,
+                `${apiModeracion}/${comentarioSeleccionado}`,
                 {
                     method: 'PATCH',
 
@@ -865,10 +1064,7 @@ async function confirmarModeracion() {
             await respuesta.json();
 
 
-        // ==================================
         // SESIÓN VENCIDA
-        // ==================================
-
         if (
             respuesta.status === 401
         ) {
@@ -883,10 +1079,7 @@ async function confirmarModeracion() {
         }
 
 
-        // ==================================
         // SIN PERMISOS
-        // ==================================
-
         if (
             respuesta.status === 403
         ) {
@@ -943,7 +1136,7 @@ async function confirmarModeracion() {
 
 
         // ==================================
-        // RECARGAR PENDIENTES
+        // RECARGAR PRODUCTOS + RESTAURANTES
         // ==================================
 
         await cargarComentariosPendientes();
@@ -951,6 +1144,7 @@ async function confirmarModeracion() {
 
         comentarioSeleccionado = null;
         estadoSeleccionado = null;
+        tipoComentarioSeleccionado = null;
 
 
     } catch (error) {

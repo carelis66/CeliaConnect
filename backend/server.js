@@ -591,6 +591,471 @@ app.patch(
 );
 
 // ==========================================
+// ADMIN - OBTENER COMENTARIOS PENDIENTES
+// DE RESTAURANTES
+// ==========================================
+
+app.get(
+    '/api/admin/comentarios/restaurantes',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [comentarios] =
+                await pool.query(`
+                    SELECT
+                        cr.id,
+                        cr.titulo,
+                        cr.comentario,
+                        cr.calificacion,
+                        cr.fechaComentario,
+                        cr.estado,
+
+                        u.id AS usuarioId,
+                        u.nombre AS usuarioNombre,
+                        u.apellido AS usuarioApellido,
+
+                        r.id AS restauranteId,
+                        r.nombre AS restauranteNombre
+
+                    FROM comentarioRestaurante cr
+
+                    INNER JOIN usuario u
+                        ON cr.usuarioId = u.id
+
+                    INNER JOIN restaurante r
+                        ON cr.restauranteId = r.id
+
+                    WHERE cr.estado = 'pendiente'
+
+                    ORDER BY cr.fechaComentario DESC
+                `);
+
+
+            res.json(comentarios);
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener comentarios pendientes de restaurantes:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener los comentarios pendientes de restaurantes'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - MODERAR COMENTARIO DE RESTAURANTE
+// ==========================================
+
+app.patch(
+    '/api/admin/comentarios/restaurantes/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const comentarioId =
+                Number(req.params.id);
+
+            const { estado } =
+                req.body;
+
+
+            // VALIDAR ID
+            if (
+                !Number.isInteger(comentarioId) ||
+                comentarioId <= 0
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'ID de comentario inválido'
+                });
+
+            }
+
+
+            // VALIDAR ESTADO
+            if (
+                estado !== 'aprobado' &&
+                estado !== 'rechazado'
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'Estado de moderación inválido'
+                });
+
+            }
+
+
+            // BUSCAR COMENTARIO
+            const [comentarios] =
+                await pool.query(`
+                    SELECT
+                        id,
+                        estado,
+                        restauranteId
+                    FROM comentarioRestaurante
+                    WHERE id = ?
+                    LIMIT 1
+                `, [comentarioId]);
+
+
+            if (comentarios.length === 0) {
+
+                return res.status(404).json({
+                    mensaje:
+                        'Comentario no encontrado'
+                });
+
+            }
+
+
+            // SOLO MODERAR PENDIENTES
+            if (
+                comentarios[0].estado !==
+                'pendiente'
+            ) {
+
+                return res.status(409).json({
+                    mensaje:
+                        'El comentario ya fue moderado'
+                });
+
+            }
+
+
+            const restauranteId =
+                comentarios[0].restauranteId;
+
+
+            // ACTUALIZAR ESTADO
+            await pool.query(`
+                UPDATE comentarioRestaurante
+                SET estado = ?
+                WHERE id = ?
+            `, [
+                estado,
+                comentarioId
+            ]);
+
+
+            // RECALCULAR PROMEDIO Y CANTIDAD
+            // SOLO CON COMENTARIOS APROBADOS
+            const [resumen] =
+                await pool.query(`
+                    SELECT
+                        COALESCE(
+                            AVG(calificacion),
+                            0
+                        ) AS promedio,
+                        COUNT(*) AS cantidad
+                    FROM comentarioRestaurante
+                    WHERE restauranteId = ?
+                        AND estado = 'aprobado'
+                `, [restauranteId]);
+
+
+            await pool.query(`
+                UPDATE restaurante
+                SET
+                    calificacionPromedio = ?,
+                    cantidadResenas = ?
+                WHERE id = ?
+            `, [
+                Number(resumen[0].promedio),
+                Number(resumen[0].cantidad),
+                restauranteId
+            ]);
+
+
+            res.json({
+                mensaje:
+                    estado === 'aprobado'
+                        ? 'Comentario aprobado correctamente'
+                        : 'Comentario rechazado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al moderar comentario de restaurante:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al moderar el comentario'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - OBTENER COMENTARIOS PENDIENTES
+// DE LOCALES
+// ==========================================
+
+app.get(
+    '/api/admin/comentarios/locales',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [comentarios] =
+                await pool.query(`
+                    SELECT
+                        cl.id,
+                        cl.titulo,
+                        cl.comentario,
+                        cl.calificacion,
+                        cl.fechaComentario,
+                        cl.estado,
+
+                        u.id AS usuarioId,
+                        u.nombre AS usuarioNombre,
+                        u.apellido AS usuarioApellido,
+
+                        l.id AS localId,
+                        l.nombre AS localNombre
+
+                    FROM comentarioLocal cl
+
+                    INNER JOIN usuario u
+                        ON cl.usuarioId = u.id
+
+                    INNER JOIN local l
+                        ON cl.localId = l.id
+
+                    WHERE cl.estado = 'pendiente'
+
+                    ORDER BY cl.fechaComentario DESC
+                `);
+
+
+            res.json(comentarios);
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener comentarios pendientes de locales:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener los comentarios pendientes de locales'
+            });
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// ADMIN - MODERAR COMENTARIO DE LOCAL
+// ==========================================
+
+app.patch(
+    '/api/admin/comentarios/locales/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const comentarioId =
+                Number(req.params.id);
+
+            const { estado } =
+                req.body;
+
+
+            // ==================================
+            // VALIDAR ID
+            // ==================================
+
+            if (
+                !Number.isInteger(comentarioId) ||
+                comentarioId <= 0
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'ID de comentario inválido'
+                });
+
+            }
+
+
+            // ==================================
+            // VALIDAR ESTADO
+            // ==================================
+
+            if (
+                estado !== 'aprobado' &&
+                estado !== 'rechazado'
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'Estado de moderación inválido'
+                });
+
+            }
+
+
+            // ==================================
+            // BUSCAR COMENTARIO
+            // ==================================
+
+            const [comentarios] =
+                await pool.query(`
+                    SELECT
+                        id,
+                        estado,
+                        localId
+                    FROM comentarioLocal
+                    WHERE id = ?
+                    LIMIT 1
+                `, [comentarioId]);
+
+
+            if (comentarios.length === 0) {
+
+                return res.status(404).json({
+                    mensaje:
+                        'Comentario no encontrado'
+                });
+
+            }
+
+
+            // ==================================
+            // SOLO MODERAR PENDIENTES
+            // ==================================
+
+            if (
+                comentarios[0].estado !==
+                'pendiente'
+            ) {
+
+                return res.status(409).json({
+                    mensaje:
+                        'El comentario ya fue moderado'
+                });
+
+            }
+
+
+            const localId =
+                comentarios[0].localId;
+
+
+            // ==================================
+            // ACTUALIZAR ESTADO
+            // ==================================
+
+            await pool.query(`
+                UPDATE comentarioLocal
+                SET estado = ?
+                WHERE id = ?
+            `, [
+                estado,
+                comentarioId
+            ]);
+
+
+            // ==================================
+            // RECALCULAR PROMEDIO Y CANTIDAD
+            // SOLO CON COMENTARIOS APROBADOS
+            // ==================================
+
+            const [resumen] =
+                await pool.query(`
+                    SELECT
+                        COALESCE(
+                            AVG(calificacion),
+                            0
+                        ) AS promedio,
+                        COUNT(*) AS cantidad
+                    FROM comentarioLocal
+                    WHERE localId = ?
+                        AND estado = 'aprobado'
+                `, [localId]);
+
+
+            // ==================================
+            // ACTUALIZAR LOCAL
+            // ==================================
+
+            await pool.query(`
+                UPDATE local
+                SET
+                    calificacionPromedio = ?,
+                    cantidadResenas = ?
+                WHERE id = ?
+            `, [
+                Number(resumen[0].promedio),
+                Number(resumen[0].cantidad),
+                localId
+            ]);
+
+
+            // ==================================
+            // RESPUESTA
+            // ==================================
+
+            res.json({
+                mensaje:
+                    estado === 'aprobado'
+                        ? 'Comentario aprobado correctamente'
+                        : 'Comentario rechazado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al moderar comentario de local:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al moderar el comentario'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
 // OBTENER TODOS LOS PRODUCTOS
 // ==========================================
 
@@ -1297,6 +1762,207 @@ app.post(
 );
 
 // ==========================================
+// CREAR COMENTARIO DE LOCAL
+// ==========================================
+
+app.post(
+    '/api/locales/:id/comentarios',
+    verificarToken,
+    async (req, res) => {
+
+        try {
+
+            const localId =
+                Number(req.params.id);
+
+            const usuarioId =
+                Number(req.usuario.id);
+
+            const {
+                titulo,
+                comentario,
+                calificacion
+            } = req.body;
+
+            const calificacionNumero =
+                Number(calificacion);
+
+
+            // ==================================
+            // VALIDAR LOCAL
+            // ==================================
+
+            if (
+                !Number.isInteger(localId) ||
+                localId <= 0
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'ID de local inválido'
+                });
+
+            }
+
+
+            // ==================================
+            // VALIDAR CAMPOS
+            // ==================================
+
+            if (
+                !titulo ||
+                !titulo.trim() ||
+                !comentario ||
+                !comentario.trim()
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'Título y comentario son obligatorios'
+                });
+
+            }
+
+
+            if (titulo.trim().length > 150) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'El título no puede superar los 150 caracteres'
+                });
+
+            }
+
+
+            if (
+                !Number.isInteger(calificacionNumero) ||
+                calificacionNumero < 1 ||
+                calificacionNumero > 5
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'La calificación debe ser entre 1 y 5 estrellas'
+                });
+
+            }
+
+
+            // ==================================
+            // VERIFICAR LOCAL
+            // ==================================
+
+            const [locales] =
+                await pool.query(`
+                    SELECT id
+                    FROM local
+                    WHERE id = ?
+                        AND estadoVerificacion = 'verificado'
+                    LIMIT 1
+                `, [localId]);
+
+
+            if (locales.length === 0) {
+
+                return res.status(404).json({
+                    mensaje:
+                        'Local no encontrado'
+                });
+
+            }
+
+
+            // ==================================
+            // VERIFICAR OPINIÓN EXISTENTE
+            // ==================================
+
+            const [comentariosExistentes] =
+                await pool.query(`
+                    SELECT id
+                    FROM comentarioLocal
+                    WHERE usuarioId = ?
+                        AND localId = ?
+                    LIMIT 1
+                `, [
+                    usuarioId,
+                    localId
+                ]);
+
+
+            if (comentariosExistentes.length > 0) {
+
+                return res.status(409).json({
+                    mensaje:
+                        'Ya dejaste una opinión para este local'
+                });
+
+            }
+
+
+            // ==================================
+            // CREAR COMENTARIO
+            // ==================================
+
+            const [resultado] =
+                await pool.query(`
+                    INSERT INTO comentarioLocal (
+                        titulo,
+                        comentario,
+                        calificacion,
+                        estado,
+                        usuarioId,
+                        localId
+                    )
+                    VALUES (?, ?, ?, 'pendiente', ?, ?)
+                `, [
+                    titulo.trim(),
+                    comentario.trim(),
+                    calificacionNumero,
+                    usuarioId,
+                    localId
+                ]);
+
+
+            // ==================================
+            // RESPUESTA
+            // ==================================
+
+            res.status(201).json({
+
+                mensaje:
+                    'Tu opinión fue enviada y está pendiente de aprobación',
+
+                comentario: {
+                    id: resultado.insertId,
+                    titulo: titulo.trim(),
+                    comentario: comentario.trim(),
+                    calificacion: calificacionNumero,
+                    estado: 'pendiente',
+                    localId: localId
+                }
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al crear comentario de local:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al enviar la opinión'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
 // OBTENER UN RESTAURANTE POR ID
 // ==========================================
 
@@ -1381,6 +2047,921 @@ app.get('/api/restaurantes/:id', async (req, res) => {
     }
 
 });
+
+// ==========================================
+// OBTENER TODOS LOS LOCALES VERIFICADOS
+// ==========================================
+
+app.get('/api/locales', async (req, res) => {
+
+    try {
+
+        const [locales] = await pool.query(`
+            SELECT
+                l.id,
+                l.nombre,
+                l.descripcion,
+                l.imagen,
+                l.direccion,
+                l.telefono,
+                l.email,
+                l.instagram,
+                l.sitioWeb,
+                l.horario,
+                l.latitud,
+                l.longitud,
+                l.estadoVerificacion,
+                l.calificacionPromedio,
+                l.cantidadResenas,
+                tl.nombre AS tipoLocal,
+                b.nombre AS barrio
+
+            FROM local l
+
+            INNER JOIN tipoLocal tl
+                ON l.tipoLocalId = tl.id
+
+            INNER JOIN barrio b
+                ON l.barrioId = b.id
+
+            WHERE l.estadoVerificacion = 'verificado'
+
+            ORDER BY l.nombre ASC
+        `);
+
+
+        res.json(locales);
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al obtener locales:',
+            error
+        );
+
+
+        res.status(500).json({
+            mensaje:
+                'Error al obtener los locales'
+        });
+
+    }
+
+});
+
+// ==========================================
+// OBTENER COMENTARIOS APROBADOS DE UN LOCAL
+// ==========================================
+
+app.get('/api/locales/:id/comentarios', async (req, res) => {
+
+    try {
+
+        const localId = Number(req.params.id);
+
+        if (
+            !Number.isInteger(localId) ||
+            localId <= 0
+        ) {
+            return res.status(400).json({
+                mensaje: 'ID de local inválido'
+            });
+        }
+
+
+        const [comentarios] = await pool.query(`
+            SELECT
+                cl.id,
+                cl.titulo,
+                cl.comentario,
+                cl.calificacion,
+                cl.fechaComentario,
+                u.nombre AS usuarioNombre,
+                u.apellido AS usuarioApellido
+
+            FROM comentarioLocal cl
+
+            INNER JOIN usuario u
+                ON cl.usuarioId = u.id
+
+            INNER JOIN local l
+                ON cl.localId = l.id
+
+            WHERE cl.localId = ?
+                AND cl.estado = 'aprobado'
+                AND l.estadoVerificacion = 'verificado'
+
+            ORDER BY cl.fechaComentario DESC
+        `, [localId]);
+
+
+        res.json(comentarios);
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al obtener comentarios del local:',
+            error
+        );
+
+        res.status(500).json({
+            mensaje:
+                'Error al obtener los comentarios del local'
+        });
+
+    }
+
+});
+
+// ==========================================
+// OBTENER UN LOCAL POR ID
+// ==========================================
+
+app.get('/api/locales/:id', async (req, res) => {
+
+    try {
+
+        const localId =
+            Number(req.params.id);
+
+
+        // VALIDAR ID
+        if (
+            !Number.isInteger(localId) ||
+            localId <= 0
+        ) {
+
+            return res.status(400).json({
+                mensaje: 'ID de local inválido'
+            });
+
+        }
+
+
+        // BUSCAR LOCAL
+        const [locales] =
+            await pool.query(`
+                SELECT
+                    l.id,
+                    l.nombre,
+                    l.descripcion,
+                    l.imagen,
+                    l.direccion,
+                    l.telefono,
+                    l.email,
+                    l.instagram,
+                    l.sitioWeb,
+                    l.horario,
+                    l.latitud,
+                    l.longitud,
+                    l.estadoVerificacion,
+                    l.calificacionPromedio,
+                    l.cantidadResenas,
+                    tl.nombre AS tipoLocal,
+                    b.nombre AS barrio
+
+                FROM local l
+
+                INNER JOIN tipoLocal tl
+                    ON l.tipoLocalId = tl.id
+
+                INNER JOIN barrio b
+                    ON l.barrioId = b.id
+
+                WHERE l.id = ?
+                    AND l.estadoVerificacion = 'verificado'
+
+                LIMIT 1
+            `, [localId]);
+
+
+        if (locales.length === 0) {
+
+            return res.status(404).json({
+                mensaje: 'Local no encontrado'
+            });
+
+        }
+
+
+        res.json(locales[0]);
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al obtener el local:',
+            error
+        );
+
+
+        res.status(500).json({
+            mensaje: 'Error al obtener el local'
+        });
+
+    }
+
+});
+
+// ==========================================
+// OBTENER NUTRICIONISTAS VERIFICADOS
+// ==========================================
+
+app.get('/api/nutricionistas', async (req, res) => {
+
+    try {
+
+        const [nutricionistas] =
+            await pool.query(`
+                SELECT
+                    n.id,
+                    n.nombre,
+                    n.apellido,
+                    n.matricula,
+                    n.descripcion,
+                    n.fotoPerfil,
+                    n.direccion,
+                    n.telefono,
+                    n.tieneWhatsapp,
+                    n.email,
+                    n.instagram,
+                    n.sitioWeb,
+                    n.horario,
+                    n.latitud,
+                    n.longitud,
+                    n.estadoVerificacion,
+                    n.calificacionPromedio,
+                    n.cantidadResenas,
+                    b.nombre AS barrio
+
+                FROM nutricionista n
+
+                INNER JOIN barrio b
+                    ON n.barrioId = b.id
+
+                WHERE n.estadoVerificacion = 'verificado'
+
+                ORDER BY n.apellido ASC, n.nombre ASC
+            `);
+
+
+        res.json(nutricionistas);
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al obtener nutricionistas:',
+            error
+        );
+
+
+        res.status(500).json({
+            mensaje:
+                'Error al obtener los nutricionistas'
+        });
+
+    }
+
+});
+
+// ==========================================
+// OBTENER UN NUTRICIONISTA POR ID
+// ==========================================
+
+app.get('/api/nutricionistas/:id', async (req, res) => {
+
+    try {
+
+        const nutricionistaId =
+            Number(req.params.id);
+
+
+        // VALIDAR ID
+        if (
+            !Number.isInteger(nutricionistaId) ||
+            nutricionistaId <= 0
+        ) {
+
+            return res.status(400).json({
+                mensaje:
+                    'ID de nutricionista inválido'
+            });
+
+        }
+
+
+        // BUSCAR NUTRICIONISTA
+        const [nutricionistas] =
+            await pool.query(`
+                SELECT
+                    n.id,
+                    n.nombre,
+                    n.apellido,
+                    n.matricula,
+                    n.descripcion,
+                    n.fotoPerfil,
+                    n.direccion,
+                    n.telefono,
+                    n.tieneWhatsapp,
+                    n.email,
+                    n.instagram,
+                    n.sitioWeb,
+                    n.horario,
+                    n.latitud,
+                    n.longitud,
+                    n.estadoVerificacion,
+                    n.calificacionPromedio,
+                    n.cantidadResenas,
+                    b.nombre AS barrio
+
+                FROM nutricionista n
+
+                INNER JOIN barrio b
+                    ON n.barrioId = b.id
+
+                WHERE n.id = ?
+                    AND n.estadoVerificacion = 'verificado'
+
+                LIMIT 1
+            `, [nutricionistaId]);
+
+
+        if (nutricionistas.length === 0) {
+
+            return res.status(404).json({
+                mensaje:
+                    'Nutricionista no encontrado'
+            });
+
+        }
+
+
+        res.json(nutricionistas[0]);
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al obtener el nutricionista:',
+            error
+        );
+
+
+        res.status(500).json({
+            mensaje:
+                'Error al obtener el nutricionista'
+        });
+
+    }
+
+});
+
+// ==========================================
+// OBTENER COMENTARIOS DE UN NUTRICIONISTA
+// ==========================================
+
+app.get('/api/nutricionistas/:id/comentarios', async (req, res) => {
+
+    try {
+
+        const nutricionistaId =
+            Number(req.params.id);
+
+
+        if (
+            !Number.isInteger(nutricionistaId) ||
+            nutricionistaId <= 0
+        ) {
+
+            return res.status(400).json({
+                mensaje:
+                    'ID de nutricionista inválido'
+            });
+
+        }
+
+
+        // VERIFICAR QUE EL NUTRICIONISTA SEA PÚBLICO
+        const [nutricionistas] =
+            await pool.query(`
+                SELECT id
+                FROM nutricionista
+                WHERE id = ?
+                    AND estadoVerificacion = 'verificado'
+                LIMIT 1
+            `, [nutricionistaId]);
+
+
+        if (nutricionistas.length === 0) {
+
+            return res.status(404).json({
+                mensaje:
+                    'Nutricionista no encontrado'
+            });
+
+        }
+
+
+        // OBTENER SOLO COMENTARIOS APROBADOS
+        const [comentarios] =
+            await pool.query(`
+                SELECT
+                    cn.id,
+                    cn.titulo,
+                    cn.comentario,
+                    cn.calificacion,
+                    cn.fechaComentario,
+                    u.nombre AS usuarioNombre,
+                    u.apellido AS usuarioApellido
+
+                FROM comentarioNutricionista cn
+
+                INNER JOIN usuario u
+                    ON cn.usuarioId = u.id
+
+                WHERE cn.nutricionistaId = ?
+                    AND cn.estado = 'aprobado'
+
+                ORDER BY cn.fechaComentario DESC
+            `, [nutricionistaId]);
+
+
+        res.json(comentarios);
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al obtener comentarios del nutricionista:',
+            error
+        );
+
+
+        res.status(500).json({
+            mensaje:
+                'Error al obtener los comentarios'
+        });
+
+    }
+
+});
+
+// ==========================================
+// CREAR COMENTARIO DE NUTRICIONISTA
+// ==========================================
+
+app.post(
+    '/api/nutricionistas/:id/comentarios',
+    verificarToken,
+    async (req, res) => {
+
+        try {
+
+            const nutricionistaId =
+                Number(req.params.id);
+
+            const usuarioId =
+                Number(req.usuario.id);
+
+            const {
+                titulo,
+                comentario,
+                calificacion
+            } = req.body;
+
+            const calificacionNumero =
+                Number(calificacion);
+
+
+            // ==================================
+            // VALIDAR NUTRICIONISTA
+            // ==================================
+
+            if (
+                !Number.isInteger(nutricionistaId) ||
+                nutricionistaId <= 0
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'ID de nutricionista inválido'
+                });
+
+            }
+
+
+            // ==================================
+            // VALIDAR CAMPOS
+            // ==================================
+
+            if (
+                !titulo ||
+                !titulo.trim() ||
+                !comentario ||
+                !comentario.trim()
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'Título y comentario son obligatorios'
+                });
+
+            }
+
+
+            if (titulo.trim().length > 150) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'El título no puede superar los 150 caracteres'
+                });
+
+            }
+
+
+            if (
+                !Number.isInteger(calificacionNumero) ||
+                calificacionNumero < 1 ||
+                calificacionNumero > 5
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'La calificación debe ser entre 1 y 5 estrellas'
+                });
+
+            }
+
+
+            // ==================================
+            // VERIFICAR NUTRICIONISTA
+            // ==================================
+
+            const [nutricionistas] =
+                await pool.query(`
+                    SELECT id
+                    FROM nutricionista
+                    WHERE id = ?
+                        AND estadoVerificacion = 'verificado'
+                    LIMIT 1
+                `, [nutricionistaId]);
+
+
+            if (nutricionistas.length === 0) {
+
+                return res.status(404).json({
+                    mensaje:
+                        'Nutricionista no encontrado'
+                });
+
+            }
+
+
+            // ==================================
+            // VERIFICAR OPINIÓN EXISTENTE
+            // ==================================
+
+            const [comentariosExistentes] =
+                await pool.query(`
+                    SELECT id
+                    FROM comentarioNutricionista
+                    WHERE usuarioId = ?
+                        AND nutricionistaId = ?
+                    LIMIT 1
+                `, [
+                    usuarioId,
+                    nutricionistaId
+                ]);
+
+
+            if (comentariosExistentes.length > 0) {
+
+                return res.status(409).json({
+                    mensaje:
+                        'Ya dejaste una opinión para este nutricionista'
+                });
+
+            }
+
+
+            // ==================================
+            // CREAR COMENTARIO
+            // ==================================
+
+            const [resultado] =
+                await pool.query(`
+                    INSERT INTO comentarioNutricionista (
+                        titulo,
+                        comentario,
+                        calificacion,
+                        estado,
+                        usuarioId,
+                        nutricionistaId
+                    )
+                    VALUES (?, ?, ?, 'pendiente', ?, ?)
+                `, [
+                    titulo.trim(),
+                    comentario.trim(),
+                    calificacionNumero,
+                    usuarioId,
+                    nutricionistaId
+                ]);
+
+
+            // ==================================
+            // RESPUESTA
+            // ==================================
+
+            res.status(201).json({
+
+                mensaje:
+                    'Tu opinión fue enviada y está pendiente de aprobación',
+
+                comentario: {
+                    id: resultado.insertId,
+                    titulo: titulo.trim(),
+                    comentario: comentario.trim(),
+                    calificacion: calificacionNumero,
+                    estado: 'pendiente',
+                    nutricionistaId: nutricionistaId
+                }
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al crear comentario de nutricionista:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al enviar la opinión'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - COMENTARIOS DE NUTRICIONISTAS
+// ==========================================
+
+app.get(
+    '/api/admin/comentarios/nutricionistas',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [comentarios] =
+                await pool.query(`
+                    SELECT
+                        cn.id,
+                        cn.titulo,
+                        cn.comentario,
+                        cn.calificacion,
+                        cn.fechaComentario,
+                        cn.estado,
+
+                        u.nombre AS usuarioNombre,
+                        u.apellido AS usuarioApellido,
+
+                        n.id AS nutricionistaId,
+                        CONCAT(
+                            n.nombre,
+                            ' ',
+                            n.apellido
+                        ) AS nutricionistaNombre
+
+                    FROM comentarioNutricionista cn
+
+                    INNER JOIN usuario u
+                        ON u.id = cn.usuarioId
+
+                    INNER JOIN nutricionista n
+                        ON n.id = cn.nutricionistaId
+
+                    WHERE cn.estado = 'pendiente'
+
+                    ORDER BY
+                        cn.fechaComentario DESC,
+                        cn.id DESC
+                `);
+
+
+            res.json(comentarios);
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener comentarios de nutricionistas:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener comentarios de nutricionistas'
+            });
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// ADMIN - MODERAR COMENTARIO NUTRICIONISTA
+// ==========================================
+
+app.patch(
+    '/api/admin/comentarios/nutricionistas/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        const conexion =
+            await pool.getConnection();
+
+        try {
+
+            const comentarioId =
+                Number(req.params.id);
+
+            const { estado } =
+                req.body;
+
+
+            if (
+                !Number.isInteger(comentarioId) ||
+                comentarioId <= 0
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'ID de comentario inválido'
+                });
+
+            }
+
+
+            if (
+                !['aprobado', 'rechazado']
+                    .includes(estado)
+            ) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'Estado inválido'
+                });
+
+            }
+
+
+            await conexion.beginTransaction();
+
+
+            // ==================================
+            // BUSCAR COMENTARIO
+            // ==================================
+
+            const [comentarios] =
+                await conexion.query(`
+                    SELECT
+                        id,
+                        nutricionistaId
+                    FROM comentarioNutricionista
+                    WHERE id = ?
+                    LIMIT 1
+                `, [comentarioId]);
+
+
+            if (comentarios.length === 0) {
+
+                await conexion.rollback();
+
+                return res.status(404).json({
+                    mensaje:
+                        'Comentario no encontrado'
+                });
+
+            }
+
+
+            const nutricionistaId =
+                comentarios[0].nutricionistaId;
+
+
+            // ==================================
+            // ACTUALIZAR ESTADO
+            // ==================================
+
+            await conexion.query(`
+                UPDATE comentarioNutricionista
+                SET estado = ?
+                WHERE id = ?
+            `, [
+                estado,
+                comentarioId
+            ]);
+
+
+            // ==================================
+            // RECALCULAR CALIFICACIÓN
+            // ==================================
+
+            const [resumen] =
+                await conexion.query(`
+                    SELECT
+                        COALESCE(
+                            AVG(calificacion),
+                            0
+                        ) AS promedio,
+
+                        COUNT(*) AS cantidad
+
+                    FROM comentarioNutricionista
+
+                    WHERE nutricionistaId = ?
+                        AND estado = 'aprobado'
+                `, [nutricionistaId]);
+
+
+            const promedio =
+                Number(
+                    resumen[0].promedio || 0
+                );
+
+            const cantidad =
+                Number(
+                    resumen[0].cantidad || 0
+                );
+
+
+            // ==================================
+            // ACTUALIZAR NUTRICIONISTA
+            // ==================================
+
+            await conexion.query(`
+                UPDATE nutricionista
+                SET
+                    calificacionPromedio = ?,
+                    cantidadResenas = ?
+                WHERE id = ?
+            `, [
+                promedio,
+                cantidad,
+                nutricionistaId
+            ]);
+
+
+            await conexion.commit();
+
+
+            res.json({
+                mensaje:
+                    estado === 'aprobado'
+                        ? 'Comentario aprobado correctamente'
+                        : 'Comentario rechazado correctamente'
+            });
+
+
+        } catch (error) {
+
+            await conexion.rollback();
+
+
+            console.error(
+                'Error al moderar comentario de nutricionista:',
+                error
+            );
+
+
+            res.status(500).json({
+                mensaje:
+                    'Error al moderar comentario de nutricionista'
+            });
+
+
+        } finally {
+
+            conexion.release();
+
+        }
+
+    }
+);
+
 
 // ==========================================
 // INICIAR SERVIDOR

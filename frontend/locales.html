@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Locales Sin TACC | CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <div id="header-placeholder"></div>
+
+
+    <!-- ================= MAIN ================= -->
+    <main>
+
+        <!-- ================= ENCABEZADO ================= -->
+        <section id="page-header">
+
+            <div class="container">
+
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-3">
+
+                        <li class="breadcrumb-item">
+                            <a href="index.html">Inicio</a>
+                        </li>
+
+                        <li
+                            class="breadcrumb-item active"
+                            aria-current="page"
+                        >
+                            Locales
+                        </li>
+
+                    </ol>
+                </nav>
+
+
+                <h1 class="fw-bold mb-2">
+                    Locales Sin TACC
+                </h1>
+
+                <p class="text-muted mb-4">
+                    Encontrá comercios con productos aptos para celíacos.
+                </p>
+
+
+                <!-- Buscador -->
+                <div class="search-box">
+
+                    <i class="bi bi-search"></i>
+
+                    <input
+                        type="text"
+                        id="buscar-local"
+                        class="form-control form-control-lg"
+                        placeholder="Buscar locales, tipos o barrios..."
+                        aria-label="Buscar locales"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= LISTADO + FILTROS ================= -->
+        <section id="listado" class="py-5">
+
+            <div class="container">
+
+                <div class="row g-4">
+
+
+                    <!-- ================= FILTROS DESKTOP ================= -->
+                    <aside class="col-lg-3 d-none d-lg-block">
+
+                        <div class="filters-card">
+
+                            <!-- Tipo de local -->
+                            <h6 class="filters-title">
+                                Tipo de local
+                            </h6>
+
+
+                            <div class="form-check mb-2">
+
+                                <input
+                                    class="form-check-input filtro-tipo"
+                                    type="checkbox"
+                                    id="tipo-supermercado"
+                                    value="Supermercado"
+                                >
+
+                                <label
+                                    class="form-check-label"
+                                    for="tipo-supermercado"
+                                >
+                                    Supermercado
+                                </label>
+
+                            </div>
+
+
+                            <div class="form-check mb-2">
+
+                                <input
+                                    class="form-check-input filtro-tipo"
+                                    type="checkbox"
+                                    id="tipo-dietetica"
+                                    value="Dietética"
+                                >
+
+                                <label
+                                    class="form-check-label"
+                                    for="tipo-dietetica"
+                                >
+                                    Dietética
+                                </label>
+
+                            </div>
+
+
+                            <div class="form-check mb-2">
+
+                                <input
+                                    class="form-check-input filtro-tipo"
+                                    type="checkbox"
+                                    id="tipo-almacen-naturista"
+                                    value="Almacén naturista"
+                                >
+
+                                <label
+                                    class="form-check-label"
+                                    for="tipo-almacen-naturista"
+                                >
+                                    Almacén naturista
+                                </label>
+
+                            </div>
+
+
+                            <div class="form-check mb-3">
+
+                                <input
+                                    class="form-check-input filtro-tipo"
+                                    type="checkbox"
+                                    id="tipo-verduleria"
+                                    value="Verdulería"
+                                >
+
+                                <label
+                                    class="form-check-label"
+                                    for="tipo-verduleria"
+                                >
+                                    Verdulería
+                                </label>
+
+                            </div>
+
+
+                            <hr class="filters-divider">
+
+
+                            <!-- Barrio -->
+                            <h6 class="filters-title">
+                                Barrio
+                            </h6>
+
+                            <select
+                                id="filtro-barrio"
+                                class="form-select mb-4"
+                                aria-label="Filtrar por barrio"
+                            >
+
+                                <option value="" selected>
+                                    Todos los barrios
+                                </option>
+
+                                <option value="Agronomía">Agronomía</option>
+                                <option value="Almagro">Almagro</option>
+                                <option value="Balvanera">Balvanera</option>
+                                <option value="Barracas">Barracas</option>
+                                <option value="Belgrano">Belgrano</option>
+                                <option value="Boedo">Boedo</option>
+                                <option value="Caballito">Caballito</option>
+                                <option value="Chacarita">Chacarita</option>
+                                <option value="Coghlan">Coghlan</option>
+                                <option value="Colegiales">Colegiales</option>
+                                <option value="Constitución">Constitución</option>
+                                <option value="Flores">Flores</option>
+                                <option value="Floresta">Floresta</option>
+                                <option value="La Boca">La Boca</option>
+                                <option value="La Paternal">La Paternal</option>
+                                <option value="Liniers">Liniers</option>
+                                <option value="Mataderos">Mataderos</option>
+                                <option value="Monte Castro">Monte Castro</option>
+                                <option value="Montserrat">Montserrat</option>
+                                <option value="Nueva Pompeya">Nueva Pompeya</option>
+                                <option value="Núñez">Núñez</option>
+                                <option value="Palermo">Palermo</option>
+                                <option value="Parque Avellaneda">Parque Avellaneda</option>
+                                <option value="Parque Chacabuco">Parque Chacabuco</option>
+                                <option value="Parque Chas">Parque Chas</option>
+                                <option value="Parque Patricios">Parque Patricios</option>
+                                <option value="Puerto Madero">Puerto Madero</option>
+                                <option value="Recoleta">Recoleta</option>
+                                <option value="Retiro">Retiro</option>
+                                <option value="Saavedra">Saavedra</option>
+                                <option value="San Cristóbal">San Cristóbal</option>
+                                <option value="San Nicolás">San Nicolás</option>
+                                <option value="San Telmo">San Telmo</option>
+                                <option value="Vélez Sarsfield">Vélez Sarsfield</option>
+                                <option value="Versalles">Versalles</option>
+                                <option value="Villa Crespo">Villa Crespo</option>
+                                <option value="Villa del Parque">Villa del Parque</option>
+                                <option value="Villa Devoto">Villa Devoto</option>
+                                <option value="Villa General Mitre">Villa General Mitre</option>
+                                <option value="Villa Lugano">Villa Lugano</option>
+                                <option value="Villa Luro">Villa Luro</option>
+                                <option value="Villa Ortúzar">Villa Ortúzar</option>
+                                <option value="Villa Pueyrredón">Villa Pueyrredón</option>
+                                <option value="Villa Real">Villa Real</option>
+                                <option value="Villa Riachuelo">Villa Riachuelo</option>
+                                <option value="Villa Santa Rita">Villa Santa Rita</option>
+                                <option value="Villa Soldati">Villa Soldati</option>
+                                <option value="Villa Urquiza">Villa Urquiza</option>
+
+                            </select>
+
+
+                            <button
+                                type="button"
+                                id="btn-aplicar-filtros-locales"
+                                class="btn btn-warning w-100 mb-2"
+                            >
+                                Aplicar filtros
+                            </button>
+
+                            <button
+                                type="button"
+                                id="btn-limpiar-filtros-locales"
+                                class="btn btn-link w-100 text-decoration-none"
+                            >
+                                Limpiar filtros
+                            </button>
+
+                        </div>
+
+                    </aside>
+
+
+                    <!-- ================= RESULTADOS ================= -->
+                    <div class="col-lg-9">
+
+
+                        <!-- Toolbar -->
+                        <div class="listado-toolbar">
+
+                            <span
+                                class="listado-count"
+                                id="locales-count"
+                            >
+                                Cargando locales...
+                            </span>
+
+
+                            <div class="listado-toolbar-actions">
+
+
+                                <!-- Botón filtros mobile -->
+                                <button
+                                    type="button"
+                                    class="btn btn-outline-secondary d-lg-none"
+                                    data-bs-toggle="offcanvas"
+                                    data-bs-target="#filtrosLocalesOffcanvas"
+                                >
+                                    <i class="bi bi-sliders"></i>
+                                    Filtros
+                                </button>
+
+
+                                <!-- Ordenamiento -->
+                                <select
+                                    id="orden-locales"
+                                    class="form-select listado-sort"
+                                    aria-label="Ordenar locales"
+                                >
+
+                                    <option value="relevantes" selected>
+                                        Más relevantes
+                                    </option>
+
+                                    <option value="calificacion">
+                                        Mejor calificados
+                                    </option>
+
+                                    <option value="nombre">
+                                        Nombre (A-Z)
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================= LOCALES ================= -->
+                        <div
+                            class="row g-4"
+                            id="locales-container"
+                        >
+                            <!-- Locales cargados dinámicamente -->
+                        </div>
+
+
+                        <!-- ================= PAGINACIÓN ================= -->
+                        <nav
+                            aria-label="Paginación de locales"
+                            class="mt-5"
+                        >
+
+                            <ul
+                                class="pagination justify-content-center"
+                                id="locales-paginacion"
+                            >
+                                <!-- Paginación generada por JavaScript -->
+                            </ul>
+
+                        </nav>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FILTROS MOBILE ================= -->
+    <div
+        class="offcanvas offcanvas-start"
+        tabindex="-1"
+        id="filtrosLocalesOffcanvas"
+    >
+
+        <div class="offcanvas-header">
+
+            <h5 class="offcanvas-title">
+                Filtros
+            </h5>
+
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Cerrar"
+            ></button>
+
+        </div>
+
+
+        <div class="offcanvas-body">
+
+
+            <!-- Tipo de local -->
+            <h6 class="filters-title">
+                Tipo de local
+            </h6>
+
+
+            <div class="form-check mb-2">
+
+                <input
+                    class="form-check-input filtro-tipo-mobile"
+                    type="checkbox"
+                    id="m-tipo-supermercado"
+                    value="Supermercado"
+                >
+
+                <label
+                    class="form-check-label"
+                    for="m-tipo-supermercado"
+                >
+                    Supermercado
+                </label>
+
+            </div>
+
+
+            <div class="form-check mb-2">
+
+                <input
+                    class="form-check-input filtro-tipo-mobile"
+                    type="checkbox"
+                    id="m-tipo-dietetica"
+                    value="Dietética"
+                >
+
+                <label
+                    class="form-check-label"
+                    for="m-tipo-dietetica"
+                >
+                    Dietética
+                </label>
+
+            </div>
+
+
+            <div class="form-check mb-2">
+
+                <input
+                    class="form-check-input filtro-tipo-mobile"
+                    type="checkbox"
+                    id="m-tipo-almacen-naturista"
+                    value="Almacén naturista"
+                >
+
+                <label
+                    class="form-check-label"
+                    for="m-tipo-almacen-naturista"
+                >
+                    Almacén naturista
+                </label>
+
+            </div>
+
+
+            <div class="form-check mb-3">
+
+                <input
+                    class="form-check-input filtro-tipo-mobile"
+                    type="checkbox"
+                    id="m-tipo-verduleria"
+                    value="Verdulería"
+                >
+
+                <label
+                    class="form-check-label"
+                    for="m-tipo-verduleria"
+                >
+                    Verdulería
+                </label>
+
+            </div>
+
+
+            <hr class="filters-divider">
+
+
+            <!-- Barrio -->
+            <h6 class="filters-title">
+                Barrio
+            </h6>
+
+            <select
+                id="filtro-barrio-mobile"
+                class="form-select mb-4"
+                aria-label="Filtrar por barrio"
+            >
+
+                <option value="" selected>
+                    Todos los barrios
+                </option>
+
+                <option value="Agronomía">Agronomía</option>
+                <option value="Almagro">Almagro</option>
+                <option value="Balvanera">Balvanera</option>
+                <option value="Barracas">Barracas</option>
+                <option value="Belgrano">Belgrano</option>
+                <option value="Boedo">Boedo</option>
+                <option value="Caballito">Caballito</option>
+                <option value="Chacarita">Chacarita</option>
+                <option value="Coghlan">Coghlan</option>
+                <option value="Colegiales">Colegiales</option>
+                <option value="Constitución">Constitución</option>
+                <option value="Flores">Flores</option>
+                <option value="Floresta">Floresta</option>
+                <option value="La Boca">La Boca</option>
+                <option value="La Paternal">La Paternal</option>
+                <option value="Liniers">Liniers</option>
+                <option value="Mataderos">Mataderos</option>
+                <option value="Monte Castro">Monte Castro</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Nueva Pompeya">Nueva Pompeya</option>
+                <option value="Núñez">Núñez</option>
+                <option value="Palermo">Palermo</option>
+                <option value="Parque Avellaneda">Parque Avellaneda</option>
+                <option value="Parque Chacabuco">Parque Chacabuco</option>
+                <option value="Parque Chas">Parque Chas</option>
+                <option value="Parque Patricios">Parque Patricios</option>
+                <option value="Puerto Madero">Puerto Madero</option>
+                <option value="Recoleta">Recoleta</option>
+                <option value="Retiro">Retiro</option>
+                <option value="Saavedra">Saavedra</option>
+                <option value="San Cristóbal">San Cristóbal</option>
+                <option value="San Nicolás">San Nicolás</option>
+                <option value="San Telmo">San Telmo</option>
+                <option value="Vélez Sarsfield">Vélez Sarsfield</option>
+                <option value="Versalles">Versalles</option>
+                <option value="Villa Crespo">Villa Crespo</option>
+                <option value="Villa del Parque">Villa del Parque</option>
+                <option value="Villa Devoto">Villa Devoto</option>
+                <option value="Villa General Mitre">Villa General Mitre</option>
+                <option value="Villa Lugano">Villa Lugano</option>
+                <option value="Villa Luro">Villa Luro</option>
+                <option value="Villa Ortúzar">Villa Ortúzar</option>
+                <option value="Villa Pueyrredón">Villa Pueyrredón</option>
+                <option value="Villa Real">Villa Real</option>
+                <option value="Villa Riachuelo">Villa Riachuelo</option>
+                <option value="Villa Santa Rita">Villa Santa Rita</option>
+                <option value="Villa Soldati">Villa Soldati</option>
+                <option value="Villa Urquiza">Villa Urquiza</option>
+
+            </select>
+
+
+            <button
+                type="button"
+                id="btn-aplicar-filtros-locales-mobile"
+                class="btn btn-warning w-100 mb-2"
+                data-bs-dismiss="offcanvas"
+            >
+                Aplicar filtros
+            </button>
+
+            <button
+                type="button"
+                id="btn-limpiar-filtros-locales-mobile"
+                class="btn btn-link w-100 text-decoration-none"
+            >
+                Limpiar filtros
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= FOOTER ================= -->
+    <div id="footer-placeholder"></div>
+
+
+    <!-- Bootstrap JS -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+    <!-- JavaScript general de CeliaConnect -->
+    <script src="js/app.js"></script>
+
+    <!-- JavaScript exclusivo de Locales -->
+    <script src="js/locales.js"></script>
+
+</body>
+
+</html>

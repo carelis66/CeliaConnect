@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Perfil del nutricionista | CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos propios -->
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+</head>
+
+<body>
+
+
+    <!-- ================= HEADER ================= -->
+
+    <div id="header-placeholder"></div>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main>
+
+
+        <!-- ================= ENCABEZADO ================= -->
+
+        <section id="page-header">
+
+            <div class="container">
+
+                <!-- Breadcrumb -->
+
+                <nav aria-label="breadcrumb">
+
+                    <ol class="breadcrumb mb-3">
+
+                        <li class="breadcrumb-item">
+
+                            <a href="index.html">
+                                Inicio
+                            </a>
+
+                        </li>
+
+
+                        <li class="breadcrumb-item">
+
+                            <a href="nutricionistas.html">
+                                Nutricionistas
+                            </a>
+
+                        </li>
+
+
+                        <li
+                            class="breadcrumb-item active"
+                            aria-current="page"
+                            id="breadcrumb-nutricionista"
+                        >
+                            Perfil
+                        </li>
+
+                    </ol>
+
+                </nav>
+
+
+                <h1 class="fw-bold mb-2">
+                    Perfil del nutricionista
+                </h1>
+
+
+                <p class="text-muted mb-0">
+                    Información profesional, contacto y opiniones.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= DETALLE ================= -->
+
+        <section class="py-5">
+
+            <div class="container">
+
+
+                <!-- CARGANDO -->
+
+                <div
+                    id="nutricionista-cargando"
+                    class="text-center py-5"
+                >
+
+                    <div
+                        class="spinner-border text-warning"
+                        role="status"
+                    >
+
+                        <span class="visually-hidden">
+                            Cargando...
+                        </span>
+
+                    </div>
+
+
+                    <p class="text-muted mt-3">
+                        Cargando nutricionista...
+                    </p>
+
+                </div>
+
+
+                <!-- ERROR -->
+
+                <div
+                    id="nutricionista-error"
+                    class="alert alert-danger d-none"
+                    role="alert"
+                >
+                    No se pudo cargar el nutricionista.
+                </div>
+
+
+                <!-- CONTENIDO -->
+
+                <div
+                    id="nutricionista-detalle"
+                    class="d-none"
+                >
+
+
+                    <div class="row g-5">
+
+
+                        <!-- ================= FOTO ================= -->
+
+                        <div class="col-lg-5">
+
+                            <div
+                                id="nutricionista-imagen"
+                                class="product-image d-flex align-items-center justify-content-center overflow-hidden"
+                                style="min-height: 350px;"
+                            >
+
+                                <i
+                                    class="bi bi-person-circle"
+                                    style="font-size: 7rem;"
+                                ></i>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ================= INFORMACIÓN ================= -->
+
+                        <div class="col-lg-7">
+
+
+                            <!-- VERIFICADO -->
+
+                            <span
+                                class="badge text-bg-success text-white"
+                            >
+                                Profesional verificado
+                            </span>
+
+
+                            <!-- NOMBRE -->
+
+                            <h2
+                                class="fw-bold mt-2 mb-2"
+                                id="nutricionista-nombre"
+                            >
+                            </h2>
+
+
+                            <!-- MATRÍCULA -->
+
+                            <p class="text-muted mb-2">
+
+                                <i class="bi bi-patch-check me-1"></i>
+
+                                Matrícula:
+                                <span id="nutricionista-matricula"></span>
+
+                            </p>
+
+
+                            <!-- CALIFICACIÓN -->
+
+                            <div
+                                class="mb-4"
+                                id="nutricionista-calificacion"
+                            >
+                            </div>
+
+
+                            <!-- DESCRIPCIÓN -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Sobre el profesional
+                                </h5>
+
+                                <p
+                                    class="text-muted"
+                                    id="nutricionista-descripcion"
+                                >
+                                </p>
+
+                            </div>
+
+
+                            <!-- UBICACIÓN -->
+
+                            <div class="mb-3">
+
+                                <h5>
+                                    Ubicación
+                                </h5>
+
+                                <p class="text-muted mb-1">
+
+                                    <i class="bi bi-geo-alt me-1"></i>
+
+                                    <span id="nutricionista-direccion"></span>
+
+                                </p>
+
+                                <p
+                                    class="text-muted"
+                                    id="nutricionista-barrio"
+                                >
+                                </p>
+
+                            </div>
+
+
+                            <!-- HORARIO -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Horarios
+                                </h5>
+
+                                <p class="text-muted">
+
+                                    <i class="bi bi-clock me-1"></i>
+
+                                    <span id="nutricionista-horario"></span>
+
+                                </p>
+
+                            </div>
+
+
+                            <!-- CONTACTO -->
+
+                            <div class="mb-4">
+
+                                <h5>
+                                    Contacto
+                                </h5>
+
+
+                                <p
+                                    class="mb-2"
+                                    id="nutricionista-telefono-container"
+                                >
+
+                                    <i class="bi bi-telephone me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="nutricionista-telefono"
+                                        class="text-decoration-none"
+                                    >
+                                    </a>
+
+                                </p>
+
+
+                                <p
+                                    class="mb-2 d-none"
+                                    id="nutricionista-whatsapp-container"
+                                >
+
+                                    <i class="bi bi-whatsapp me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="nutricionista-whatsapp"
+                                        class="text-decoration-none"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Contactar por WhatsApp
+                                    </a>
+
+                                </p>
+
+
+                                <p
+                                    class="mb-2"
+                                    id="nutricionista-email-container"
+                                >
+
+                                    <i class="bi bi-envelope me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="nutricionista-email"
+                                        class="text-decoration-none"
+                                    >
+                                    </a>
+
+                                </p>
+
+
+                                <p
+                                    class="mb-2"
+                                    id="nutricionista-web-container"
+                                >
+
+                                    <i class="bi bi-globe me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="nutricionista-web"
+                                        class="text-decoration-none"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        Sitio web
+                                    </a>
+
+                                </p>
+
+
+                                <p
+                                    class="mb-0"
+                                    id="nutricionista-instagram-container"
+                                >
+
+                                    <i class="bi bi-instagram me-1"></i>
+
+                                    <a
+                                        href="#"
+                                        id="nutricionista-instagram"
+                                        class="text-decoration-none"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                    </a>
+
+                                </p>
+
+                            </div>
+
+
+                            <!-- VOLVER -->
+
+                            <a
+                                href="nutricionistas.html"
+                                class="btn btn-outline-secondary"
+                            >
+
+                                <i class="bi bi-arrow-left"></i>
+
+                                Volver a nutricionistas
+
+                            </a>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= MAPA ================= -->
+
+                    <div class="mt-5 pt-4 border-top">
+
+                        <div class="mb-4">
+
+                            <h3 class="fw-bold mb-2">
+                                Ubicación
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Consultá la ubicación del consultorio y cómo llegar.
+                            </p>
+
+                        </div>
+
+
+                        <div
+                            id="nutricionista-mapa-container"
+                            class="d-none"
+                        >
+
+                            <div
+                                class="ratio ratio-21x9 rounded overflow-hidden border mb-3"
+                            >
+
+                                <iframe
+                                    id="nutricionista-mapa"
+                                    title="Ubicación del nutricionista"
+                                    loading="lazy"
+                                    allowfullscreen
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                ></iframe>
+
+                            </div>
+
+
+                            <a
+                                href="#"
+                                id="nutricionista-como-llegar"
+                                class="btn btn-warning"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+
+                                <i class="bi bi-geo-alt-fill me-1"></i>
+
+                                Cómo llegar
+
+                            </a>
+
+                        </div>
+
+
+                        <div
+                            id="nutricionista-mapa-vacio"
+                            class="alert alert-light border d-none"
+                        >
+                            La ubicación en el mapa no está disponible.
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= OPINIONES ================= -->
+
+                    <div class="mt-5 pt-4 border-top">
+
+                        <div class="mb-4">
+
+                            <h3 class="fw-bold mb-2">
+                                Opiniones de la comunidad
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Experiencias compartidas por otros usuarios.
+                            </p>
+
+                        </div>
+
+
+                        <!-- ================= DEJAR OPINIÓN ================= -->
+
+                        <div
+                            id="opinion-formulario-container"
+                            class="card border-0 shadow-sm mb-5"
+                        >
+
+                            <div class="card-body p-4">
+
+                                <h4 class="fw-bold mb-2">
+                                    Dejá tu opinión
+                                </h4>
+
+                                <p class="text-muted mb-4">
+                                    Compartí tu experiencia con este profesional.
+                                </p>
+
+
+                                <div
+                                    id="opinion-mensaje"
+                                    class="alert d-none"
+                                    role="alert"
+                                >
+                                </div>
+
+
+                                <form id="opinion-formulario">
+
+
+                                    <!-- CALIFICACIÓN -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="opinion-calificacion"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Calificación
+                                        </label>
+
+                                        <select
+                                            class="form-select"
+                                            id="opinion-calificacion"
+                                            required
+                                        >
+
+                                            <option value="">
+                                                Seleccioná una calificación
+                                            </option>
+
+                                            <option value="5">
+                                                ★★★★★ - Excelente
+                                            </option>
+
+                                            <option value="4">
+                                                ★★★★☆ - Muy bueno
+                                            </option>
+
+                                            <option value="3">
+                                                ★★★☆☆ - Bueno
+                                            </option>
+
+                                            <option value="2">
+                                                ★★☆☆☆ - Regular
+                                            </option>
+
+                                            <option value="1">
+                                                ★☆☆☆☆ - Malo
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <!-- TÍTULO -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="opinion-titulo"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Título
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="opinion-titulo"
+                                            maxlength="150"
+                                            placeholder="Ej: Excelente profesional"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    <!-- COMENTARIO -->
+
+                                    <div class="mb-3">
+
+                                        <label
+                                            for="opinion-comentario"
+                                            class="form-label fw-semibold"
+                                        >
+                                            Comentario
+                                        </label>
+
+                                        <textarea
+                                            class="form-control"
+                                            id="opinion-comentario"
+                                            rows="4"
+                                            placeholder="Contanos tu experiencia..."
+                                            required
+                                        ></textarea>
+
+                                    </div>
+
+
+                                    <!-- BOTÓN -->
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-warning"
+                                        id="btn-enviar-opinion"
+                                    >
+
+                                        <i class="bi bi-send me-1"></i>
+
+                                        Enviar opinión
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- CARGANDO COMENTARIOS -->
+
+                        <div
+                            id="comentarios-cargando"
+                            class="text-muted d-none"
+                        >
+                            Cargando opiniones...
+                        </div>
+
+
+                        <!-- ERROR -->
+
+                        <div
+                            id="comentarios-error"
+                            class="alert alert-danger d-none"
+                            role="alert"
+                        >
+                            No se pudieron cargar las opiniones.
+                        </div>
+
+
+                        <!-- SIN COMENTARIOS -->
+
+                        <div
+                            id="comentarios-vacio"
+                            class="alert alert-light border"
+                        >
+                            Este nutricionista todavía no tiene opiniones.
+                        </div>
+
+
+                        <!-- LISTA -->
+
+                        <div
+                            id="comentarios-container"
+                            class="row g-4"
+                        >
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <div id="footer-placeholder"></div>
+
+
+    <!-- Bootstrap JS -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+    <!-- JavaScript general -->
+
+    <script src="js/app.js"></script>
+
+
+    <!-- JavaScript detalle nutricionista -->
+
+    <script src="js/nutricionista-detalle.js"></script>
+
+
+</body>
+
+</html>
