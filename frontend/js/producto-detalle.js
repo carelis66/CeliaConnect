@@ -568,6 +568,30 @@ async function cargarProducto() {
         const producto =
             await respuesta.json();
 
+        // ==================================
+// IMAGEN DEL PRODUCTO
+// ==================================
+
+const imagenProducto =
+    document.getElementById(
+        'producto-imagen'
+    );
+
+if (producto.imagen) {
+
+    imagenProducto.src =
+        producto.imagen;
+
+    imagenProducto.alt =
+        producto.nombre;
+
+} else {
+
+    imagenProducto.style.display =
+        'none';
+
+}
+
 
         // ==================================
         // MOSTRAR DATOS

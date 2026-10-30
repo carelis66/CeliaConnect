@@ -439,8 +439,11 @@ function mostrarImagen(
         <img
             src="${nutricionista.fotoPerfil}"
             alt="${nutricionista.nombre} ${nutricionista.apellido}"
-            class="img-fluid w-100 h-100"
-            style="object-fit: cover;"
+            class="w-100 h-100"
+            style="
+                object-fit: cover;
+                object-position: center 20%;
+            "
         >
     `;
 

@@ -116,9 +116,34 @@ function mostrarProductos() {
                     aria-label="Ver detalle de ${producto.nombre}"
                 >
 
-                    <div class="product-image">
+                    <div
+                        class="product-image"
+                        style="
+                            position: relative;
+                            overflow: hidden;
+                            height: 220px;
+                            background: #f8f5f2;
+                        "
+                    >
 
-                        <i class="bi bi-basket2-fill"></i>
+                        ${
+                            producto.imagen
+                                ? `
+                                    <img
+                                        src="${producto.imagen}"
+                                        alt="${producto.nombre}"
+                                        class="w-100 h-100"
+                                        style="
+                                            object-fit: cover;
+                                            object-position: center;
+                                        "
+                                        onerror="this.style.display='none'"
+                                    >
+                                `
+                                : `
+                                    <i class="bi bi-basket2-fill"></i>
+                                `
+                        }
 
                         ${certificado}
 
@@ -141,9 +166,13 @@ function mostrarProductos() {
                         <div class="product-footer">
 
                             <span class="product-rating">
-                                <i class="bi bi-star"></i>
-                                Sin reseñas
-                            </span>
+    <i class="bi bi-star-fill"></i>
+    ${
+        Number(producto.cantidadResenas) > 0
+            ? `${Number(producto.calificacionPromedio).toFixed(1)} (${producto.cantidadResenas} ${Number(producto.cantidadResenas) === 1 ? 'reseña' : 'reseñas'})`
+            : 'Sin reseñas'
+    }
+</span>
 
                             <button
                                 class="product-fav"
@@ -449,17 +478,6 @@ function aplicarFiltros() {
     );
 
 
-    // --------------------------------------
-    // CERTIFICACIÓN SIN TACC
-    // --------------------------------------
-
-    const switchCertificado =
-        document.getElementById('cert-sintacc');
-
-    const soloCertificados =
-        switchCertificado
-            ? switchCertificado.checked
-            : false;
 
 
     // --------------------------------------
@@ -503,13 +521,11 @@ function aplicarFiltros() {
                 );
 
 
-            // Certificación
-            const coincideCertificado =
-                !soloCertificados ||
-                Number(
-                    producto.certificadoSinTacc
-                ) === 1;
-
+            // Certificación El catálogo público muestra únicamente productos Sin TACC certificados.
+const coincideCertificado =
+    Number(
+        producto.certificadoSinTacc
+    ) === 1;
 
             return (
                 coincideTexto &&
@@ -582,15 +598,22 @@ function limpiarFiltros() {
         });
 
 
-    // Restaurar Solo certificados Sin TACC
-    const switchCertificado =
-        document.getElementById('cert-sintacc');
+  // ----------------------------------
+// SWITCH SIN TACC
+// ----------------------------------
 
-    if (switchCertificado) {
+const switchCertificado =
+    document.getElementById(
+        'cert-sintacc'
+    );
 
-        switchCertificado.checked = true;
+if (switchCertificado) {
 
-    }
+    switchCertificado.addEventListener(
+        'change',
+        aplicarFiltros
+    );
+}
 
 
     // Restaurar orden

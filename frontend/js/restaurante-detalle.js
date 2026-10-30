@@ -218,20 +218,20 @@ function mostrarCalificacion(restaurante) {
 
 
 // ==========================================
-// MOSTRAR IMAGEN
+// MOSTRAR FOTO DEL INTERIOR
 // ==========================================
 
 function mostrarImagen(restaurante) {
 
     if (
-        restaurante.imagenExterior &&
-        restaurante.imagenExterior.trim() !== ''
+        restaurante.imagenInterior &&
+        restaurante.imagenInterior.trim() !== ''
     ) {
 
         imagen.innerHTML = `
             <img
-                src="${restaurante.imagenExterior}"
-                alt="${restaurante.nombre}"
+                src="${restaurante.imagenInterior}"
+                alt="Interior de ${restaurante.nombre}"
                 class="img-fluid w-100 h-100"
                 style="object-fit: cover;"
             >
@@ -240,6 +240,9 @@ function mostrarImagen(restaurante) {
         return;
     }
 
+
+    // Si el restaurante no tiene foto interior,
+    // mostramos el icono por defecto.
 
     imagen.innerHTML = `
         <i
@@ -756,11 +759,9 @@ async function enviarOpinion(evento) {
 
 
         /*
-            No agregamos la opinión a la lista pública
-            porque acaba de quedar PENDIENTE.
-
-            Recién aparecerá cuando el administrador
-            la apruebe.
+            La opinión queda pendiente de moderación.
+            Aparecerá públicamente cuando el
+            administrador la apruebe.
         */
 
 

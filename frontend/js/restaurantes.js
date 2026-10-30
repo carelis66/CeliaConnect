@@ -124,6 +124,7 @@ function crearTarjetaRestaurante(restaurante) {
             <img
                 src="${restaurante.imagenExterior}"
                 class="card-img-top"
+                style="height: 500px; object-fit: cover; object-position: center;"
                 alt="${restaurante.nombre}"
             >
         `

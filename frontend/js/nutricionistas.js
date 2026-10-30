@@ -272,7 +272,7 @@ function mostrarNutricionistas() {
                     src="${foto}"
                     class="card-img-top"
                     alt="${nutricionista.nombre} ${nutricionista.apellido}"
-                    style="height: 220px; object-fit: cover;"
+                    style="height: 400px; object-fit: cover;"
                     onerror="this.style.display='none'"
                 >
 

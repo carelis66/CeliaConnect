@@ -1074,12 +1074,48 @@ app.get('/api/productos', async (req, res) => {
                 p.codigoBarras,
                 p.certificadoSinTacc,
                 m.nombre AS marca,
-                c.nombre AS categoria
+                c.nombre AS categoria,
+
+                COALESCE(
+                    AVG(
+                        CASE
+                            WHEN cp.estado = 'aprobado'
+                            THEN cp.calificacion
+                        END
+                    ),
+                    0
+                ) AS calificacionPromedio,
+
+                COUNT(
+                    CASE
+                        WHEN cp.estado = 'aprobado'
+                        THEN cp.id
+                    END
+                ) AS cantidadResenas
+
             FROM producto p
+
             INNER JOIN marca m
                 ON p.marcaId = m.id
+
             INNER JOIN categoria c
                 ON p.categoriaId = c.id
+
+            LEFT JOIN comentarioProducto cp
+                ON cp.productoId = p.id
+
+            GROUP BY
+                p.id,
+                p.nombre,
+                p.descripcion,
+                p.ingredientes,
+                p.informacionNutricional,
+                p.imagen,
+                p.codigoBarras,
+                p.certificadoSinTacc,
+                m.nombre,
+                c.nombre
+
             ORDER BY p.id
         `);
 
