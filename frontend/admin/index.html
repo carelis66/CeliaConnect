@@ -107,53 +107,145 @@
 
                 <!-- MÉTRICAS -->
 
-                <div class="row g-4 mb-4">
+<div class="row g-4 mb-4">
 
-                    <div class="col-sm-6 col-xl-3">
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="bi bi-basket2-fill"></i></div>
-                            <div>
-                                <p class="stat-value">248</p>
-                                <p class="stat-label">Productos</p>
-                                <span class="stat-trend"><i class="bi bi-arrow-up-right"></i> 12 este mes</span>
-                            </div>
-                        </div>
-                    </div>
+    <!-- PRODUCTOS -->
+    <div class="col-sm-6 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-basket2-fill"></i>
+            </div>
 
-                    <div class="col-sm-6 col-xl-3">
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="bi bi-shop"></i></div>
-                            <div>
-                                <p class="stat-value">86</p>
-                                <p class="stat-label">Restaurantes</p>
-                                <span class="stat-trend"><i class="bi bi-arrow-up-right"></i> 4 este mes</span>
-                            </div>
-                        </div>
-                    </div>
+            <div>
+                <p
+                    class="stat-value"
+                    id="kpiProductos"
+                >
+                    -
+                </p>
 
-                    <div class="col-sm-6 col-xl-3">
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="bi bi-heart-pulse-fill"></i></div>
-                            <div>
-                                <p class="stat-value">34</p>
-                                <p class="stat-label">Nutricionistas</p>
-                                <span class="stat-trend"><i class="bi bi-arrow-up-right"></i> 2 este mes</span>
-                            </div>
-                        </div>
-                    </div>
+                <p class="stat-label">
+                    Productos
+                </p>
 
-                    <div class="col-sm-6 col-xl-3">
-                        <div class="stat-card">
-                            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
-                            <div>
-                                <p class="stat-value">1.204</p>
-                                <p class="stat-label">Usuarios</p>
-                                <span class="stat-trend"><i class="bi bi-arrow-up-right"></i> 58 este mes</span>
-                            </div>
-                        </div>
-                    </div>
+                <span class="stat-trend">
+                    Certificados Sin TACC
+                </span>
+            </div>
+        </div>
+    </div>
 
-                </div>
+
+    <!-- RESTAURANTES -->
+    <div class="col-sm-6 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-shop"></i>
+            </div>
+
+            <div>
+                <p
+                    class="stat-value"
+                    id="kpiRestaurantes"
+                >
+                    -
+                </p>
+
+                <p class="stat-label">
+                    Restaurantes
+                </p>
+
+                <span class="stat-trend">
+                    Verificados
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- LOCALES -->
+    <div class="col-sm-6 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-geo-alt-fill"></i>
+            </div>
+
+            <div>
+                <p
+                    class="stat-value"
+                    id="kpiLocales"
+                >
+                    -
+                </p>
+
+                <p class="stat-label">
+                    Locales
+                </p>
+
+                <span class="stat-trend">
+                    Verificados
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- NUTRICIONISTAS -->
+    <div class="col-sm-6 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-heart-pulse-fill"></i>
+            </div>
+
+            <div>
+                <p
+                    class="stat-value"
+                    id="kpiNutricionistas"
+                >
+                    -
+                </p>
+
+                <p class="stat-label">
+                    Nutricionistas
+                </p>
+
+                <span class="stat-trend">
+                    Verificados
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- USUARIOS -->
+    <div class="col-sm-6 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+
+            <div>
+                <p
+                    class="stat-value"
+                    id="kpiUsuarios"
+                >
+                    -
+                </p>
+
+                <p class="stat-label">
+                    Usuarios
+                </p>
+
+                <span class="stat-trend">
+                    Activos
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+    
 
                 <!-- ÚLTIMAS ALTAS + MODERACIÓN -->
 
@@ -187,7 +279,7 @@
                                         </tr>
                                     </thead>
 
-                                    <tbody>
+                                    <tbody id="tablaUltimasAltas">
 
                                         <tr>
                                             <td>

@@ -1073,6 +1073,8 @@ app.get('/api/productos', async (req, res) => {
                 p.imagen,
                 p.codigoBarras,
                 p.certificadoSinTacc,
+                p.marcaId,
+                P.categoriaId,
                 m.nombre AS marca,
                 c.nombre AS categoria,
 
@@ -1113,6 +1115,8 @@ app.get('/api/productos', async (req, res) => {
                 p.imagen,
                 p.codigoBarras,
                 p.certificadoSinTacc,
+                p.marcaId,
+                p.categoriaId,
                 m.nombre,
                 c.nombre
 
@@ -1437,6 +1441,8 @@ app.get('/api/productos/:id', async (req, res) => {
                 p.imagen,
                 p.codigoBarras,
                 p.certificadoSinTacc,
+                p.marcaId,
+                p.categoriaId,
                 m.nombre AS marca,
                 c.nombre AS categoria
             FROM producto p
@@ -2998,6 +3004,506 @@ app.patch(
     }
 );
 
+// ==========================================
+// ADMIN - MARCAS
+// ==========================================
+
+app.get(
+    '/api/admin/marcas',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [marcas] =
+                await pool.query(`
+                    SELECT id, nombre
+                    FROM marca
+                    ORDER BY nombre ASC
+                `);
+
+            res.json(marcas);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener marcas:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al obtener las marcas'
+            });
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// ADMIN - CATEGORÍAS
+// ==========================================
+
+app.get(
+    '/api/admin/categorias',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [categorias] =
+                await pool.query(`
+                    SELECT id, nombre
+                    FROM categoria
+                    ORDER BY nombre ASC
+                `);
+
+            res.json(categorias);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener categorías:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al obtener las categorías'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - CREAR PRODUCTO
+// ==========================================
+
+app.post(
+    '/api/admin/productos',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const {
+                nombre,
+                descripcion,
+                ingredientes,
+                informacionNutricional,
+                imagen,
+                codigoBarras,
+                certificadoSinTacc,
+                marcaId,
+                categoriaId
+            } = req.body;
+
+
+            if (
+                !nombre ||
+                !marcaId ||
+                !categoriaId
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, marca y categoría son obligatorios'
+                });
+            }
+
+
+            const [resultado] =
+                await pool.query(`
+                    INSERT INTO producto (
+                        nombre,
+                        descripcion,
+                        ingredientes,
+                        informacionNutricional,
+                        imagen,
+                        codigoBarras,
+                        certificadoSinTacc,
+                        fechaCreacion,
+                        marcaId,
+                        categoriaId
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
+                `, [
+                    nombre.trim(),
+                    descripcion || null,
+                    ingredientes || null,
+                    informacionNutricional || null,
+                    imagen || null,
+                    codigoBarras || null,
+                    Number(certificadoSinTacc) === 1 ? 1 : 0,
+                    Number(marcaId),
+                    Number(categoriaId)
+                ]);
+
+
+            res.status(201).json({
+                mensaje:
+                    'Producto creado correctamente',
+
+                id:
+                    resultado.insertId
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al crear producto:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al crear el producto'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - EDITAR PRODUCTO
+// ==========================================
+
+app.put(
+    '/api/admin/productos/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const productoId =
+                Number(req.params.id);
+
+            if (
+                !Number.isInteger(productoId) ||
+                productoId <= 0
+            ) {
+                return res.status(400).json({
+                    mensaje: 'ID de producto inválido'
+                });
+            }
+
+
+            const {
+                nombre,
+                descripcion,
+                ingredientes,
+                informacionNutricional,
+                imagen,
+                codigoBarras,
+                certificadoSinTacc,
+                marcaId,
+                categoriaId
+            } = req.body;
+
+
+            if (
+                !nombre ||
+                !marcaId ||
+                !categoriaId
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, marca y categoría son obligatorios'
+                });
+            }
+
+
+            const [productos] =
+                await pool.query(`
+                    SELECT id
+                    FROM producto
+                    WHERE id = ?
+                    LIMIT 1
+                `, [productoId]);
+
+
+            if (productos.length === 0) {
+                return res.status(404).json({
+                    mensaje: 'Producto no encontrado'
+                });
+            }
+
+
+            await pool.query(`
+                UPDATE producto
+                SET
+                    nombre = ?,
+                    descripcion = ?,
+                    ingredientes = ?,
+                    informacionNutricional = ?,
+                    imagen = ?,
+                    codigoBarras = ?,
+                    certificadoSinTacc = ?,
+                    marcaId = ?,
+                    categoriaId = ?
+                WHERE id = ?
+            `, [
+                nombre.trim(),
+                descripcion || null,
+                ingredientes || null,
+                informacionNutricional || null,
+                imagen || null,
+                codigoBarras || null,
+                Number(certificadoSinTacc) === 1 ? 1 : 0,
+                Number(marcaId),
+                Number(categoriaId),
+                productoId
+            ]);
+
+
+            res.json({
+                mensaje: 'Producto actualizado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al actualizar producto:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al actualizar el producto'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - ELIMINAR PRODUCTO
+// ==========================================
+
+app.delete(
+    '/api/admin/productos/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const productoId =
+                Number(req.params.id);
+
+            if (
+                !Number.isInteger(productoId) ||
+                productoId <= 0
+            ) {
+                return res.status(400).json({
+                    mensaje: 'ID de producto inválido'
+                });
+            }
+
+
+            const [productos] =
+                await pool.query(`
+                    SELECT id
+                    FROM producto
+                    WHERE id = ?
+                    LIMIT 1
+                `, [productoId]);
+
+
+            if (productos.length === 0) {
+                return res.status(404).json({
+                    mensaje: 'Producto no encontrado'
+                });
+            }
+
+
+            await pool.query(`
+                DELETE FROM producto
+                WHERE id = ?
+            `, [productoId]);
+
+
+            res.json({
+                mensaje:
+                    'Producto eliminado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al eliminar producto:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al eliminar el producto'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - ESTADÍSTICAS DEL DASHBOARD
+// ==========================================
+
+app.get(
+    '/api/admin/dashboard',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [productos] = await pool.query(`
+                SELECT COUNT(*) AS total
+                FROM producto
+                WHERE certificadoSinTacc = 1
+            `);
+
+            const [restaurantes] = await pool.query(`
+                SELECT COUNT(*) AS total
+                FROM restaurante
+                WHERE estadoVerificacion = 'verificado'
+            `);
+
+            const [locales] = await pool.query(`
+                SELECT COUNT(*) AS total
+                FROM local
+                WHERE estadoVerificacion = 'verificado'
+            `);
+
+            const [nutricionistas] = await pool.query(`
+                SELECT COUNT(*) AS total
+                FROM nutricionista
+                WHERE estadoVerificacion = 'verificado'
+            `);
+
+            const [usuarios] = await pool.query(`
+                SELECT COUNT(*) AS total
+                FROM usuario
+                WHERE esActivo = 1
+            `);
+
+            res.json({
+                productos: Number(productos[0].total),
+                restaurantes: Number(restaurantes[0].total),
+                locales: Number(locales[0].total),
+                nutricionistas: Number(nutricionistas[0].total),
+                usuarios: Number(usuarios[0].total)
+            });
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener estadísticas del dashboard:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener las estadísticas del dashboard'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - ÚLTIMAS ALTAS
+// ==========================================
+
+app.get(
+    '/api/admin/ultimas-altas',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [altas] = await pool.query(`
+                SELECT *
+                FROM (
+                    SELECT
+                        id,
+                        nombre,
+                        'Producto' AS tipo,
+                        CASE
+                            WHEN certificadoSinTacc = 1
+                                THEN 'Verificado'
+                            ELSE 'Pendiente'
+                        END AS estado,
+                        fechaCreacion
+                    FROM producto
+
+                    UNION ALL
+
+                    SELECT
+                        id,
+                        nombre,
+                        'Restaurante' AS tipo,
+                        estadoVerificacion AS estado,
+                        fechaCreacion
+                    FROM restaurante
+
+                    UNION ALL
+
+                    SELECT
+                        id,
+                        nombre,
+                        'Local' AS tipo,
+                        estadoVerificacion AS estado,
+                        fechaCreacion
+                    FROM local
+
+                    UNION ALL
+
+                    SELECT
+                        id,
+                        CONCAT(nombre, ' ', apellido) AS nombre,
+                        'Nutricionista' AS tipo,
+                        estadoVerificacion AS estado,
+                        fechaCreacion
+                    FROM nutricionista
+                ) AS ultimasAltas
+
+                WHERE fechaCreacion IS NOT NULL
+
+                ORDER BY fechaCreacion DESC
+
+                LIMIT 6
+            `);
+
+            res.json(altas);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener últimas altas:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener las últimas altas'
+            });
+
+        }
+
+    }
+);
 
 // ==========================================
 // INICIAR SERVIDOR

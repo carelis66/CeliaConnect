@@ -15,6 +15,21 @@ const API_ADMIN_LOCALES =
 const API_ADMIN_NUTRICIONISTAS =
 'http://localhost:3000/api/admin/comentarios/nutricionistas';
 
+const API_ADMIN_DASHBOARD =
+    'http://localhost:3000/api/admin/dashboard';
+
+const API_PRODUCTOS =
+    'http://localhost:3000/api/productos';
+
+const API_ADMIN_MARCAS =
+    'http://localhost:3000/api/admin/marcas';
+
+const API_ADMIN_CATEGORIAS =
+    'http://localhost:3000/api/admin/categorias';
+
+const API_ADMIN_ULTIMAS_ALTAS =
+    'http://localhost:3000/api/admin/ultimas-altas';
+
 let comentarioSeleccionado = null;
 let estadoSeleccionado = null;
 let tipoComentarioSeleccionado = null;
@@ -120,6 +135,895 @@ function verificarAccesoAdmin() {
     return true;
 }
 
+// ==========================================
+// DASHBOARD - ESTADÍSTICAS
+// ==========================================
+
+async function cargarEstadisticasDashboard() {
+    try {
+
+        const kpiProductos = document.getElementById('kpiProductos');
+        if (!kpiProductos) {
+             return;
+        }
+
+        const token = obtenerTokenAdmin();
+
+        const respuesta = await fetch(API_ADMIN_DASHBOARD, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!respuesta.ok) {
+            throw new Error(
+                'No se pudieron cargar las estadísticas del dashboard'
+            );
+        }
+
+        const datos = await respuesta.json();
+
+        document.getElementById('kpiProductos').textContent =
+            datos.productos;
+
+        document.getElementById('kpiRestaurantes').textContent =
+            datos.restaurantes;
+
+        document.getElementById('kpiLocales').textContent =
+            datos.locales;
+
+        document.getElementById('kpiNutricionistas').textContent =
+            datos.nutricionistas;
+
+        document.getElementById('kpiUsuarios').textContent =
+            datos.usuarios;
+
+    } catch (error) {
+        console.error(
+            'Error al cargar estadísticas del dashboard:',
+            error
+        );
+    }
+}
+
+// ==========================================
+// DASHBOARD - ÚLTIMAS ALTAS
+// ==========================================
+
+async function cargarUltimasAltas() {
+    try {
+        const token = obtenerTokenAdmin();
+
+        const respuesta = await fetch(API_ADMIN_ULTIMAS_ALTAS, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        if (!respuesta.ok) {
+            throw new Error(
+                'No se pudieron cargar las últimas altas'
+            );
+        }
+
+        const altas = await respuesta.json();
+
+        const tabla = document.getElementById('tablaUltimasAltas');
+
+        if (!tabla) {
+            return;
+        }
+
+        tabla.innerHTML = '';
+
+        altas.forEach((alta) => {
+
+            let icono = 'bi-circle-fill';
+
+            if (alta.tipo === 'Producto') {
+                icono = 'bi-basket2-fill';
+            }
+
+            if (alta.tipo === 'Restaurante') {
+                icono = 'bi-shop';
+            }
+
+            if (alta.tipo === 'Local') {
+                icono = 'bi-geo-alt-fill';
+            }
+
+            if (alta.tipo === 'Nutricionista') {
+                icono = 'bi-heart-pulse-fill';
+            }
+
+
+            let claseEstado = 'status-pending';
+            let iconoEstado = 'bi-hourglass-split';
+
+            const estado = alta.estado.toLowerCase();
+
+            if (estado === 'verificado') {
+                claseEstado = 'status-ok';
+                iconoEstado = 'bi-patch-check-fill';
+            }
+
+            if (estado === 'rechazado') {
+                claseEstado = 'status-rejected';
+                iconoEstado = 'bi-x-circle-fill';
+            }
+
+
+            const fecha = new Date(alta.fechaCreacion);
+
+            const fechaFormateada =
+                fecha.toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: 'short'
+                });
+
+
+            tabla.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="admin-item">
+
+                            <span class="admin-item-icon">
+                                <i class="bi ${icono}"></i>
+                            </span>
+
+                            <div>
+                                <span class="admin-item-name">
+                                    ${alta.nombre}
+                                </span>
+                            </div>
+
+                        </div>
+                    </td>
+
+                    <td>
+                        ${alta.tipo}
+                    </td>
+
+                    <td>
+                        <span class="status-pill ${claseEstado}">
+                            <i class="bi ${iconoEstado}"></i>
+                            ${alta.estado}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${fechaFormateada}
+                    </td>
+                </tr>
+            `;
+        });
+
+    } catch (error) {
+        console.error(
+            'Error al cargar últimas altas:',
+            error
+        );
+    }
+}
+
+async function cargarProductosAdmin() {
+
+    const tabla =
+        document.getElementById('tablaProductosAdmin');
+
+    if (!tabla) {
+        return;
+    }
+
+    try {
+
+        const respuesta =
+            await fetch(API_PRODUCTOS);
+
+        if (!respuesta.ok) {
+            throw new Error(
+                'No se pudieron cargar los productos'
+            );
+        }
+
+        const productos =
+            await respuesta.json();
+
+        tabla.innerHTML = '';
+
+        productos.forEach((producto) => {
+
+            const certificado =
+                Number(producto.certificadoSinTacc) === 1;
+
+            const claseEstado =
+                certificado
+                    ? 'status-ok'
+                    : 'status-pending';
+
+            const iconoEstado =
+                certificado
+                    ? 'bi-patch-check-fill'
+                    : 'bi-hourglass-split';
+
+            const textoEstado =
+                certificado
+                    ? 'Certificado'
+                    : 'Pendiente';
+
+            tabla.innerHTML += `
+                <tr>
+
+                    <td>
+                        <div class="admin-item">
+
+                            <span class="admin-item-icon">
+                                <i class="bi bi-basket2-fill"></i>
+                            </span>
+
+                            <div>
+                                <span class="admin-item-name">
+                                    ${producto.nombre}
+                                </span>
+
+                                <span class="admin-item-sub">
+                                    ${producto.codigoBarras || 'Sin código'}
+                                </span>
+                            </div>
+
+                        </div>
+                    </td>
+
+                    <td>
+                        ${producto.marca}
+                    </td>
+
+                    <td>
+                        ${producto.categoria}
+                    </td>
+
+                    <td>
+                        <span class="status-pill ${claseEstado}">
+                            <i class="bi ${iconoEstado}"></i>
+                            ${textoEstado}
+                        </span>
+                    </td>
+
+                    <td class="text-end">
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-light me-1"
+                            title="Editar"
+                            data-id="${producto.id}"
+                        >
+                            <i class="bi bi-pencil"></i>
+                        </button>
+
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-light"
+                            title="Eliminar"
+                            data-id="${producto.id}"
+                        >
+                            <i class="bi bi-trash3"></i>
+                        </button>
+
+                    </td>
+
+                </tr>
+            `;
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            'Error al cargar productos:',
+            error
+        );
+
+        tabla.innerHTML = `
+            <tr>
+                <td
+                    colspan="5"
+                    class="text-center py-5 text-muted"
+                >
+                    No se pudieron cargar los productos.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+// ==========================================
+// EDITAR PRODUCTO - ADMIN
+// ==========================================
+
+async function cargarOpcionesProducto() {
+
+    const selectMarca =
+        document.getElementById('productoMarca');
+
+    const selectCategoria =
+        document.getElementById('productoCategoria');
+
+    if (!selectMarca || !selectCategoria) {
+        return;
+    }
+
+    try {
+
+        const token = obtenerTokenAdmin();
+
+        const [respuestaMarcas, respuestaCategorias] =
+            await Promise.all([
+                fetch(API_ADMIN_MARCAS, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }),
+
+                fetch(API_ADMIN_CATEGORIAS, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+            ]);
+
+
+        if (
+            !respuestaMarcas.ok ||
+            !respuestaCategorias.ok
+        ) {
+            throw new Error(
+                'No se pudieron cargar marcas y categorías'
+            );
+        }
+
+
+        const marcas =
+            await respuestaMarcas.json();
+
+        const categorias =
+            await respuestaCategorias.json();
+
+
+        selectMarca.innerHTML =
+            '<option value="">Seleccionar marca</option>';
+
+        marcas.forEach((marca) => {
+
+            selectMarca.innerHTML += `
+                <option value="${marca.id}">
+                    ${marca.nombre}
+                </option>
+            `;
+
+        });
+
+
+        selectCategoria.innerHTML =
+            '<option value="">Seleccionar categoría</option>';
+
+        categorias.forEach((categoria) => {
+
+            selectCategoria.innerHTML += `
+                <option value="${categoria.id}">
+                    ${categoria.nombre}
+                </option>
+            `;
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al cargar opciones de producto:',
+            error
+        );
+
+    }
+
+}
+
+function inicializarEdicionProductos() {
+
+    const tabla =
+        document.getElementById('tablaProductosAdmin');
+
+    const modalElemento =
+        document.getElementById('modalProducto');
+
+    if (!tabla || !modalElemento) {
+        return;
+    }
+
+    tabla.addEventListener('click', async (event) => {
+
+        const boton =
+            event.target.closest(
+                'button[title="Editar"]'
+            );
+
+        if (!boton) {
+            return;
+        }
+
+        const productoId =
+            Number(boton.dataset.id);
+
+        try {
+
+            const respuesta =
+                await fetch(
+                    `${API_PRODUCTOS}/${productoId}`
+                );
+
+            if (!respuesta.ok) {
+                throw new Error(
+                    'No se pudo obtener el producto'
+                );
+            }
+
+            const producto =
+                await respuesta.json();
+
+
+            document.getElementById(
+                'productoId'
+            ).value = producto.id;
+
+            document.getElementById(
+                'productoNombre'
+            ).value = producto.nombre || '';
+
+            document.getElementById(
+                'productoCodigoBarras'
+            ).value = producto.codigoBarras || '';
+
+            document.getElementById(
+                'productoDescripcion'
+            ).value = producto.descripcion || '';
+
+            document.getElementById(
+                'productoIngredientes'
+            ).value = producto.ingredientes || '';
+
+            document.getElementById(
+                'productoInfoNutricional'
+            ).value =
+                producto.informacionNutricional || '';
+
+            document.getElementById(
+                'productoImagen'
+            ).value = producto.imagen || '';
+
+            document.getElementById(
+    'productoMarca'
+).value = producto.marcaId;
+
+document.getElementById(
+    'productoCategoria'
+).value = producto.categoriaId;
+
+            document.getElementById(
+                'productoCertificado'
+            ).checked =
+                Number(producto.certificadoSinTacc) === 1;
+
+
+            document.getElementById(
+                'modalProductoTitulo'
+            ).textContent = 'Editar producto';
+
+            document.getElementById(
+    'btnGuardarProducto'
+).innerHTML = `
+    <i class="bi bi-check-lg"></i>
+    Guardar producto
+`;
+
+
+            const modal =
+                bootstrap.Modal.getOrCreateInstance(
+                    modalElemento
+                );
+
+            modal.show();
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al cargar producto para editar:',
+                error
+            );
+
+        }
+
+    });
+
+}
+
+// ==========================================
+// PREPARAR ELIMINACIÓN DE PRODUCTO - ADMIN
+// ==========================================
+
+function inicializarEliminarProducto() {
+
+    const tabla =
+        document.getElementById('tablaProductosAdmin');
+
+    const modalElemento =
+        document.getElementById('modalEliminarProducto');
+
+    if (!tabla || !modalElemento) {
+        return;
+    }
+
+    tabla.addEventListener('click', (event) => {
+
+        const boton =
+            event.target.closest(
+                'button[title="Eliminar"]'
+            );
+
+        if (!boton) {
+            return;
+        }
+
+        const productoId =
+            Number(boton.dataset.id);
+
+        const fila =
+            boton.closest('tr');
+
+        const nombreProducto =
+            fila.querySelector(
+                '.admin-item-name'
+            ).textContent.trim();
+
+
+        document.getElementById(
+            'nombreProductoEliminar'
+        ).textContent = nombreProducto;
+
+
+        const botonConfirmar =
+            document.getElementById(
+                'btnConfirmarEliminarProducto'
+            );
+
+        botonConfirmar.dataset.id =
+            productoId;
+
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(
+                modalElemento
+            );
+
+        modal.show();
+
+    });
+
+}
+
+// ==========================================
+// CONFIRMAR ELIMINACIÓN DE PRODUCTO - ADMIN
+// ==========================================
+
+function inicializarConfirmarEliminarProducto() {
+
+    const botonConfirmar =
+        document.getElementById(
+            'btnConfirmarEliminarProducto'
+        );
+
+    const modalElemento =
+        document.getElementById(
+            'modalEliminarProducto'
+        );
+
+    if (!botonConfirmar || !modalElemento) {
+        return;
+    }
+
+
+    botonConfirmar.addEventListener(
+        'click',
+        async () => {
+
+            const productoId =
+                Number(
+                    botonConfirmar.dataset.id
+                );
+
+            if (!productoId) {
+                return;
+            }
+
+
+            try {
+
+                const token =
+                    obtenerTokenAdmin();
+
+                botonConfirmar.disabled = true;
+
+
+                const respuesta =
+                    await fetch(
+                        `http://localhost:3000/api/admin/productos/${productoId}`,
+                        {
+                            method: 'DELETE',
+
+                            headers: {
+                                Authorization:
+                                    `Bearer ${token}`
+                            }
+                        }
+                    );
+
+
+                const resultado =
+                    await respuesta.json();
+
+
+                if (!respuesta.ok) {
+                    throw new Error(
+                        resultado.mensaje ||
+                        'No se pudo eliminar el producto'
+                    );
+                }
+
+
+                const modal =
+                    bootstrap.Modal.getInstance(
+                        modalElemento
+                    );
+
+                modal.hide();
+
+
+                await cargarProductosAdmin();
+
+
+            } catch (error) {
+
+                console.error(
+                    'Error al eliminar producto:',
+                    error
+                );
+
+            } finally {
+
+                botonConfirmar.disabled = false;
+
+            }
+
+        }
+    );
+
+}
+
+// ==========================================
+// GUARDAR EDICIÓN DE PRODUCTO - ADMIN
+// ==========================================
+
+function inicializarGuardarProducto() {
+
+    const formulario =
+        document.getElementById('formProducto');
+
+    const modalElemento =
+        document.getElementById('modalProducto');
+
+    if (!formulario || !modalElemento) {
+        return;
+    }
+
+    formulario.addEventListener('submit', async (event) => {
+
+        event.preventDefault();
+
+        const productoId =
+            Number(
+                document.getElementById('productoId').value
+            );
+
+
+        const token =
+            obtenerTokenAdmin();
+
+        const datosProducto = {
+
+            nombre:
+                document.getElementById(
+                    'productoNombre'
+                ).value.trim(),
+
+            codigoBarras:
+                document.getElementById(
+                    'productoCodigoBarras'
+                ).value.trim(),
+
+            marcaId:
+                Number(
+                    document.getElementById(
+                        'productoMarca'
+                    ).value
+                ),
+
+            categoriaId:
+                Number(
+                    document.getElementById(
+                        'productoCategoria'
+                    ).value
+                ),
+
+            descripcion:
+                document.getElementById(
+                    'productoDescripcion'
+                ).value.trim(),
+
+            ingredientes:
+                document.getElementById(
+                    'productoIngredientes'
+                ).value.trim(),
+
+            informacionNutricional:
+                document.getElementById(
+                    'productoInfoNutricional'
+                ).value.trim(),
+
+            imagen:
+                document.getElementById(
+                    'productoImagen'
+                ).value.trim(),
+
+            certificadoSinTacc:
+                document.getElementById(
+                    'productoCertificado'
+                ).checked
+                    ? 1
+                    : 0
+        };
+
+
+        try {
+
+            const botonGuardar =
+                document.getElementById(
+                    'btnGuardarProducto'
+                );
+
+            botonGuardar.disabled = true;
+
+            const esNuevo =
+    !productoId;
+
+const url =
+    esNuevo
+        ? 'http://localhost:3000/api/admin/productos'
+        : `http://localhost:3000/api/admin/productos/${productoId}`;
+
+const metodo =
+    esNuevo
+        ? 'POST'
+        : 'PUT';
+
+const respuesta =
+    await fetch(
+        url,
+        {
+            method: metodo,
+
+            headers: {
+                'Content-Type':
+                    'application/json',
+
+                Authorization:
+                    `Bearer ${token}`
+            },
+
+            body:
+                JSON.stringify(datosProducto)
+        }
+    );
+
+
+            const resultado =
+                await respuesta.json();
+
+
+            if (!respuesta.ok) {
+                throw new Error(
+                    resultado.mensaje ||
+                    'No se pudo actualizar el producto'
+                );
+            }
+
+            const tituloExito =
+    document.querySelector(
+        '#modalProductoExito h5'
+    );
+
+const textoExito =
+    document.querySelector(
+        '#modalProductoExito p'
+    );
+
+if (tituloExito && textoExito) {
+
+    tituloExito.textContent =
+        esNuevo
+            ? 'Producto creado'
+            : 'Producto actualizado';
+
+    textoExito.textContent =
+        esNuevo
+            ? 'El producto se creó correctamente.'
+            : 'Los cambios se guardaron correctamente.';
+}
+
+
+            const modal =
+    bootstrap.Modal.getInstance(
+        modalElemento
+    );
+
+modalElemento.addEventListener(
+    'hidden.bs.modal',
+    () => {
+
+        const modalExitoElemento =
+            document.getElementById(
+                'modalProductoExito'
+            );
+
+        const modalExito =
+            bootstrap.Modal.getOrCreateInstance(
+                modalExitoElemento
+            );
+
+        modalExito.show();
+
+    },
+    { once: true }
+);
+
+modal.hide();
+
+
+            await cargarProductosAdmin();
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al guardar producto:',
+                error
+            );
+
+        } finally {
+
+            const botonGuardar =
+                document.getElementById(
+                    'btnGuardarProducto'
+                );
+
+            botonGuardar.disabled = false;
+
+        }
+
+    });
+
+}
 
 // ==========================================
 // INICIAR ADMIN
@@ -151,10 +1055,74 @@ document.addEventListener(
 
         inicializarModalModeracion();
 
+        cargarEstadisticasDashboard();
+
+        cargarUltimasAltas();
+
         cargarComentariosPendientes();
+
+        cargarProductosAdmin();
+
+        cargarOpcionesProducto()
+    .then(() => {
+        inicializarEdicionProductos();
+        inicializarNuevoProducto();
+    });
+    inicializarGuardarProducto();
+    inicializarEliminarProducto();
+    inicializarConfirmarEliminarProducto();
 
     }
 );
+
+// ==========================================
+// NUEVO PRODUCTO - ADMIN
+// ==========================================
+
+function inicializarNuevoProducto() {
+
+    const botonNuevo =
+        document.getElementById('btnNuevoProducto');
+
+    const formulario =
+        document.getElementById('formProducto');
+
+    const modalElemento =
+        document.getElementById('modalProducto');
+
+    if (!botonNuevo || !formulario || !modalElemento) {
+        return;
+    }
+
+    botonNuevo.addEventListener('click', () => {
+
+        formulario.reset();
+
+        document.getElementById(
+            'productoId'
+        ).value = '';
+
+        document.getElementById(
+            'modalProductoTitulo'
+        ).textContent = 'Nuevo producto';
+
+        document.getElementById(
+            'btnGuardarProducto'
+        ).innerHTML = `
+            <i class="bi bi-check-lg"></i>
+            Crear producto
+        `;
+
+        const modal =
+            bootstrap.Modal.getOrCreateInstance(
+                modalElemento
+            );
+
+        modal.show();
+
+    });
+
+}
 
 
 // ==========================================
