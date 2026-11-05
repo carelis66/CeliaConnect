@@ -49,10 +49,6 @@
 
                 <div class="admin-topbar-right">
 
-                    <button type="button" class="icon-btn" aria-label="Notificaciones">
-                        <i class="bi bi-bell"></i>
-                        <span class="icon-dot"></span>
-                    </button>
 
                     <div class="admin-user">
 
@@ -60,17 +56,23 @@
         AD
     </span>
 
-    <span class="admin-user-info">
+  <span class="admin-user-info">
 
-        <span class="admin-user-name">
-            Administrador
-        </span>
-
-        <span class="admin-user-role">
-            Rol: admin
-        </span>
-
+    <span
+        class="admin-user-name"
+        id="adminUsuarioNombre"
+    >
+        Administrador
     </span>
+
+    <span
+        class="admin-user-role"
+        id="adminUsuarioRol"
+    >
+        Rol: admin
+    </span>
+
+</span>
 
 </div>
 
@@ -81,33 +83,23 @@
             <!-- PÁGINA -->
 
             <main class="admin-content">
-
-                <div class="admin-page-head">
+                <div class="admin-page-head"
+                id="dashboardAdminHead">
 
                     <div>
                         <h1 class="admin-title">Resumen general</h1>
                         <p class="admin-subtitle">Un vistazo a la actividad de CeliaConnect en CABA.</p>
                     </div>
 
-                    <div class="admin-page-actions">
-
-                        <a href="productos.html" class="btn btn-warning">
-                            <i class="bi bi-plus-lg"></i>
-                            Nuevo producto
-                        </a>
-
-                        <a href="restaurantes.html" class="btn btn-outline-secondary">
-                            <i class="bi bi-plus-lg"></i>
-                            Nuevo restaurante
-                        </a>
-
-                    </div>
 
                 </div>
 
                 <!-- MÉTRICAS -->
 
-<div class="row g-4 mb-4">
+<div
+    class="row g-4 mb-4"
+    id="dashboardAdminMetricas"
+>
 
     <!-- PRODUCTOS -->
     <div class="col-sm-6 col-lg">
@@ -245,13 +237,28 @@
 
 </div>
 
-    
+<!-- ENCABEZADO MODERADOR -->
+<div
+    id="dashboardModeradorHead"
+    class="admin-page-head d-none"
+>
+    <div>
+        <h1 class="admin-title">
+            Panel de moderación
+        </h1>
+
+        <p class="admin-subtitle">
+            Revisá y gestioná las opiniones pendientes de la comunidad.
+        </p>
+    </div>
+</div>
 
                 <!-- ÚLTIMAS ALTAS + MODERACIÓN -->
 
                 <div class="row g-4">
 
-                    <div class="col-xl-8">
+                    <div class="col-xl-8"
+                    id="dashboardAdminAltas">
 
                         <div class="admin-panel">
 
@@ -381,7 +388,8 @@
 
                     </div>
 
-                    <div class="col-xl-4">
+                    <div class="col-xl-4"
+                    id="dashboardModeracion">
 
                         <div class="admin-panel">
 
@@ -392,10 +400,6 @@
                                     <span class="admin-count">3</span>
                                 </h3>
 
-                                <a href="comentarios.html" class="admin-panel-link">
-                                    Ver todos
-                                    <i class="bi bi-arrow-right"></i>
-                                </a>
 
                             </div>
 

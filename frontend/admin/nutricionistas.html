@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>Nutricionistas | Admin CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos CeliaConnect -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <aside
+            id="admin-sidebar-placeholder"
+            class="admin-sidebar"
+        ></aside>
+
+        <!-- OVERLAY MOBILE -->
+        <div
+            class="admin-overlay"
+            id="adminOverlay"
+        ></div>
+
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="admin-main">
+
+            <!-- BARRA SUPERIOR -->
+            <div class="admin-topbar">
+
+                <div class="admin-topbar-left">
+
+                    <button
+                        type="button"
+                        class="admin-menu-btn"
+                        id="adminMenuToggle"
+                        aria-label="Abrir menú"
+                    >
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <h2 class="admin-topbar-title">
+                        Panel de administración
+                    </h2>
+
+                </div>
+
+
+                <div class="admin-topbar-right">
+
+                    <div class="admin-user">
+
+                        <span class="admin-avatar">
+                            AD
+                        </span>
+
+                        <span class="admin-user-info">
+
+                            <span class="admin-user-name">
+                                Administrador
+                            </span>
+
+                            <span class="admin-user-role">
+                                Rol: admin
+                            </span>
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PÁGINA -->
+            <main class="admin-content">
+
+                <!-- ENCABEZADO -->
+                <div class="admin-page-head">
+
+                    <div>
+
+                        <h1 class="admin-title">
+                            Nutricionistas
+                        </h1>
+
+                        <p class="admin-subtitle">
+                            Administrá los nutricionistas registrados
+                            en CeliaConnect.
+                        </p>
+
+                    </div>
+
+
+                    <div class="admin-page-actions">
+
+                        <button
+                            type="button"
+                            class="btn btn-warning"
+                            id="btnNuevoNutricionista"
+                        >
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo nutricionista
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PANEL NUTRICIONISTAS -->
+                <div class="admin-panel">
+
+                    <div class="admin-panel-head">
+
+                        <div>
+
+                            <h3 class="admin-panel-title mb-1">
+                                Nutricionistas registrados
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Profesionales registrados en la base de datos.
+                            </p>
+
+                        </div>
+
+
+                        <!-- BUSCADOR -->
+                        <div
+                            class="input-group"
+                            style="max-width: 320px;"
+                        >
+
+                            <span class="input-group-text bg-white">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input
+                                type="search"
+                                class="form-control"
+                                id="buscarNutricionistaAdmin"
+                                placeholder="Buscar nutricionista..."
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TABLA -->
+                    <div class="table-responsive">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Nutricionista</th>
+                                    <th>Matrícula</th>
+                                    <th>Barrio</th>
+                                    <th>Estado</th>
+
+                                    <th class="text-end">
+                                        Acciones
+                                    </th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="tablaNutricionistasAdmin">
+
+                                <tr>
+
+                                    <td
+                                        colspan="5"
+                                        class="text-center py-5 text-muted"
+                                    >
+
+                                        <div
+                                            class="spinner-border spinner-border-sm me-2"
+                                            role="status"
+                                        ></div>
+
+                                        Cargando nutricionistas...
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL CREAR / EDITAR NUTRICIONISTA
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalNutricionista"
+        tabindex="-1"
+        aria-labelledby="modalNutricionistaTitulo"
+        aria-hidden="true"
+    >
+
+        <div
+            class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+        >
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header border-0">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="modalNutricionistaTitulo"
+                    >
+                        Nuevo nutricionista
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <form id="formNutricionista">
+
+                        <input
+                            type="hidden"
+                            id="nutricionistaId"
+                        >
+
+
+                        <div class="row g-3">
+
+                            <!-- NOMBRE -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaNombre"
+                                    class="form-label"
+                                >
+                                    Nombre
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaNombre"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- APELLIDO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaApellido"
+                                    class="form-label"
+                                >
+                                    Apellido
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaApellido"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- MATRÍCULA -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaMatricula"
+                                    class="form-label"
+                                >
+                                    Matrícula
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaMatricula"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- BARRIO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaBarrio"
+                                    class="form-label"
+                                >
+                                    Barrio
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="nutricionistaBarrio"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Seleccionar barrio
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- ESTADO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaEstado"
+                                    class="form-label"
+                                >
+                                    Estado
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="nutricionistaEstado"
+                                    required
+                                >
+
+                                    <option value="pendiente">
+                                        Pendiente
+                                    </option>
+
+                                    <option value="verificado">
+                                        Verificado
+                                    </option>
+
+                                    <option value="rechazado">
+                                        Rechazado
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- FOTO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaFoto"
+                                    class="form-label"
+                                >
+                                    Foto de perfil
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaFoto"
+                                    placeholder="assets/images/nutricionistas/..."
+                                >
+
+                            </div>
+
+
+                            <!-- DESCRIPCIÓN -->
+                            <div class="col-12">
+
+                                <label
+                                    for="nutricionistaDescripcion"
+                                    class="form-label"
+                                >
+                                    Descripción
+                                </label>
+
+                                <textarea
+                                    class="form-control"
+                                    id="nutricionistaDescripcion"
+                                    rows="3"
+                                ></textarea>
+
+                            </div>
+
+
+                            <!-- DIRECCIÓN -->
+                            <div class="col-12">
+
+                                <label
+                                    for="nutricionistaDireccion"
+                                    class="form-label"
+                                >
+                                    Dirección
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaDireccion"
+                                >
+
+                            </div>
+
+
+                            <!-- TELÉFONO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaTelefono"
+                                    class="form-label"
+                                >
+                                    Teléfono
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaTelefono"
+                                >
+
+                            </div>
+
+
+                            <!-- WHATSAPP -->
+                            <div class="col-md-6">
+
+                                <label class="form-label d-block">
+                                    WhatsApp
+                                </label>
+
+                                <div class="form-check mt-2">
+
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="nutricionistaWhatsapp"
+                                    >
+
+                                    <label
+                                        class="form-check-label"
+                                        for="nutricionistaWhatsapp"
+                                    >
+                                        El teléfono tiene WhatsApp
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaEmail"
+                                    class="form-label"
+                                >
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="nutricionistaEmail"
+                                >
+
+                            </div>
+
+
+                            <!-- HORARIO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaHorario"
+                                    class="form-label"
+                                >
+                                    Horario
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaHorario"
+                                >
+
+                            </div>
+
+
+                            <!-- SITIO WEB -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaSitioWeb"
+                                    class="form-label"
+                                >
+                                    Sitio web
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaSitioWeb"
+                                >
+
+                            </div>
+
+
+                            <!-- INSTAGRAM -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaInstagram"
+                                    class="form-label"
+                                >
+                                    Instagram
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="nutricionistaInstagram"
+                                >
+
+                            </div>
+
+
+                            <!-- LATITUD -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaLatitud"
+                                    class="form-label"
+                                >
+                                    Latitud
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="any"
+                                    class="form-control"
+                                    id="nutricionistaLatitud"
+                                >
+
+                            </div>
+
+
+                            <!-- LONGITUD -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="nutricionistaLongitud"
+                                    class="form-label"
+                                >
+                                    Longitud
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="any"
+                                    class="form-control"
+                                    id="nutricionistaLongitud"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <div class="modal-footer border-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        form="formNutricionista"
+                        class="btn btn-warning"
+                        id="btnGuardarNutricionista"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Guardar nutricionista
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL ELIMINAR NUTRICIONISTA
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalEliminarNutricionista"
+        tabindex="-1"
+        aria-labelledby="modalEliminarNutricionistaTitulo"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header border-0">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="modalEliminarNutricionistaTitulo"
+                    >
+                        Eliminar nutricionista
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <p class="mb-2">
+                        ¿Seguro que querés eliminar a
+                        <strong id="nombreNutricionistaEliminar"></strong>?
+                    </p>
+
+                    <p class="text-muted small mb-0">
+                        Esta acción no se puede deshacer.
+                    </p>
+
+                </div>
+
+
+                <div class="modal-footer border-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        id="btnConfirmarEliminarNutricionista"
+                    >
+                        <i class="bi bi-trash3"></i>
+                        Eliminar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL CONFIRMACIÓN NUTRICIONISTA
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalNutricionistaExito"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-body text-center p-4">
+
+                    <div class="mb-3">
+
+                        <i
+                            class="bi bi-check-circle-fill text-success"
+                            style="font-size: 3rem;"
+                        ></i>
+
+                    </div>
+
+                    <h5
+                        class="fw-bold"
+                        id="modalNutricionistaExitoTitulo"
+                    >
+                        Nutricionista actualizado
+                    </h5>
+
+                    <p
+                        class="text-muted mb-4"
+                        id="modalNutricionistaExitoMensaje"
+                    >
+                        Los cambios del nutricionista se guardaron correctamente.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-warning px-4"
+                        data-bs-dismiss="modal"
+                    >
+                        Aceptar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Bootstrap JS -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- JavaScript CeliaConnect -->
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+
+</body>
+
+</html>

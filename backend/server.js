@@ -4,11 +4,28 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./db');
 
+const usuariosRoutes =
+    require('./routes/usuarios.routes');
+
 const app = express();
 const PORT = 3000;
 
+const {
+    verificarAdminOModerador
+} = require('./middleware/auth.middleware');
+
 app.use(cors());
 app.use(express.json());
+
+// ==========================================
+// RUTAS MODULARES
+// ==========================================
+
+app.use(
+    '/api/admin/usuarios',
+    usuariosRoutes
+);
+
 
 // ==========================================
 // VERIFICAR TOKEN JWT
@@ -390,7 +407,7 @@ app.post('/api/registro', async (req, res) => {
 app.get(
     '/api/admin/comentarios/productos',
     verificarToken,
-    verificarAdmin,
+    verificarAdminOModerador,
     async (req, res) => {
 
         try {
@@ -598,7 +615,7 @@ app.patch(
 app.get(
     '/api/admin/comentarios/restaurantes',
     verificarToken,
-    verificarAdmin,
+    verificarAdminOModerador,
     async (req, res) => {
 
         try {
@@ -662,7 +679,7 @@ app.get(
 app.patch(
     '/api/admin/comentarios/restaurantes/:id',
     verificarToken,
-    verificarAdmin,
+    verificarAdminOModerador,
     async (req, res) => {
 
         try {
@@ -817,7 +834,7 @@ app.patch(
 app.get(
     '/api/admin/comentarios/locales',
     verificarToken,
-    verificarAdmin,
+    verificarAdminOModerador,
     async (req, res) => {
 
         try {
@@ -882,7 +899,7 @@ app.get(
 app.patch(
     '/api/admin/comentarios/locales/:id',
     verificarToken,
-    verificarAdmin,
+    verificarAdminOModerador,
     async (req, res) => {
 
         try {
@@ -2004,6 +2021,208 @@ app.post(
     }
 );
 
+// Actualizar local
+app.put(
+    '/api/admin/locales/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const localId =
+                Number(req.params.id);
+
+            if (!Number.isInteger(localId) || localId <= 0) {
+                return res.status(400).json({
+                    mensaje: 'ID de local inválido'
+                });
+            }
+
+
+            const {
+                nombre,
+                descripcion,
+                imagen,
+                direccion,
+                telefono,
+                email,
+                instagram,
+                sitioWeb,
+                horario,
+                latitud,
+                longitud,
+                estadoVerificacion,
+                tipoLocalId,
+                barrioId
+            } = req.body;
+
+
+            if (!nombre || !tipoLocalId || !barrioId) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, tipo de local y barrio son obligatorios'
+                });
+
+            }
+
+
+            const [existente] =
+                await pool.query(
+                    `
+                    SELECT id
+                    FROM local
+                    WHERE id = ?
+                    `,
+                    [localId]
+                );
+
+
+            if (existente.length === 0) {
+
+                return res.status(404).json({
+                    mensaje: 'Local no encontrado'
+                });
+
+            }
+
+
+            await pool.query(
+                `
+                UPDATE local
+                SET
+                    nombre = ?,
+                    descripcion = ?,
+                    imagen = ?,
+                    direccion = ?,
+                    telefono = ?,
+                    email = ?,
+                    instagram = ?,
+                    sitioWeb = ?,
+                    horario = ?,
+                    latitud = ?,
+                    longitud = ?,
+                    estadoVerificacion = ?,
+                    tipoLocalId = ?,
+                    barrioId = ?
+                WHERE id = ?
+                `,
+                [
+                    nombre,
+                    descripcion || null,
+                    imagen || null,
+                    direccion || null,
+                    telefono || null,
+                    email || null,
+                    instagram || null,
+                    sitioWeb || null,
+                    horario || null,
+                    latitud || null,
+                    longitud || null,
+                    estadoVerificacion || 'pendiente',
+                    tipoLocalId,
+                    barrioId,
+                    localId
+                ]
+            );
+
+
+            res.json({
+                mensaje: 'Local actualizado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al actualizar local:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al actualizar el local'
+            });
+
+        }
+
+    }
+);
+
+// Eliminar local
+app.delete(
+    '/api/admin/locales/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const localId =
+                Number(req.params.id);
+
+
+            if (!Number.isInteger(localId) || localId <= 0) {
+
+                return res.status(400).json({
+                    mensaje: 'ID de local inválido'
+                });
+
+            }
+
+
+            const [existente] =
+                await pool.query(
+                    `
+                    SELECT id
+                    FROM local
+                    WHERE id = ?
+                    `,
+                    [localId]
+                );
+
+
+            if (existente.length === 0) {
+
+                return res.status(404).json({
+                    mensaje: 'Local no encontrado'
+                });
+
+            }
+
+
+            await pool.query(
+                `
+                DELETE FROM local
+                WHERE id = ?
+                `,
+                [localId]
+            );
+
+
+            res.json({
+                mensaje: 'Local eliminado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al eliminar local:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al eliminar el local'
+            });
+
+        }
+
+    }
+);
+
+
+
 // ==========================================
 // OBTENER UN RESTAURANTE POR ID
 // ==========================================
@@ -2120,7 +2339,7 @@ app.get('/api/locales', async (req, res) => {
 
             FROM local l
 
-            INNER JOIN tipoLocal tl
+            INNER JOIN tipolocal tl
                 ON l.tipoLocalId = tl.id
 
             INNER JOIN barrio b
@@ -2752,6 +2971,390 @@ app.post(
     }
 );
 
+// ADMIN - CREAR NUTRICIONISTA
+app.post(
+    '/api/admin/nutricionistas',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+        try {
+
+            const {
+                nombre,
+                apellido,
+                matricula,
+                descripcion,
+                fotoPerfil,
+                direccion,
+                telefono,
+                tieneWhatsapp,
+                email,
+                instagram,
+                sitioWeb,
+                horario,
+                latitud,
+                longitud,
+                estadoVerificacion,
+                barrioId
+            } = req.body;
+
+
+            if (
+                !nombre ||
+                !apellido ||
+                !matricula ||
+                !barrioId
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, apellido, matrícula y barrio son obligatorios'
+                });
+            }
+
+
+            const [matriculaExistente] =
+                await pool.query(
+                    `
+                    SELECT id
+                    FROM nutricionista
+                    WHERE matricula = ?
+                    `,
+                    [matricula]
+                );
+
+
+            if (matriculaExistente.length > 0) {
+                return res.status(409).json({
+                    mensaje:
+                        'Ya existe un nutricionista con esa matrícula'
+                });
+            }
+
+
+            const [resultado] =
+                await pool.query(
+                    `
+                    INSERT INTO nutricionista (
+                        nombre,
+                        apellido,
+                        matricula,
+                        descripcion,
+                        fotoPerfil,
+                        direccion,
+                        telefono,
+                        tieneWhatsapp,
+                        email,
+                        instagram,
+                        sitioWeb,
+                        horario,
+                        latitud,
+                        longitud,
+                        estadoVerificacion,
+                        calificacionPromedio,
+                        cantidadResenas,
+                        barrioId,
+                        fechaCreacion
+                    )
+                    VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, 0, 0, ?, NOW()
+                    )
+                    `,
+                    [
+                        nombre,
+                        apellido,
+                        matricula,
+                        descripcion || null,
+                        fotoPerfil || null,
+                        direccion || null,
+                        telefono || null,
+                        tieneWhatsapp ? 1 : 0,
+                        email || null,
+                        instagram || null,
+                        sitioWeb || null,
+                        horario || null,
+                        latitud || null,
+                        longitud || null,
+                        estadoVerificacion || 'pendiente',
+                        barrioId
+                    ]
+                );
+
+
+            res.status(201).json({
+                mensaje:
+                    'Nutricionista creado correctamente',
+                id: resultado.insertId
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al crear nutricionista:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al crear el nutricionista'
+            });
+
+        }
+    }
+);
+
+// ADMIN - ACTUALIZAR NUTRICIONISTA
+app.put(
+    '/api/admin/nutricionistas/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+        try {
+
+            const nutricionistaId =
+                Number(req.params.id);
+
+            if (
+                !Number.isInteger(nutricionistaId) ||
+                nutricionistaId <= 0
+            ) {
+                return res.status(400).json({
+                    mensaje: 'ID de nutricionista inválido'
+                });
+            }
+
+
+            const {
+                nombre,
+                apellido,
+                matricula,
+                descripcion,
+                fotoPerfil,
+                direccion,
+                telefono,
+                tieneWhatsapp,
+                email,
+                instagram,
+                sitioWeb,
+                horario,
+                latitud,
+                longitud,
+                estadoVerificacion,
+                barrioId
+            } = req.body;
+
+
+            if (
+                !nombre ||
+                !apellido ||
+                !matricula ||
+                !barrioId
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, apellido, matrícula y barrio son obligatorios'
+                });
+            }
+
+
+            const [existente] =
+                await pool.query(
+                    `
+                    SELECT id
+                    FROM nutricionista
+                    WHERE id = ?
+                    `,
+                    [nutricionistaId]
+                );
+
+
+            if (existente.length === 0) {
+                return res.status(404).json({
+                    mensaje: 'Nutricionista no encontrado'
+                });
+            }
+
+
+            const [matriculaExistente] =
+                await pool.query(
+                    `
+                    SELECT id
+                    FROM nutricionista
+                    WHERE matricula = ?
+                    AND id <> ?
+                    `,
+                    [
+                        matricula,
+                        nutricionistaId
+                    ]
+                );
+
+
+            if (matriculaExistente.length > 0) {
+                return res.status(409).json({
+                    mensaje:
+                        'Ya existe otro nutricionista con esa matrícula'
+                });
+            }
+
+
+            await pool.query(
+                `
+                UPDATE nutricionista
+                SET
+                    nombre = ?,
+                    apellido = ?,
+                    matricula = ?,
+                    descripcion = ?,
+                    fotoPerfil = ?,
+                    direccion = ?,
+                    telefono = ?,
+                    tieneWhatsapp = ?,
+                    email = ?,
+                    instagram = ?,
+                    sitioWeb = ?,
+                    horario = ?,
+                    latitud = ?,
+                    longitud = ?,
+                    estadoVerificacion = ?,
+                    barrioId = ?
+                WHERE id = ?
+                `,
+                [
+                    nombre,
+                    apellido,
+                    matricula,
+                    descripcion || null,
+                    fotoPerfil || null,
+                    direccion || null,
+                    telefono || null,
+                    tieneWhatsapp ? 1 : 0,
+                    email || null,
+                    instagram || null,
+                    sitioWeb || null,
+                    horario || null,
+                    latitud || null,
+                    longitud || null,
+                    estadoVerificacion || 'pendiente',
+                    barrioId,
+                    nutricionistaId
+                ]
+            );
+
+
+            res.json({
+                mensaje:
+                    'Nutricionista actualizado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al actualizar nutricionista:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al actualizar el nutricionista'
+            });
+
+        }
+    }
+);
+
+// ADMIN - ELIMINAR NUTRICIONISTA
+app.delete(
+    '/api/admin/nutricionistas/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+        try {
+
+            const nutricionistaId =
+                Number(req.params.id);
+
+            if (
+                !Number.isInteger(nutricionistaId) ||
+                nutricionistaId <= 0
+            ) {
+                return res.status(400).json({
+                    mensaje: 'ID de nutricionista inválido'
+                });
+            }
+
+
+            const [existente] =
+                await pool.query(
+                    `
+                    SELECT id, nombre, apellido
+                    FROM nutricionista
+                    WHERE id = ?
+                    `,
+                    [nutricionistaId]
+                );
+
+
+            if (existente.length === 0) {
+                return res.status(404).json({
+                    mensaje: 'Nutricionista no encontrado'
+                });
+            }
+
+
+            // Eliminar relaciones asociadas
+            await pool.query(
+                `
+                DELETE FROM comentarionutricionista
+                WHERE nutricionistaId = ?
+                `,
+                [nutricionistaId]
+            );
+
+
+            await pool.query(
+                `
+                DELETE FROM favoritonutricionista
+                WHERE nutricionistaId = ?
+                `,
+                [nutricionistaId]
+            );
+
+
+            // Eliminar nutricionista
+            await pool.query(
+                `
+                DELETE FROM nutricionista
+                WHERE id = ?
+                `,
+                [nutricionistaId]
+            );
+
+
+            res.json({
+                mensaje:
+                    'Nutricionista eliminado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al eliminar nutricionista:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al eliminar el nutricionista'
+            });
+
+        }
+    }
+);
+
 // ==========================================
 // ADMIN - COMENTARIOS DE NUTRICIONISTAS
 // ==========================================
@@ -2759,7 +3362,7 @@ app.post(
 app.get(
     '/api/admin/comentarios/nutricionistas',
     verificarToken,
-    verificarAdmin,
+    verificarAdminOModerador,
     async (req, res) => {
 
         try {
@@ -2829,7 +3432,7 @@ app.get(
 app.patch(
     '/api/admin/comentarios/nutricionistas/:id',
     verificarToken,
-    verificarAdmin,
+    verificarAdminOModerador,
     async (req, res) => {
 
         const conexion =
@@ -3079,6 +3682,405 @@ app.get(
     }
 );
 
+
+
+// ==========================================
+// ADMIN - TIPOS DE RESTAURANTE
+// ==========================================
+
+app.get(
+    '/api/admin/tipos-restaurante',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [tipos] =
+                await pool.query(`
+                    SELECT id, nombre
+                    FROM tipoRestaurante
+                    ORDER BY nombre ASC
+                `);
+
+            res.json(tipos);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener tipos de restaurante:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener los tipos de restaurante'
+            });
+
+        }
+
+    }
+);
+
+
+// ==========================================
+// ADMIN - BARRIOS
+// ==========================================
+
+app.get(
+    '/api/admin/barrios',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [barrios] =
+                await pool.query(`
+                    SELECT id, nombre
+                    FROM barrio
+                    ORDER BY nombre ASC
+                `);
+
+            res.json(barrios);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener barrios:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener los barrios'
+            });
+
+        }
+
+    }
+);
+
+
+
+// ==========================================
+// ADMIN - LISTAR TODOS LOS RESTAURANTES
+// ==========================================
+
+app.get(
+    '/api/admin/restaurantes',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [restaurantes] =
+                await pool.query(`
+                    SELECT
+                        r.id,
+                        r.nombre,
+                        r.descripcion,
+                        r.direccion,
+                        r.imagenExterior,
+                        r.imagenInterior,
+                        r.sitioWeb,
+                        r.horario,
+                        r.latitud,
+                        r.longitud,
+                        r.instagram,
+                        r.email,
+                        r.telefono,
+                        r.estadoVerificacion,
+                        r.calificacionPromedio,
+                        r.cantidadResenas,
+                        r.tipoRestauranteId,
+                        r.barrioId,
+                        r.fechaCreacion,
+                        tr.nombre AS tipo,
+                        b.nombre AS barrio
+                    FROM restaurante r
+                    INNER JOIN tipoRestaurante tr
+                        ON r.tipoRestauranteId = tr.id
+                    INNER JOIN barrio b
+                        ON r.barrioId = b.id
+                    ORDER BY r.nombre ASC
+                `);
+
+            res.json(restaurantes);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener restaurantes para admin:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al obtener los restaurantes'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - ACTUALIZAR RESTAURANTE
+// ==========================================
+
+app.put(
+    '/api/admin/restaurantes/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const restauranteId =
+                Number(req.params.id);
+
+            if (
+                !Number.isInteger(restauranteId) ||
+                restauranteId <= 0
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'ID de restaurante inválido'
+                });
+            }
+
+
+            const {
+                nombre,
+                descripcion,
+                direccion,
+                imagenExterior,
+                imagenInterior,
+                sitioWeb,
+                horario,
+                latitud,
+                longitud,
+                instagram,
+                email,
+                telefono,
+                estadoVerificacion,
+                tipoRestauranteId,
+                barrioId
+            } = req.body;
+
+
+            if (
+                !nombre ||
+                !direccion ||
+                !tipoRestauranteId ||
+                !barrioId
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, dirección, tipo y barrio son obligatorios'
+                });
+            }
+
+
+            const [restaurantes] =
+                await pool.query(`
+                    SELECT id
+                    FROM restaurante
+                    WHERE id = ?
+                    LIMIT 1
+                `, [restauranteId]);
+
+
+            if (restaurantes.length === 0) {
+
+                return res.status(404).json({
+                    mensaje:
+                        'Restaurante no encontrado'
+                });
+
+            }
+
+
+            await pool.query(`
+                UPDATE restaurante
+                SET
+                    nombre = ?,
+                    descripcion = ?,
+                    direccion = ?,
+                    imagenExterior = ?,
+                    imagenInterior = ?,
+                    sitioWeb = ?,
+                    horario = ?,
+                    latitud = ?,
+                    longitud = ?,
+                    instagram = ?,
+                    email = ?,
+                    telefono = ?,
+                    estadoVerificacion = ?,
+                    tipoRestauranteId = ?,
+                    barrioId = ?
+                WHERE id = ?
+            `, [
+                nombre.trim(),
+                descripcion || null,
+                direccion.trim(),
+                imagenExterior || null,
+                imagenInterior || null,
+                sitioWeb || null,
+                horario || null,
+                latitud || null,
+                longitud || null,
+                instagram || null,
+                email || null,
+                telefono || null,
+                estadoVerificacion || 'pendiente',
+                Number(tipoRestauranteId),
+                Number(barrioId),
+                restauranteId
+            ]);
+
+
+            res.json({
+                mensaje:
+                    'Restaurante actualizado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al actualizar restaurante:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al actualizar el restaurante'
+            });
+
+        }
+
+    }
+);
+
+// ==========================================
+// ADMIN - CREAR RESTAURANTE
+// ==========================================
+
+app.post(
+    '/api/admin/restaurantes',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const {
+                nombre,
+                descripcion,
+                direccion,
+                imagenExterior,
+                imagenInterior,
+                sitioWeb,
+                horario,
+                latitud,
+                longitud,
+                instagram,
+                email,
+                telefono,
+                estadoVerificacion,
+                tipoRestauranteId,
+                barrioId
+            } = req.body;
+
+
+            if (
+                !nombre ||
+                !direccion ||
+                !tipoRestauranteId ||
+                !barrioId
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, dirección, tipo y barrio son obligatorios'
+                });
+            }
+
+
+            const [resultado] =
+                await pool.query(`
+                    INSERT INTO restaurante (
+                        nombre,
+                        descripcion,
+                        direccion,
+                        imagenExterior,
+                        imagenInterior,
+                        sitioWeb,
+                        horario,
+                        latitud,
+                        longitud,
+                        instagram,
+                        email,
+                        telefono,
+                        estadoVerificacion,
+                        calificacionPromedio,
+                        cantidadResenas,
+                        tipoRestauranteId,
+                        barrioId,
+                        fechaCreacion
+                    )
+                    VALUES (
+                        ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, ?, ?, ?,
+                        ?, 0, 0, ?, ?, NOW()
+                    )
+                `, [
+                    nombre.trim(),
+                    descripcion || null,
+                    direccion.trim(),
+                    imagenExterior || null,
+                    imagenInterior || null,
+                    sitioWeb || null,
+                    horario || null,
+                    latitud || null,
+                    longitud || null,
+                    instagram || null,
+                    email || null,
+                    telefono || null,
+                    estadoVerificacion || 'pendiente',
+                    Number(tipoRestauranteId),
+                    Number(barrioId)
+                ]);
+
+
+            res.status(201).json({
+                mensaje:
+                    'Restaurante creado correctamente',
+
+                id:
+                    resultado.insertId
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al crear restaurante:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al crear el restaurante'
+            });
+
+        }
+
+    }
+);
+
 // ==========================================
 // ADMIN - CREAR PRODUCTO
 // ==========================================
@@ -3284,6 +4286,284 @@ app.put(
     }
 );
 
+
+
+// ==========================================
+// ADMIN - ELIMINAR RESTAURANTE
+// ==========================================
+
+app.delete(
+    '/api/admin/restaurantes/:id',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const restauranteId =
+                Number(req.params.id);
+
+
+            if (
+                !Number.isInteger(restauranteId) ||
+                restauranteId <= 0
+            ) {
+                return res.status(400).json({
+                    mensaje:
+                        'ID de restaurante inválido'
+                });
+            }
+
+
+            const [restaurantes] =
+                await pool.query(`
+                    SELECT id
+                    FROM restaurante
+                    WHERE id = ?
+                    LIMIT 1
+                `, [restauranteId]);
+
+
+            if (restaurantes.length === 0) {
+
+                return res.status(404).json({
+                    mensaje:
+                        'Restaurante no encontrado'
+                });
+
+            }
+
+
+            await pool.query(`
+                DELETE FROM restaurante
+                WHERE id = ?
+            `, [restauranteId]);
+
+
+            res.json({
+                mensaje:
+                    'Restaurante eliminado correctamente'
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al eliminar restaurante:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje:
+                    'Error al eliminar el restaurante'
+            });
+
+        }
+
+    }
+);
+
+/* =====================================================
+   ADMIN - LOCALES
+===================================================== */
+
+// Obtener todos los locales para administración
+app.get(
+    '/api/admin/locales',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [locales] =
+                await pool.query(`
+                    SELECT
+                        l.id,
+                        l.nombre,
+                        l.descripcion,
+                        l.imagen,
+                        l.direccion,
+                        l.telefono,
+                        l.email,
+                        l.instagram,
+                        l.sitioWeb,
+                        l.horario,
+                        l.latitud,
+                        l.longitud,
+                        l.estadoVerificacion,
+                        l.calificacionPromedio,
+                        l.cantidadResenas,
+                        l.tipoLocalId,
+                        l.barrioId,
+                        l.fechaCreacion,
+                        tl.nombre AS tipo,
+                        b.nombre AS barrio
+                    FROM local l
+                    INNER JOIN tipoLocal tl
+                        ON l.tipoLocalId = tl.id
+                    INNER JOIN barrio b
+                        ON l.barrioId = b.id
+                    ORDER BY l.nombre ASC
+                `);
+
+            res.json(locales);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener locales para admin:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al obtener los locales'
+            });
+
+        }
+
+    }
+);
+
+// Crear nuevo local
+app.post(
+    '/api/admin/locales',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const {
+                nombre,
+                descripcion,
+                imagen,
+                direccion,
+                telefono,
+                email,
+                instagram,
+                sitioWeb,
+                horario,
+                latitud,
+                longitud,
+                estadoVerificacion,
+                tipoLocalId,
+                barrioId
+            } = req.body;
+
+
+            if (!nombre || !tipoLocalId || !barrioId) {
+
+                return res.status(400).json({
+                    mensaje:
+                        'Nombre, tipo de local y barrio son obligatorios'
+                });
+
+            }
+
+
+            const [resultado] =
+                await pool.query(
+                    `
+                    INSERT INTO local (
+                        nombre,
+                        descripcion,
+                        imagen,
+                        direccion,
+                        telefono,
+                        email,
+                        instagram,
+                        sitioWeb,
+                        horario,
+                        latitud,
+                        longitud,
+                        estadoVerificacion,
+                        calificacionPromedio,
+                        cantidadResenas,
+                        tipoLocalId,
+                        barrioId,
+                        fechaCreacion
+                    )
+                    VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                        ?, 0, 0, ?, ?, NOW()
+                    )
+                    `,
+                    [
+                        nombre,
+                        descripcion || null,
+                        imagen || null,
+                        direccion || null,
+                        telefono || null,
+                        email || null,
+                        instagram || null,
+                        sitioWeb || null,
+                        horario || null,
+                        latitud || null,
+                        longitud || null,
+                        estadoVerificacion || 'pendiente',
+                        tipoLocalId,
+                        barrioId
+                    ]
+                );
+
+
+            res.status(201).json({
+                mensaje: 'Local creado correctamente',
+                id: resultado.insertId
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                'Error al crear local:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al crear el local'
+            });
+
+        }
+
+    }
+);
+
+// Obtener tipos de local para administración
+app.get(
+    '/api/admin/tipos-local',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+
+        try {
+
+            const [tipos] =
+                await pool.query(`
+                    SELECT id, nombre
+                    FROM tipolocal
+                    ORDER BY nombre ASC
+                `);
+
+            res.json(tipos);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener tipos de local:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al obtener los tipos de local'
+            });
+
+        }
+
+    }
+);
+
 // ==========================================
 // ADMIN - ELIMINAR PRODUCTO
 // ==========================================
@@ -3421,6 +4701,60 @@ app.get(
     }
 );
 
+// ADMIN - OBTENER NUTRICIONISTAS
+app.get(
+    '/api/admin/nutricionistas',
+    verificarToken,
+    verificarAdmin,
+    async (req, res) => {
+        try {
+
+            const [nutricionistas] = await pool.query(`
+                SELECT
+                    n.id,
+                    n.nombre,
+                    n.apellido,
+                    n.matricula,
+                    n.descripcion,
+                    n.fotoPerfil,
+                    n.direccion,
+                    n.telefono,
+                    n.tieneWhatsapp,
+                    n.email,
+                    n.instagram,
+                    n.sitioWeb,
+                    n.horario,
+                    n.latitud,
+                    n.longitud,
+                    n.estadoVerificacion,
+                    n.calificacionPromedio,
+                    n.cantidadResenas,
+                    n.barrioId,
+                    n.fechaCreacion,
+                    b.nombre AS barrio
+                FROM nutricionista n
+                INNER JOIN barrio b
+                    ON n.barrioId = b.id
+                ORDER BY n.apellido ASC, n.nombre ASC
+            `);
+
+            res.json(nutricionistas);
+
+        } catch (error) {
+
+            console.error(
+                'Error al obtener nutricionistas para admin:',
+                error
+            );
+
+            res.status(500).json({
+                mensaje: 'Error al obtener los nutricionistas'
+            });
+
+        }
+    }
+);
+
 // ==========================================
 // ADMIN - ÚLTIMAS ALTAS
 // ==========================================
@@ -3504,6 +4838,8 @@ app.get(
 
     }
 );
+
+
 
 // ==========================================
 // INICIAR SERVIDOR

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>Restaurantes | Admin CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos CeliaConnect -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <aside
+            id="admin-sidebar-placeholder"
+            class="admin-sidebar"
+        ></aside>
+
+        <!-- OVERLAY MOBILE -->
+        <div
+            class="admin-overlay"
+            id="adminOverlay"
+        ></div>
+
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="admin-main">
+
+            <!-- BARRA SUPERIOR -->
+            <div class="admin-topbar">
+
+                <div class="admin-topbar-left">
+
+                    <button
+                        type="button"
+                        class="admin-menu-btn"
+                        id="adminMenuToggle"
+                        aria-label="Abrir menú"
+                    >
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <h2 class="admin-topbar-title">
+                        Panel de administración
+                    </h2>
+
+                </div>
+
+
+                <div class="admin-topbar-right">
+
+
+
+                    <div class="admin-user">
+
+                        <span class="admin-avatar">
+                            AD
+                        </span>
+
+                        <span class="admin-user-info">
+
+                            <span class="admin-user-name">
+                                Administrador
+                            </span>
+
+                            <span class="admin-user-role">
+                                Rol: admin
+                            </span>
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PÁGINA -->
+            <main class="admin-content">
+
+                <!-- ENCABEZADO -->
+                <div class="admin-page-head">
+
+                    <div>
+
+                        <h1 class="admin-title">
+                            Restaurantes
+                        </h1>
+
+                        <p class="admin-subtitle">
+                            Administrá los restaurantes registrados
+                            en CeliaConnect.
+                        </p>
+
+                    </div>
+
+
+                    <div class="admin-page-actions">
+
+                        <button
+                            type="button"
+                            class="btn btn-warning"
+                            id="btnNuevoRestaurante"
+                        >
+                            <i class="bi bi-plus-lg"></i>
+                            Nuevo restaurante
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PANEL RESTAURANTES -->
+                <div class="admin-panel">
+
+                    <div class="admin-panel-head">
+
+                        <div>
+
+                            <h3 class="admin-panel-title mb-1">
+                                Restaurantes registrados
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Restaurantes registrados en la base de datos.
+                            </p>
+
+                        </div>
+
+
+                        <!-- BUSCADOR -->
+                        <div
+                            class="input-group"
+                            style="max-width: 320px;"
+                        >
+
+                            <span class="input-group-text bg-white">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input
+                                type="search"
+                                class="form-control"
+                                id="buscarRestauranteAdmin"
+                                placeholder="Buscar restaurante..."
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TABLA -->
+                    <div class="table-responsive">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Restaurante</th>
+                                    <th>Tipo</th>
+                                    <th>Barrio</th>
+                                    <th>Estado</th>
+
+                                    <th class="text-end">
+                                        Acciones
+                                    </th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="tablaRestaurantesAdmin">
+
+                                <tr>
+
+                                    <td
+                                        colspan="5"
+                                        class="text-center py-5 text-muted"
+                                    >
+
+                                        <div
+                                            class="spinner-border spinner-border-sm me-2"
+                                            role="status"
+                                        ></div>
+
+                                        Cargando restaurantes...
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL CREAR / EDITAR RESTAURANTE
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalRestaurante"
+        tabindex="-1"
+        aria-labelledby="modalRestauranteTitulo"
+        aria-hidden="true"
+    >
+
+        <div
+            class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+        >
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header border-0">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="modalRestauranteTitulo"
+                    >
+                        Nuevo restaurante
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <form id="formRestaurante">
+
+                        <input
+                            type="hidden"
+                            id="restauranteId"
+                        >
+
+
+                        <div class="row g-3">
+
+                            <!-- NOMBRE -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteNombre"
+                                    class="form-label"
+                                >
+                                    Nombre
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteNombre"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- TIPO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteTipo"
+                                    class="form-label"
+                                >
+                                    Tipo de restaurante
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="restauranteTipo"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Seleccionar tipo
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- BARRIO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteBarrio"
+                                    class="form-label"
+                                >
+                                    Barrio
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="restauranteBarrio"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Seleccionar barrio
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- ESTADO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteEstado"
+                                    class="form-label"
+                                >
+                                    Estado
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="restauranteEstado"
+                                    required
+                                >
+
+                                    <option value="pendiente">
+                                        Pendiente
+                                    </option>
+
+                                    <option value="verificado">
+                                        Verificado
+                                    </option>
+
+                                    <option value="rechazado">
+                                        Rechazado
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <!-- DESCRIPCIÓN -->
+                            <div class="col-12">
+
+                                <label
+                                    for="restauranteDescripcion"
+                                    class="form-label"
+                                >
+                                    Descripción
+                                </label>
+
+                                <textarea
+                                    class="form-control"
+                                    id="restauranteDescripcion"
+                                    rows="3"
+                                ></textarea>
+
+                            </div>
+
+
+                            <!-- DIRECCIÓN -->
+                            <div class="col-12">
+
+                                <label
+                                    for="restauranteDireccion"
+                                    class="form-label"
+                                >
+                                    Dirección
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteDireccion"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- TELÉFONO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteTelefono"
+                                    class="form-label"
+                                >
+                                    Teléfono
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteTelefono"
+                                >
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteEmail"
+                                    class="form-label"
+                                >
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="restauranteEmail"
+                                >
+
+                            </div>
+
+
+                            <!-- HORARIO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteHorario"
+                                    class="form-label"
+                                >
+                                    Horario
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteHorario"
+                                >
+
+                            </div>
+
+
+                            <!-- SITIO WEB -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteSitioWeb"
+                                    class="form-label"
+                                >
+                                    Sitio web
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteSitioWeb"
+                                >
+
+                            </div>
+
+
+                            <!-- INSTAGRAM -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteInstagram"
+                                    class="form-label"
+                                >
+                                    Instagram
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteInstagram"
+                                >
+
+                            </div>
+
+
+                            <!-- LATITUD -->
+                            <div class="col-md-3">
+
+                                <label
+                                    for="restauranteLatitud"
+                                    class="form-label"
+                                >
+                                    Latitud
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="any"
+                                    class="form-control"
+                                    id="restauranteLatitud"
+                                >
+
+                            </div>
+
+
+                            <!-- LONGITUD -->
+                            <div class="col-md-3">
+
+                                <label
+                                    for="restauranteLongitud"
+                                    class="form-label"
+                                >
+                                    Longitud
+                                </label>
+
+                                <input
+                                    type="number"
+                                    step="any"
+                                    class="form-control"
+                                    id="restauranteLongitud"
+                                >
+
+                            </div>
+
+
+                            <!-- IMAGEN EXTERIOR -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteImagenExterior"
+                                    class="form-label"
+                                >
+                                    Imagen exterior
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteImagenExterior"
+                                    placeholder="assets/images/restaurantes/..."
+                                >
+
+                            </div>
+
+
+                            <!-- IMAGEN INTERIOR -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="restauranteImagenInterior"
+                                    class="form-label"
+                                >
+                                    Imagen interior
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="restauranteImagenInterior"
+                                    placeholder="assets/images/restaurantes/..."
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <div class="modal-footer border-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        form="formRestaurante"
+                        class="btn btn-warning"
+                        id="btnGuardarRestaurante"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Guardar restaurante
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL ELIMINAR RESTAURANTE
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalEliminarRestaurante"
+        tabindex="-1"
+        aria-labelledby="modalEliminarRestauranteTitulo"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header border-0">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="modalEliminarRestauranteTitulo"
+                    >
+                        Eliminar restaurante
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <p class="mb-2">
+                        ¿Seguro que querés eliminar
+                        <strong id="nombreRestauranteEliminar"></strong>?
+                    </p>
+
+                    <p class="text-muted small mb-0">
+                        Esta acción no se puede deshacer.
+                    </p>
+
+                </div>
+
+
+                <div class="modal-footer border-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-danger"
+                        id="btnConfirmarEliminarRestaurante"
+                    >
+                        <i class="bi bi-trash3"></i>
+                        Eliminar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL CONFIRMACIÓN RESTAURANTE
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalRestauranteExito"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-body text-center p-4">
+
+                    <div class="mb-3">
+
+                        <i
+                            class="bi bi-check-circle-fill text-success"
+                            style="font-size: 3rem;"
+                        ></i>
+
+                    </div>
+
+                    <h5 class="fw-bold">
+                        Restaurante actualizado
+                    </h5>
+
+                    <p class="text-muted mb-4">
+                        Los cambios del restaurante se guardaron correctamente.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-warning px-4"
+                        data-bs-dismiss="modal"
+                    >
+                        Aceptar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Bootstrap JS -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- JavaScript CeliaConnect -->
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+
+</body>
+
+</html>

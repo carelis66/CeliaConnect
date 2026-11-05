@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+
+    <title>Usuarios | Admin CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos CeliaConnect -->
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <aside
+            id="admin-sidebar-placeholder"
+            class="admin-sidebar"
+        ></aside>
+
+        <!-- OVERLAY MOBILE -->
+        <div
+            class="admin-overlay"
+            id="adminOverlay"
+        ></div>
+
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="admin-main">
+
+            <!-- BARRA SUPERIOR -->
+            <div class="admin-topbar">
+
+                <div class="admin-topbar-left">
+
+                    <button
+                        type="button"
+                        class="admin-menu-btn"
+                        id="adminMenuToggle"
+                        aria-label="Abrir menú"
+                    >
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <h2 class="admin-topbar-title">
+                        Panel de administración
+                    </h2>
+
+                </div>
+
+
+                <div class="admin-topbar-right">
+
+                    <div class="admin-user">
+
+                        <span class="admin-avatar">
+                            AD
+                        </span>
+
+                        <span class="admin-user-info">
+
+                            <span class="admin-user-name">
+                                Administrador
+                            </span>
+
+                            <span class="admin-user-role">
+                                Rol: admin
+                            </span>
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PÁGINA -->
+            <main class="admin-content">
+
+                <!-- ENCABEZADO -->
+                <div class="admin-page-head">
+
+                    <div>
+
+                        <h1 class="admin-title">
+                            Usuarios
+                        </h1>
+
+                        <p class="admin-subtitle">
+                            Administrá las cuentas y permisos
+                            de CeliaConnect.
+                        </p>
+
+                    </div>
+
+
+                    <div class="admin-page-actions">
+
+                        <button
+                            type="button"
+                            class="btn btn-warning"
+                            id="btnNuevoUsuario"
+                        >
+                            <i class="bi bi-person-plus-fill"></i>
+                            Nuevo usuario
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PANEL USUARIOS -->
+                <div class="admin-panel">
+
+                    <div class="admin-panel-head">
+
+                        <div>
+
+                            <h3 class="admin-panel-title mb-1">
+                                Usuarios registrados
+                            </h3>
+
+                            <p class="text-muted mb-0">
+                                Cuentas registradas en la base de datos.
+                            </p>
+
+                        </div>
+
+
+                        <!-- BUSCADOR -->
+                        <div
+                            class="input-group"
+                            style="max-width: 320px;"
+                        >
+
+                            <span class="input-group-text bg-white">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input
+                                type="search"
+                                class="form-control"
+                                id="buscarUsuarioAdmin"
+                                placeholder="Buscar usuario..."
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- TABLA -->
+                    <div class="table-responsive">
+
+                        <table class="admin-table">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+
+                                    <th class="text-end">
+                                        Acciones
+                                    </th>
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="tablaUsuariosAdmin">
+
+                                <tr>
+
+                                    <td
+                                        colspan="5"
+                                        class="text-center py-5 text-muted"
+                                    >
+
+                                        <div
+                                            class="spinner-border spinner-border-sm me-2"
+                                            role="status"
+                                        ></div>
+
+                                        Cargando usuarios...
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL CREAR / EDITAR USUARIO
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalUsuario"
+        tabindex="-1"
+        aria-labelledby="modalUsuarioTitulo"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header border-0">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="modalUsuarioTitulo"
+                    >
+                        Nuevo usuario
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <form id="formUsuario">
+
+                        <input
+                            type="hidden"
+                            id="usuarioId"
+                        >
+
+
+                        <div class="row g-3">
+
+                            <!-- NOMBRE -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioNombre"
+                                    class="form-label"
+                                >
+                                    Nombre
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="usuarioNombre"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- APELLIDO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioApellido"
+                                    class="form-label"
+                                >
+                                    Apellido
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="usuarioApellido"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- DOCUMENTO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioDocumento"
+                                    class="form-label"
+                                >
+                                    Documento
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="usuarioDocumento"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioEmail"
+                                    class="form-label"
+                                >
+                                    Email
+                                </label>
+
+                                <input
+                                    type="email"
+                                    class="form-control"
+                                    id="usuarioEmail"
+                                    required
+                                >
+
+                            </div>
+
+
+                            <!-- TELÉFONO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioTelefono"
+                                    class="form-label"
+                                >
+                                    Teléfono
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    id="usuarioTelefono"
+                                >
+
+                            </div>
+
+
+                            <!-- FECHA NACIMIENTO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioFechaNacimiento"
+                                    class="form-label"
+                                >
+                                    Fecha de nacimiento
+                                </label>
+
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    id="usuarioFechaNacimiento"
+                                >
+
+                            </div>
+
+
+                            <!-- GÉNERO -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioGenero"
+                                    class="form-label"
+                                >
+                                    Género
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="usuarioGenero"
+                                >
+                                    <option value="">
+                                        No especificar
+                                    </option>
+
+                                    <option value="F">
+                                        Femenino
+                                    </option>
+
+                                    <option value="M">
+                                        Masculino
+                                    </option>
+
+                                    <option value="O">
+                                        Otro
+                                    </option>
+                                </select>
+
+                            </div>
+
+
+                            <!-- ROL -->
+                            <div class="col-md-6">
+
+                                <label
+                                    for="usuarioRol"
+                                    class="form-label"
+                                >
+                                    Rol
+                                </label>
+
+                                <select
+                                    class="form-select"
+                                    id="usuarioRol"
+                                    required
+                                >
+                                    <option value="2">
+                                        Usuario
+                                    </option>
+
+                                    <option value="3">
+                                        Moderador
+                                    </option>
+
+                                    <option value="1">
+                                        Administrador
+                                    </option>
+                                </select>
+
+                            </div>
+
+
+                            <!-- CONTRASEÑA -->
+                            <div
+                                class="col-md-6"
+                                id="grupoPasswordUsuario"
+                            >
+
+                                <label
+                                    for="usuarioPassword"
+                                    class="form-label"
+                                >
+                                    Contraseña
+                                </label>
+
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="usuarioPassword"
+                                    autocomplete="new-password"
+                                >
+
+                            </div>
+
+
+                            <!-- CONFIRMAR CONTRASEÑA -->
+                            <div
+                                class="col-md-6"
+                                id="grupoConfirmarPasswordUsuario"
+                            >
+
+                                <label
+                                    for="usuarioConfirmarPassword"
+                                    class="form-label"
+                                >
+                                    Confirmar contraseña
+                                </label>
+
+                                <input
+                                    type="password"
+                                    class="form-control"
+                                    id="usuarioConfirmarPassword"
+                                    autocomplete="new-password"
+                                >
+
+                            </div>
+
+
+                            <!-- ESTADO -->
+                            <div class="col-12">
+
+                                <div class="form-check mt-2">
+
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        id="usuarioActivo"
+                                        checked
+                                    >
+
+                                    <label
+                                        class="form-check-label"
+                                        for="usuarioActivo"
+                                    >
+                                        Cuenta activa
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+
+                <div class="modal-footer border-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="submit"
+                        form="formUsuario"
+                        class="btn btn-warning"
+                        id="btnGuardarUsuario"
+                    >
+                        <i class="bi bi-check-lg"></i>
+                        Guardar usuario
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL CAMBIO DE ESTADO
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalEstadoUsuario"
+        tabindex="-1"
+        aria-labelledby="modalEstadoUsuarioTitulo"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header border-0">
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="modalEstadoUsuarioTitulo"
+                    >
+                        Cambiar estado de cuenta
+                    </h5>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"
+                    ></button>
+
+                </div>
+
+
+                <div class="modal-body">
+
+                    <p class="mb-2">
+                        Vas a cambiar el estado de
+                        <strong id="nombreUsuarioEstado"></strong>.
+                    </p>
+
+                    <p
+                        class="text-muted small mb-0"
+                        id="mensajeEstadoUsuario"
+                    ></p>
+
+                </div>
+
+
+                <div class="modal-footer border-0">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-warning"
+                        id="btnConfirmarEstadoUsuario"
+                    >
+                        Confirmar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+         MODAL CONFIRMACIÓN
+    =========================================== -->
+
+    <div
+        class="modal fade"
+        id="modalUsuarioExito"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-body text-center p-4">
+
+                    <div class="mb-3">
+
+                        <i
+                            class="bi bi-check-circle-fill text-success"
+                            style="font-size: 3rem;"
+                        ></i>
+
+                    </div>
+
+                    <h5
+                        class="fw-bold"
+                        id="modalUsuarioExitoTitulo"
+                    >
+                        Operación realizada
+                    </h5>
+
+                    <p
+                        class="text-muted mb-4"
+                        id="modalUsuarioExitoMensaje"
+                    >
+                        Los cambios se guardaron correctamente.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="btn btn-warning px-4"
+                        data-bs-dismiss="modal"
+                    >
+                        Aceptar
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Bootstrap JS -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- JavaScript CeliaConnect -->
+    <script src="../js/app.js"></script>
+    <script src="../js/admin.js"></script>
+    <script src="../js/admin-usuarios.js"></script>
+
+</body>
+
+</html>

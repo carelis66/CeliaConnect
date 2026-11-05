@@ -1294,3 +1294,75 @@
     }
 
 }
+
+/* =====================================================
+   USUARIOS - ROLES Y ESTADOS
+===================================================== */
+
+.role-pill,
+.account-pill {
+
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:.78rem;
+    font-weight:700;
+
+    white-space:nowrap;
+
+}
+
+
+/* USUARIO */
+
+.role-user {
+
+    background:#E7F5DF;
+    color:#3E7A1E;
+
+}
+
+
+/* MODERADOR */
+
+.role-moderator {
+
+    background:var(--primary-light);
+    color:var(--primary);
+
+}
+
+
+/* ADMINISTRADOR */
+
+.role-admin {
+
+    background:#FDE8EA;
+    color:#B02A37;
+
+}
+
+
+/* CUENTA ACTIVA */
+
+.account-active {
+
+    background:#E7F5DF;
+    color:#3E7A1E;
+
+}
+
+
+/* CUENTA INACTIVA */
+
+.account-inactive {
+
+    background:#F1F1F3;
+    color:#666666;
+
+}

@@ -411,8 +411,9 @@ function actualizarCuentaUsuario() {
         ===================================== */
 
         if (
-            Number(usuario.rolId) === 1
-        ) {
+    Number(usuario.rolId) === 1 ||
+    Number(usuario.rolId) === 3
+) {
 
             if (opcionPanelAdmin) {
 
