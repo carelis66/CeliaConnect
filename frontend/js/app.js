@@ -3,34 +3,20 @@
    Carga de componentes reutilizables (header / footer)
 ===================================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+document.addEventListener("DOMContentLoaded", () => {
+  cargarComponente("#header-placeholder", "components/header.html", () => {
+    marcarLinkActivo();
+    actualizarCuentaUsuario();
+  });
 
-        cargarComponente(
-            "#header-placeholder",
-            "components/header.html",
-            () => {
+  cargarComponente(
+    "#footer-placeholder",
+    "components/footer.html",
+    ajustarAcordeonFooter,
+  );
 
-                marcarLinkActivo();
-                actualizarCuentaUsuario();
-
-            }
-        );
-
-
-        cargarComponente(
-            "#footer-placeholder",
-            "components/footer.html",
-            ajustarAcordeonFooter
-        );
-
-
-        inicializarToggleContraseña();
-
-    }
-);
-
+  inicializarToggleContraseña();
+});
 
 /**
  * Carga un componente HTML dentro de un elemento del DOM.
@@ -39,68 +25,34 @@ document.addEventListener(
  * @param {Function} [callback] - función a ejecutar luego de inyectar el HTML
  */
 
-function cargarComponente(
-    selector,
-    url,
-    callback
-) {
+function cargarComponente(selector, url, callback) {
+  const destino = document.querySelector(selector);
 
-    const destino =
-        document.querySelector(
-            selector
-        );
+  if (!destino) {
+    return;
+  }
 
+  fetch(url)
+    .then((respuesta) => {
+      if (!respuesta.ok) {
+        throw new Error(`No se pudo cargar ${url} (${respuesta.status})`);
+      }
 
-    if (!destino) {
-        return;
-    }
+      return respuesta.text();
+    })
 
+    .then((html) => {
+      destino.innerHTML = html;
 
-    fetch(url)
+      if (typeof callback === "function") {
+        callback();
+      }
+    })
 
-        .then(respuesta => {
-
-            if (!respuesta.ok) {
-
-                throw new Error(
-                    `No se pudo cargar ${url} (${respuesta.status})`
-                );
-
-            }
-
-
-            return respuesta.text();
-
-        })
-
-        .then(html => {
-
-            destino.innerHTML =
-                html;
-
-
-            if (
-                typeof callback ===
-                "function"
-            ) {
-
-                callback();
-
-            }
-
-        })
-
-        .catch(error => {
-
-            console.error(
-                "Error cargando componente:",
-                error
-            );
-
-        });
-
+    .catch((error) => {
+      console.error("Error cargando componente:", error);
+    });
 }
-
 
 /**
  * Controla el acordeón del footer
@@ -108,42 +60,18 @@ function cargarComponente(
  */
 
 function ajustarAcordeonFooter() {
+  const ESCRITORIO = window.matchMedia("(min-width: 768px)");
 
-    const ESCRITORIO =
-        window.matchMedia(
-            "(min-width: 768px)"
-        );
+  const aplicarEstado = () => {
+    document.querySelectorAll(".footer-accordion").forEach((acordeon) => {
+      acordeon.open = ESCRITORIO.matches;
+    });
+  };
 
+  aplicarEstado();
 
-    const aplicarEstado =
-        () => {
-
-            document
-                .querySelectorAll(
-                    ".footer-accordion"
-                )
-                .forEach(
-                    acordeon => {
-
-                        acordeon.open =
-                            ESCRITORIO.matches;
-
-                    }
-                );
-
-        };
-
-
-    aplicarEstado();
-
-
-    ESCRITORIO.addEventListener(
-        "change",
-        aplicarEstado
-    );
-
+  ESCRITORIO.addEventListener("change", aplicarEstado);
 }
-
 
 /**
  * Habilita el botón para mostrar
@@ -151,65 +79,26 @@ function ajustarAcordeonFooter() {
  */
 
 function inicializarToggleContraseña() {
+  document.querySelectorAll(".password-toggle").forEach((boton) => {
+    boton.addEventListener("click", () => {
+      const input = boton.previousElementSibling;
 
-    document
-        .querySelectorAll(
-            ".password-toggle"
-        )
-        .forEach(
-            boton => {
+      const icono = boton.querySelector("i");
 
-                boton.addEventListener(
-                    "click",
-                    () => {
+      if (!input || !icono) {
+        return;
+      }
 
-                        const input =
-                            boton
-                                .previousElementSibling;
+      const esPassword = input.type === "password";
 
-                        const icono =
-                            boton.querySelector(
-                                "i"
-                            );
+      input.type = esPassword ? "text" : "password";
 
+      icono.classList.toggle("bi-eye", !esPassword);
 
-                        if (
-                            !input ||
-                            !icono
-                        ) {
-                            return;
-                        }
-
-
-                        const esPassword =
-                            input.type ===
-                            "password";
-
-
-                        input.type =
-                            esPassword
-                                ? "text"
-                                : "password";
-
-
-                        icono.classList.toggle(
-                            "bi-eye",
-                            !esPassword
-                        );
-
-                        icono.classList.toggle(
-                            "bi-eye-slash",
-                            esPassword
-                        );
-
-                    }
-                );
-
-            }
-        );
-
+      icono.classList.toggle("bi-eye-slash", esPassword);
+    });
+  });
 }
-
 
 /**
  * Marca como activo el link del menú
@@ -217,36 +106,15 @@ function inicializarToggleContraseña() {
  */
 
 function marcarLinkActivo() {
+  const paginaActual =
+    window.location.pathname.split("/").pop() || "index.html";
 
-    const paginaActual =
-        window.location.pathname
-            .split("/")
-            .pop() ||
-        "index.html";
+  document.querySelectorAll(".nav-link[data-page]").forEach((link) => {
+    const esActivo = link.dataset.page === paginaActual;
 
-
-    document
-        .querySelectorAll(
-            ".nav-link[data-page]"
-        )
-        .forEach(
-            link => {
-
-                const esActivo =
-                    link.dataset.page ===
-                    paginaActual;
-
-
-                link.classList.toggle(
-                    "active",
-                    esActivo
-                );
-
-            }
-        );
-
+    link.classList.toggle("active", esActivo);
+  });
 }
-
 
 /**
  * Elimina todos los datos relacionados
@@ -254,25 +122,14 @@ function marcarLinkActivo() {
  */
 
 function limpiarSesionUsuario() {
+  sessionStorage.removeItem("celiaUsuario");
 
-    sessionStorage.removeItem(
-        "celiaUsuario"
-    );
+  sessionStorage.removeItem("celiaToken");
 
-    sessionStorage.removeItem(
-        "celiaToken"
-    );
+  localStorage.removeItem("celiaUsuario");
 
-    localStorage.removeItem(
-        "celiaUsuario"
-    );
-
-    localStorage.removeItem(
-        "celiaToken"
-    );
-
+  localStorage.removeItem("celiaToken");
 }
-
 
 /**
  * Muestra el nombre del usuario cuando
@@ -283,227 +140,179 @@ function limpiarSesionUsuario() {
  */
 
 function actualizarCuentaUsuario() {
+  const botonCuenta = document.getElementById("cuenta-usuario");
 
-    const botonCuenta =
-        document.getElementById(
-            "cuenta-usuario"
-        );
+  const menuUsuario = document.getElementById("menu-usuario");
 
-    const menuUsuario =
-        document.getElementById(
-            "menu-usuario"
-        );
+  const nombreUsuario = document.getElementById("nombre-usuario");
 
-    const nombreUsuario =
-        document.getElementById(
-            "nombre-usuario"
-        );
+  const emailUsuario = document.getElementById("email-usuario");
 
-    const emailUsuario =
-        document.getElementById(
-            "email-usuario"
-        );
+  const botonCerrarSesion = document.getElementById("btn-cerrar-sesion");
 
-    const botonCerrarSesion =
-        document.getElementById(
-            "btn-cerrar-sesion"
-        );
+  const opcionPanelAdmin = document.getElementById("opcion-panel-admin");
 
-    const opcionPanelAdmin =
-        document.getElementById(
-            "opcion-panel-admin"
-        );
+  const separadorPanelAdmin = document.getElementById("separador-panel-admin");
 
-    const separadorPanelAdmin =
-        document.getElementById(
-            "separador-panel-admin"
-        );
+  if (!botonCuenta || !menuUsuario) {
+    return;
+  }
 
+  const usuarioGuardado =
+    sessionStorage.getItem("celiaUsuario") ||
+    localStorage.getItem("celiaUsuario");
 
-    if (
-        !botonCuenta ||
-        !menuUsuario
-    ) {
-        return;
-    }
-
-
-    const usuarioGuardado =
-        sessionStorage.getItem(
-            "celiaUsuario"
-        ) ||
-        localStorage.getItem(
-            "celiaUsuario"
-        );
-
-
-    /* =========================================
+  /* =========================================
        USUARIO NO LOGUEADO
     ========================================= */
 
-    if (!usuarioGuardado) {
+  if (!usuarioGuardado) {
+    botonCuenta.classList.remove("d-none");
 
-        botonCuenta.classList.remove(
-            "d-none"
-        );
+    menuUsuario.classList.add("d-none");
 
-        menuUsuario.classList.add(
-            "d-none"
-        );
+    return;
+  }
 
-
-        return;
-
-    }
-
-
-    /* =========================================
+  /* =========================================
        USUARIO LOGUEADO
     ========================================= */
 
-    try {
+  try {
+    const usuario = JSON.parse(usuarioGuardado);
 
-        const usuario =
-            JSON.parse(
-                usuarioGuardado
-            );
+    if (!usuario || !usuario.email) {
+      throw new Error("Datos de usuario inválidos");
+    }
 
+    botonCuenta.classList.add("d-none");
 
-        if (
-            !usuario ||
-            !usuario.email
-        ) {
+    menuUsuario.classList.remove("d-none");
 
-            throw new Error(
-                "Datos de usuario inválidos"
-            );
+    if (nombreUsuario) {
+      nombreUsuario.textContent =
+    `${usuario.nombre} ${usuario.apellido || ''}`.trim();
+    }
 
-        }
+    if (emailUsuario) {
+      emailUsuario.textContent = usuario.email;
+    }
 
-
-        botonCuenta.classList.add(
-            "d-none"
-        );
-
-        menuUsuario.classList.remove(
-            "d-none"
-        );
-
-
-        if (nombreUsuario) {
-
-            nombreUsuario.textContent =
-                usuario.nombre;
-
-        }
-
-
-        if (emailUsuario) {
-
-            emailUsuario.textContent =
-                usuario.email;
-
-        }
-
-
-        /* =====================================
+    /* =====================================
            PANEL DE ADMINISTRACIÓN
         ===================================== */
 
-        if (
-    Number(usuario.rolId) === 1 ||
-    Number(usuario.rolId) === 3
-) {
+    if (Number(usuario.rolId) === 1 || Number(usuario.rolId) === 3) {
+      if (opcionPanelAdmin) {
+        opcionPanelAdmin.classList.remove("d-none");
+      }
 
-            if (opcionPanelAdmin) {
+      if (separadorPanelAdmin) {
+        separadorPanelAdmin.classList.remove("d-none");
+      }
+    } else {
+      if (opcionPanelAdmin) {
+        opcionPanelAdmin.classList.add("d-none");
+      }
 
-                opcionPanelAdmin
-                    .classList
-                    .remove(
-                        "d-none"
-                    );
+      if (separadorPanelAdmin) {
+        separadorPanelAdmin.classList.add("d-none");
+      }
+    }
 
-            }
-
-
-            if (separadorPanelAdmin) {
-
-                separadorPanelAdmin
-                    .classList
-                    .remove(
-                        "d-none"
-                    );
-
-            }
-
-        } else {
-
-            if (opcionPanelAdmin) {
-
-                opcionPanelAdmin
-                    .classList
-                    .add(
-                        "d-none"
-                    );
-
-            }
-
-
-            if (separadorPanelAdmin) {
-
-                separadorPanelAdmin
-                    .classList
-                    .add(
-                        "d-none"
-                    );
-
-            }
-
-        }
-
-
-        /* =====================================
+    /* =====================================
            CERRAR SESIÓN
         ===================================== */
 
-        if (botonCerrarSesion) {
-
-            botonCerrarSesion
-                .addEventListener(
-                    "click",
-                    () => {
-
-                        limpiarSesionUsuario();
-
-
-                        window.location.href =
-                            "index.html";
-
-                    }
-                );
-
-        }
-
-
-    } catch (error) {
-
-        console.error(
-            "Error al leer el usuario guardado:",
-            error
-        );
-
-
+    if (botonCerrarSesion) {
+      botonCerrarSesion.addEventListener("click", () => {
         limpiarSesionUsuario();
 
+        window.location.href = "index.html";
+      });
+    }
+  } catch (error) {
+    console.error("Error al leer el usuario guardado:", error);
 
-        botonCuenta.classList.remove(
-            "d-none"
-        );
+    limpiarSesionUsuario();
 
-        menuUsuario.classList.add(
-            "d-none"
-        );
+    botonCuenta.classList.remove("d-none");
 
+    menuUsuario.classList.add("d-none");
+  }
+}
+
+// ==========================================
+// HOME - PUNTAJE DE PRODUCTOS DESTACADOS
+// ==========================================
+async function cargarRatingProductosHome() {
+  const productosHome = [
+    {
+      nombre: "Barritas de Cereal",
+      elementoId: "rating-producto-barritas",
+    },
+    {
+      nombre: "Mezcla para Panqueques",
+      elementoId: "rating-producto-panqueques",
+    },
+    {
+      nombre: "Yogur Natural",
+      elementoId: "rating-producto-yogur",
+    },
+  ];
+
+  const estamosEnHome = productosHome.some((producto) =>
+    document.getElementById(producto.elementoId),
+  );
+
+  if (!estamosEnHome) {
+    return;
+  }
+
+  try {
+    const respuesta = await fetch("http://localhost:3000/api/productos");
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron obtener los productos");
     }
 
+    const productos = await respuesta.json();
+
+    productosHome.forEach((productoHome) => {
+      const elemento = document.getElementById(productoHome.elementoId);
+
+      if (!elemento) {
+        return;
+      }
+
+      const producto = productos.find(
+        (item) => item.nombre === productoHome.nombre,
+      );
+
+      if (!producto) {
+        return;
+      }
+
+      const cantidadResenas = Number(producto.cantidadResenas);
+
+      if (cantidadResenas > 0) {
+        elemento.innerHTML = `
+                    <i class="bi bi-star-fill"></i>
+                    ${Number(producto.calificacionPromedio).toFixed(1)}
+                    (${cantidadResenas}
+                    ${cantidadResenas === 1 ? "reseña" : "reseñas"})
+                `;
+      } else {
+        elemento.innerHTML = `
+                    <i class="bi bi-star-fill"></i>
+                    Sin reseñas
+                `;
+      }
+    });
+  } catch (error) {
+    console.error("Error al cargar ratings de productos en Home:", error);
+  }
 }
+
+// Ejecutar al cargar el Home
+document.addEventListener("DOMContentLoaded", cargarRatingProductosHome);

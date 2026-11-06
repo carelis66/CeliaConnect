@@ -1,79 +1,94 @@
-const API_PRODUCTOS = 'http://localhost:3000/api/productos';
+const API_PRODUCTOS = "http://localhost:3000/api/productos";
 
 const PRODUCTOS_POR_PAGINA = 9;
 
 let productos = [];
 let productosFiltrados = [];
+let productosFavoritos = [];
 let paginaActual = 1;
-
 
 // ==========================================
 // CARGAR PRODUCTOS DESDE LA API
 // ==========================================
 
 async function cargarProductos() {
+  const contenedor = document.getElementById("productos-container");
+  const contador = document.getElementById("productos-count");
 
-    const contenedor =
-        document.getElementById('productos-container');
+  try {
+    // Cargar todos los productos
+    const respuesta = await fetch(API_PRODUCTOS);
 
-    const contador =
-        document.getElementById('productos-count');
-
-    try {
-
-        const respuesta = await fetch(API_PRODUCTOS);
-
-        if (!respuesta.ok) {
-            throw new Error('No se pudieron obtener los productos');
-        }
-
-        productos = await respuesta.json();
-
-        paginaActual = 1;
-
-        aplicarFiltros();
-
-    } catch (error) {
-
-        console.error('Error al cargar productos:', error);
-
-        contador.textContent =
-            'No se pudieron cargar los productos';
-
-        contenedor.innerHTML = `
-            <div class="col-12">
-                <div class="alert alert-danger">
-                    No se pudieron cargar los productos.
-                    Verificá que el servidor de CeliaConnect esté encendido.
-                </div>
-            </div>
-        `;
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron obtener los productos");
     }
-}
 
+    productos = await respuesta.json();
+
+    // ======================================
+    // CARGAR FAVORITOS DEL USUARIO
+    // ======================================
+
+    const token =
+      localStorage.getItem("celiaToken") ||
+      sessionStorage.getItem("celiaToken");
+
+    productosFavoritos = [];
+
+    if (token) {
+      const respuestaFavoritos = await fetch(
+        `${API_PRODUCTOS}/favoritos`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (respuestaFavoritos.ok) {
+        const favoritos = await respuestaFavoritos.json();
+
+        productosFavoritos = favoritos.map(
+          (favorito) => Number(favorito.productoId),
+        );
+      }
+    }
+
+    paginaActual = 1;
+
+    aplicarFiltros();
+  } catch (error) {
+    console.error("Error al cargar productos:", error);
+
+    contador.textContent = "No se pudieron cargar los productos";
+
+    contenedor.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-danger">
+          No se pudieron cargar los productos.
+          Verificá que el servidor de CeliaConnect esté encendido.
+        </div>
+      </div>
+    `;
+  }
+}
 
 // ==========================================
 // MOSTRAR PRODUCTOS
 // ==========================================
 
 function mostrarProductos() {
+  const contenedor = document.getElementById("productos-container");
 
-    const contenedor =
-        document.getElementById('productos-container');
+  const contador = document.getElementById("productos-count");
 
-    const contador =
-        document.getElementById('productos-count');
+  contenedor.innerHTML = "";
 
-    contenedor.innerHTML = '';
+  contador.textContent = `${productosFiltrados.length} productos encontrados`;
 
-    contador.textContent =
-        `${productosFiltrados.length} productos encontrados`;
-
-
-    // Sin resultados
-    if (productosFiltrados.length === 0) {
-
-        contenedor.innerHTML = `
+  // Sin resultados
+  if (productosFiltrados.length === 0) {
+    contenedor.innerHTML = `
             <div class="col-12">
                 <div class="alert alert-light text-center">
                     No se encontraron productos con los filtros seleccionados.
@@ -81,31 +96,23 @@ function mostrarProductos() {
             </div>
         `;
 
-        return;
-    }
+    return;
+  }
 
+  // Productos de la página actual
+  const inicio = (paginaActual - 1) * PRODUCTOS_POR_PAGINA;
 
-    // Productos de la página actual
-    const inicio =
-        (paginaActual - 1) * PRODUCTOS_POR_PAGINA;
+  const fin = inicio + PRODUCTOS_POR_PAGINA;
 
-    const fin =
-        inicio + PRODUCTOS_POR_PAGINA;
+  const productosPagina = productosFiltrados.slice(inicio, fin);
 
-    const productosPagina =
-        productosFiltrados.slice(inicio, fin);
+  // Crear tarjetas
+  productosPagina.forEach((producto) => {
+    const certificado = producto.certificadoSinTacc
+      ? '<span class="product-tag">Sin TACC</span>'
+      : '<span class="product-tag">Certificación pendiente</span>';
 
-
-    // Crear tarjetas
-    productosPagina.forEach(producto => {
-
-        const certificado =
-            producto.certificadoSinTacc
-                ? '<span class="product-tag">Sin TACC</span>'
-                : '<span class="product-tag">Certificación pendiente</span>';
-
-
-        const tarjeta = `
+    const tarjeta = `
             <div class="col-md-6 col-xl-4">
 
                 <div
@@ -127,8 +134,8 @@ function mostrarProductos() {
                     >
 
                         ${
-                            producto.imagen
-                                ? `
+                          producto.imagen
+                            ? `
                                     <img
                                         src="${producto.imagen}"
                                         alt="${producto.nombre}"
@@ -140,7 +147,7 @@ function mostrarProductos() {
                                         onerror="this.style.display='none'"
                                     >
                                 `
-                                : `
+                            : `
                                     <i class="bi bi-basket2-fill"></i>
                                 `
                         }
@@ -168,19 +175,28 @@ function mostrarProductos() {
                             <span class="product-rating">
     <i class="bi bi-star-fill"></i>
     ${
-        Number(producto.cantidadResenas) > 0
-            ? `${Number(producto.calificacionPromedio).toFixed(1)} (${producto.cantidadResenas} ${Number(producto.cantidadResenas) === 1 ? 'reseña' : 'reseñas'})`
-            : 'Sin reseñas'
+      Number(producto.cantidadResenas) > 0
+        ? `${Number(producto.calificacionPromedio).toFixed(1)} (${producto.cantidadResenas} ${Number(producto.cantidadResenas) === 1 ? "reseña" : "reseñas"})`
+        : "Sin reseñas"
     }
 </span>
 
-                            <button
-                                class="product-fav"
-                                type="button"
-                                aria-label="Agregar ${producto.nombre} a favoritos"
-                            >
-                                <i class="bi bi-heart"></i>
-                            </button>
+<button
+    class="product-fav"
+    type="button"
+    data-producto-id="${producto.id}"
+    aria-label="${
+      productosFavoritos.includes(Number(producto.id))
+        ? `Quitar ${producto.nombre} de favoritos`
+        : `Agregar ${producto.nombre} a favoritos`
+    }"
+>
+    <i class="bi ${
+      productosFavoritos.includes(Number(producto.id))
+        ? "bi-heart-fill"
+        : "bi-heart"
+    }"></i>
+</button>
 
                         </div>
 
@@ -191,84 +207,148 @@ function mostrarProductos() {
             </div>
         `;
 
-        contenedor.insertAdjacentHTML(
-            'beforeend',
-            tarjeta
+    contenedor.insertAdjacentHTML("beforeend", tarjeta);
+  });
+
+  // ======================================
+  // CLIC EN TARJETAS
+  // ======================================
+
+  const tarjetas = contenedor.querySelectorAll(".product-card");
+
+  tarjetas.forEach((tarjeta) => {
+    // Abrir producto con clic
+    tarjeta.addEventListener("click", (event) => {
+      // Si se hace clic en favoritos,
+      // no abrimos el detalle del producto.
+      if (event.target.closest(".product-fav")) {
+        return;
+      }
+
+      const productoId = tarjeta.dataset.productoId;
+
+      window.location.href = `producto-detalle.html?id=${productoId}`;
+    });
+
+    // Abrir producto con Enter
+    tarjeta.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        const productoId = tarjeta.dataset.productoId;
+
+        window.location.href = `producto-detalle.html?id=${productoId}`;
+      }
+    });
+  });
+
+  // ==========================================
+  // FAVORITOS DE PRODUCTOS
+  // ==========================================
+  // ==========================================
+  // FAVORITOS DE PRODUCTOS
+  // ==========================================
+
+  const botonesFavoritos =
+    contenedor.querySelectorAll(".product-fav");
+
+  botonesFavoritos.forEach((boton) => {
+    boton.addEventListener("click", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const productoId = Number(boton.dataset.productoId);
+
+      const token =
+        localStorage.getItem("celiaToken") ||
+        sessionStorage.getItem("celiaToken");
+
+      if (!token) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const esFavorito =
+        productosFavoritos.includes(productoId);
+
+      try {
+        const respuesta = await fetch(
+          `${API_PRODUCTOS}/${productoId}/favorito`,
+          {
+            method: esFavorito ? "DELETE" : "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
         );
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+          throw new Error(
+            datos.mensaje ||
+              "No se pudo actualizar el favorito",
+          );
+        }
+
+        const icono = boton.querySelector("i");
+
+        if (esFavorito) {
+          // Quitar de la lista local
+          productosFavoritos =
+            productosFavoritos.filter(
+              (id) => id !== productoId,
+            );
+
+          icono.classList.remove("bi-heart-fill");
+          icono.classList.add("bi-heart");
+
+          boton.setAttribute(
+            "aria-label",
+            "Agregar producto a favoritos",
+          );
+        } else {
+          // Agregar a la lista local
+          productosFavoritos.push(productoId);
+
+          icono.classList.remove("bi-heart");
+          icono.classList.add("bi-heart-fill");
+
+          boton.setAttribute(
+            "aria-label",
+            "Quitar producto de favoritos",
+          );
+        }
+      } catch (error) {
+        console.error(
+          "Error al actualizar favorito:",
+          error,
+        );
+      }
     });
-
-
-    // ======================================
-    // CLIC EN TARJETAS
-    // ======================================
-
-    const tarjetas =
-        contenedor.querySelectorAll('.product-card');
-
-    tarjetas.forEach(tarjeta => {
-
-        // Abrir producto con clic
-        tarjeta.addEventListener('click', (event) => {
-
-            // Si se hace clic en favoritos,
-            // no abrimos el detalle del producto.
-            if (event.target.closest('.product-fav')) {
-                return;
-            }
-
-            const productoId =
-                tarjeta.dataset.productoId;
-
-            window.location.href =
-                `producto-detalle.html?id=${productoId}`;
-        });
-
-
-        // Abrir producto con Enter
-        tarjeta.addEventListener('keydown', (event) => {
-
-            if (event.key === 'Enter') {
-
-                const productoId =
-                    tarjeta.dataset.productoId;
-
-                window.location.href =
-                    `producto-detalle.html?id=${productoId}`;
-            }
-        });
-
-    });
+  });
 }
-
 
 // ==========================================
 // PAGINACIÓN
 // ==========================================
 
 function mostrarPaginacion() {
+  const paginacion = document.getElementById("productos-paginacion");
 
-    const paginacion =
-        document.getElementById('productos-paginacion');
+  paginacion.innerHTML = "";
 
-    paginacion.innerHTML = '';
+  const totalPaginas = Math.ceil(
+    productosFiltrados.length / PRODUCTOS_POR_PAGINA,
+  );
 
-    const totalPaginas =
-        Math.ceil(
-            productosFiltrados.length /
-            PRODUCTOS_POR_PAGINA
-        );
+  if (totalPaginas === 0) {
+    return;
+  }
 
-
-    if (totalPaginas === 0) {
-        return;
-    }
-
-
-    // Botón anterior
-    paginacion.insertAdjacentHTML(
-        'beforeend',
-        `
-        <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
+  // Botón anterior
+  paginacion.insertAdjacentHTML(
+    "beforeend",
+    `
+        <li class="page-item ${paginaActual === 1 ? "disabled" : ""}">
 
             <button
                 class="page-link"
@@ -279,21 +359,15 @@ function mostrarPaginacion() {
             </button>
 
         </li>
-        `
-    );
+        `,
+  );
 
-
-    // Números de página
-    for (
-        let pagina = 1;
-        pagina <= totalPaginas;
-        pagina++
-    ) {
-
-        paginacion.insertAdjacentHTML(
-            'beforeend',
-            `
-            <li class="page-item ${pagina === paginaActual ? 'active' : ''}">
+  // Números de página
+  for (let pagina = 1; pagina <= totalPaginas; pagina++) {
+    paginacion.insertAdjacentHTML(
+      "beforeend",
+      `
+            <li class="page-item ${pagina === paginaActual ? "active" : ""}">
 
                 <button
                     class="page-link"
@@ -304,16 +378,15 @@ function mostrarPaginacion() {
                 </button>
 
             </li>
-            `
-        );
-    }
+            `,
+    );
+  }
 
-
-    // Botón siguiente
-    paginacion.insertAdjacentHTML(
-        'beforeend',
-        `
-        <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
+  // Botón siguiente
+  paginacion.insertAdjacentHTML(
+    "beforeend",
+    `
+        <li class="page-item ${paginaActual === totalPaginas ? "disabled" : ""}">
 
             <button
                 class="page-link"
@@ -324,419 +397,266 @@ function mostrarPaginacion() {
             </button>
 
         </li>
-        `
-    );
+        `,
+  );
 
+  // Eventos de paginación
+  const botones = paginacion.querySelectorAll("[data-pagina]");
 
-    // Eventos de paginación
-    const botones =
-        paginacion.querySelectorAll('[data-pagina]');
+  botones.forEach((boton) => {
+    boton.addEventListener("click", () => {
+      const nuevaPagina = Number(boton.dataset.pagina);
 
-    botones.forEach(boton => {
+      if (
+        nuevaPagina < 1 ||
+        nuevaPagina > totalPaginas ||
+        nuevaPagina === paginaActual
+      ) {
+        return;
+      }
 
-        boton.addEventListener('click', () => {
+      paginaActual = nuevaPagina;
 
-            const nuevaPagina =
-                Number(boton.dataset.pagina);
+      mostrarProductos();
+      mostrarPaginacion();
 
-            if (
-                nuevaPagina < 1 ||
-                nuevaPagina > totalPaginas ||
-                nuevaPagina === paginaActual
-            ) {
-                return;
-            }
-
-            paginaActual = nuevaPagina;
-
-            mostrarProductos();
-            mostrarPaginacion();
-
-            document
-                .getElementById('listado')
-                .scrollIntoView({
-                    behavior: 'smooth'
-                });
-        });
+      document.getElementById("listado").scrollIntoView({
+        behavior: "smooth",
+      });
     });
+  });
 }
-
 
 // ==========================================
 // ORDENAR PRODUCTOS
 // ==========================================
 
 function ordenarProductos() {
+  const selectorOrden = document.getElementById("orden-productos");
 
-    const selectorOrden =
-        document.getElementById('orden-productos');
+  if (!selectorOrden) {
+    return;
+  }
 
-    if (!selectorOrden) {
-        return;
-    }
+  const orden = selectorOrden.value;
 
-    const orden =
-        selectorOrden.value;
+  switch (orden) {
+    // Orden original de la base de datos
+    case "relevantes":
+      productosFiltrados.sort((a, b) => Number(a.id) - Number(b.id));
 
+      break;
 
-    switch (orden) {
+    // Nombre A-Z
+    case "nombre":
+      productosFiltrados.sort((a, b) =>
+        a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }),
+      );
 
-        // Orden original de la base de datos
-        case 'relevantes':
+      break;
 
-            productosFiltrados.sort(
-                (a, b) =>
-                    Number(a.id) - Number(b.id)
-            );
+    // Marca A-Z
+    case "marca":
+      productosFiltrados.sort((a, b) =>
+        a.marca.localeCompare(b.marca, "es", { sensitivity: "base" }),
+      );
 
-            break;
+      break;
 
-
-        // Nombre A-Z
-        case 'nombre':
-
-            productosFiltrados.sort(
-                (a, b) =>
-                    a.nombre.localeCompare(
-                        b.nombre,
-                        'es',
-                        { sensitivity: 'base' }
-                    )
-            );
-
-            break;
-
-
-        // Marca A-Z
-        case 'marca':
-
-            productosFiltrados.sort(
-                (a, b) =>
-                    a.marca.localeCompare(
-                        b.marca,
-                        'es',
-                        { sensitivity: 'base' }
-                    )
-            );
-
-            break;
-
-
-        // Se implementará cuando
-        // conectemos las reseñas.
-        case 'calificacion':
-
-            break;
-    }
+    // Se implementará cuando
+    // conectemos las reseñas.
+    case "calificacion":
+      break;
+  }
 }
-
 
 // ==========================================
 // APLICAR BÚSQUEDA + FILTROS
 // ==========================================
 
 function aplicarFiltros() {
+  // --------------------------------------
+  // BUSCADOR
+  // --------------------------------------
 
-    // --------------------------------------
-    // BUSCADOR
-    // --------------------------------------
+  const buscador = document.getElementById("buscar-producto");
 
-    const buscador =
-        document.getElementById('buscar-producto');
+  const texto = buscador ? buscador.value.toLowerCase().trim() : "";
 
-    const texto =
-        buscador
-            ? buscador.value.toLowerCase().trim()
-            : '';
+  // --------------------------------------
+  // CATEGORÍAS
+  // --------------------------------------
 
+  const categoriasSeleccionadas = Array.from(
+    document.querySelectorAll(".filtro-categoria:checked"),
+  ).map((checkbox) => checkbox.value.toLowerCase());
 
-    // --------------------------------------
-    // CATEGORÍAS
-    // --------------------------------------
+  // --------------------------------------
+  // MARCAS
+  // --------------------------------------
 
-    const categoriasSeleccionadas = Array.from(
-        document.querySelectorAll(
-            '.filtro-categoria:checked'
-        )
-    ).map(
-        checkbox =>
-            checkbox.value.toLowerCase()
+  const marcasSeleccionadas = Array.from(
+    document.querySelectorAll(".filtro-marca:checked"),
+  ).map((checkbox) => checkbox.value.toLowerCase());
+
+  // --------------------------------------
+  // FILTRAR
+  // --------------------------------------
+
+  productosFiltrados = productos.filter((producto) => {
+    const nombre = producto.nombre?.toLowerCase() || "";
+
+    const marca = producto.marca?.toLowerCase() || "";
+
+    const categoria = producto.categoria?.toLowerCase() || "";
+
+    // Buscador
+    const coincideTexto =
+      texto === "" ||
+      nombre.includes(texto) ||
+      marca.includes(texto) ||
+      categoria.includes(texto);
+
+    // Categoría
+    const coincideCategoria =
+      categoriasSeleccionadas.length === 0 ||
+      categoriasSeleccionadas.includes(categoria);
+
+    // Marca
+    const coincideMarca =
+      marcasSeleccionadas.length === 0 || marcasSeleccionadas.includes(marca);
+
+    // Certificación El catálogo público muestra únicamente productos Sin TACC certificados.
+    const coincideCertificado = Number(producto.certificadoSinTacc) === 1;
+
+    return (
+      coincideTexto && coincideCategoria && coincideMarca && coincideCertificado
     );
+  });
 
+  // Ordenar resultados
+  ordenarProductos();
 
-    // --------------------------------------
-    // MARCAS
-    // --------------------------------------
+  // Volver a página 1
+  paginaActual = 1;
 
-    const marcasSeleccionadas = Array.from(
-        document.querySelectorAll(
-            '.filtro-marca:checked'
-        )
-    ).map(
-        checkbox =>
-            checkbox.value.toLowerCase()
-    );
-
-
-
-
-    // --------------------------------------
-    // FILTRAR
-    // --------------------------------------
-
-    productosFiltrados =
-        productos.filter(producto => {
-
-            const nombre =
-                producto.nombre?.toLowerCase() || '';
-
-            const marca =
-                producto.marca?.toLowerCase() || '';
-
-            const categoria =
-                producto.categoria?.toLowerCase() || '';
-
-
-            // Buscador
-            const coincideTexto =
-                texto === '' ||
-                nombre.includes(texto) ||
-                marca.includes(texto) ||
-                categoria.includes(texto);
-
-
-            // Categoría
-            const coincideCategoria =
-                categoriasSeleccionadas.length === 0 ||
-                categoriasSeleccionadas.includes(
-                    categoria
-                );
-
-
-            // Marca
-            const coincideMarca =
-                marcasSeleccionadas.length === 0 ||
-                marcasSeleccionadas.includes(
-                    marca
-                );
-
-
-            // Certificación El catálogo público muestra únicamente productos Sin TACC certificados.
-const coincideCertificado =
-    Number(
-        producto.certificadoSinTacc
-    ) === 1;
-
-            return (
-                coincideTexto &&
-                coincideCategoria &&
-                coincideMarca &&
-                coincideCertificado
-            );
-        });
-
-
-    // Ordenar resultados
-    ordenarProductos();
-
-
-    // Volver a página 1
-    paginaActual = 1;
-
-    mostrarProductos();
-    mostrarPaginacion();
+  mostrarProductos();
+  mostrarPaginacion();
 }
-
 
 // ==========================================
 // CAMBIAR ORDEN
 // ==========================================
 
 function cambiarOrden() {
+  ordenarProductos();
 
-    ordenarProductos();
+  paginaActual = 1;
 
-    paginaActual = 1;
-
-    mostrarProductos();
-    mostrarPaginacion();
+  mostrarProductos();
+  mostrarPaginacion();
 }
-
 
 // ==========================================
 // LIMPIAR FILTROS
 // ==========================================
 
 function limpiarFiltros() {
+  // Vaciar buscador
+  const buscador = document.getElementById("buscar-producto");
 
-    // Vaciar buscador
-    const buscador =
-        document.getElementById('buscar-producto');
+  if (buscador) {
+    buscador.value = "";
+  }
 
-    if (buscador) {
-        buscador.value = '';
-    }
+  // Desmarcar categorías
+  document.querySelectorAll(".filtro-categoria").forEach((checkbox) => {
+    checkbox.checked = false;
+  });
 
-
-    // Desmarcar categorías
-    document
-        .querySelectorAll('.filtro-categoria')
-        .forEach(checkbox => {
-
-            checkbox.checked = false;
-
-        });
-
-
-    // Desmarcar marcas
-    document
-        .querySelectorAll('.filtro-marca')
-        .forEach(checkbox => {
-
-            checkbox.checked = false;
-
-        });
-
+  // Desmarcar marcas
+  document.querySelectorAll(".filtro-marca").forEach((checkbox) => {
+    checkbox.checked = false;
+  });
 
   // ----------------------------------
-// SWITCH SIN TACC
-// ----------------------------------
+  // SWITCH SIN TACC
+  // ----------------------------------
 
-const switchCertificado =
-    document.getElementById(
-        'cert-sintacc'
-    );
+  const switchCertificado = document.getElementById("cert-sintacc");
 
-if (switchCertificado) {
+  if (switchCertificado) {
+    switchCertificado.addEventListener("change", aplicarFiltros);
+  }
 
-    switchCertificado.addEventListener(
-        'change',
-        aplicarFiltros
-    );
+  // Restaurar orden
+  const selectorOrden = document.getElementById("orden-productos");
+
+  if (selectorOrden) {
+    selectorOrden.value = "relevantes";
+  }
+
+  aplicarFiltros();
 }
-
-
-    // Restaurar orden
-    const selectorOrden =
-        document.getElementById(
-            'orden-productos'
-        );
-
-    if (selectorOrden) {
-
-        selectorOrden.value =
-            'relevantes';
-
-    }
-
-
-    aplicarFiltros();
-}
-
 
 // ==========================================
 // INICIAR PRODUCTOS
 // ==========================================
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
+document.addEventListener("DOMContentLoaded", () => {
+  // ----------------------------------
+  // BUSCADOR
+  // ----------------------------------
 
-        // ----------------------------------
-        // BUSCADOR
-        // ----------------------------------
+  const buscador = document.getElementById("buscar-producto");
 
-        const buscador =
-            document.getElementById(
-                'buscar-producto'
-            );
+  if (buscador) {
+    buscador.addEventListener("input", aplicarFiltros);
+  }
 
-        if (buscador) {
+  // ----------------------------------
+  // APLICAR FILTROS
+  // ----------------------------------
 
-            buscador.addEventListener(
-                'input',
-                aplicarFiltros
-            );
-        }
+  const btnAplicarFiltros = document.getElementById("btn-aplicar-filtros");
 
+  if (btnAplicarFiltros) {
+    btnAplicarFiltros.addEventListener("click", aplicarFiltros);
+  }
 
-        // ----------------------------------
-        // APLICAR FILTROS
-        // ----------------------------------
+  // ----------------------------------
+  // LIMPIAR FILTROS
+  // ----------------------------------
 
-        const btnAplicarFiltros =
-            document.getElementById(
-                'btn-aplicar-filtros'
-            );
+  const btnLimpiarFiltros = document.getElementById("btn-limpiar-filtros");
 
-        if (btnAplicarFiltros) {
+  if (btnLimpiarFiltros) {
+    btnLimpiarFiltros.addEventListener("click", limpiarFiltros);
+  }
 
-            btnAplicarFiltros.addEventListener(
-                'click',
-                aplicarFiltros
-            );
-        }
+  // ----------------------------------
+  // SWITCH SIN TACC
+  // ----------------------------------
 
+  const switchCertificado = document.getElementById("cert-sintacc");
 
-        // ----------------------------------
-        // LIMPIAR FILTROS
-        // ----------------------------------
+  if (switchCertificado) {
+    switchCertificado.addEventListener("change", aplicarFiltros);
+  }
 
-        const btnLimpiarFiltros =
-            document.getElementById(
-                'btn-limpiar-filtros'
-            );
+  // ----------------------------------
+  // ORDENAMIENTO
+  // ----------------------------------
 
-        if (btnLimpiarFiltros) {
+  const selectorOrden = document.getElementById("orden-productos");
 
-            btnLimpiarFiltros.addEventListener(
-                'click',
-                limpiarFiltros
-            );
-        }
+  if (selectorOrden) {
+    selectorOrden.addEventListener("change", cambiarOrden);
+  }
 
+  // ----------------------------------
+  // CARGAR PRODUCTOS
+  // ----------------------------------
 
-        // ----------------------------------
-        // SWITCH SIN TACC
-        // ----------------------------------
-
-        const switchCertificado =
-            document.getElementById(
-                'cert-sintacc'
-            );
-
-        if (switchCertificado) {
-
-            switchCertificado.addEventListener(
-                'change',
-                aplicarFiltros
-            );
-        }
-
-
-        // ----------------------------------
-        // ORDENAMIENTO
-        // ----------------------------------
-
-        const selectorOrden =
-            document.getElementById(
-                'orden-productos'
-            );
-
-        if (selectorOrden) {
-
-            selectorOrden.addEventListener(
-                'change',
-                cambiarOrden
-            );
-        }
-
-
-        // ----------------------------------
-        // CARGAR PRODUCTOS
-        // ----------------------------------
-
-        cargarProductos();
-
-    }
-);
+  cargarProductos();
+});

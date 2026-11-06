@@ -9,6 +9,7 @@ const LOCALES_POR_PAGINA = 9;
 
 let todosLosLocales = [];
 let localesFiltrados = [];
+let localesFavoritos = [];
 let paginaActual = 1;
 
 
@@ -61,18 +62,53 @@ async function cargarLocales() {
         const respuesta =
             await fetch(API_LOCALES);
 
-
         if (!respuesta.ok) {
 
             throw new Error(
                 'No se pudieron cargar los locales'
             );
-
         }
 
 
         todosLosLocales =
             await respuesta.json();
+
+
+        // ======================================
+        // CARGAR FAVORITOS DEL USUARIO
+        // ======================================
+
+        const token =
+            localStorage.getItem('celiaToken') ||
+            sessionStorage.getItem('celiaToken');
+
+        localesFavoritos = [];
+
+        if (token) {
+
+            const respuestaFavoritos =
+                await fetch(
+                    `${API_LOCALES}/favoritos`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            if (respuestaFavoritos.ok) {
+
+                const favoritos =
+                    await respuestaFavoritos.json();
+
+                localesFavoritos =
+                    favoritos.map(
+                        favorito =>
+                            Number(favorito.localId)
+                    );
+            }
+        }
 
 
         localesFiltrados =
@@ -107,9 +143,7 @@ async function cargarLocales() {
 
             </div>
         `;
-
     }
-
 }
 
 
@@ -127,7 +161,6 @@ function obtenerTiposSeleccionados() {
 
     return Array.from(checkboxes)
         .map(checkbox => checkbox.value);
-
 }
 
 
@@ -145,7 +178,6 @@ function obtenerTiposSeleccionadosMobile() {
 
     return Array.from(checkboxes)
         .map(checkbox => checkbox.value);
-
 }
 
 
@@ -203,7 +235,6 @@ function aplicarFiltros() {
                 coincideTipo &&
                 coincideBarrio
             );
-
         });
 
 
@@ -212,7 +243,6 @@ function aplicarFiltros() {
     paginaActual = 1;
 
     mostrarLocales();
-
 }
 
 
@@ -226,7 +256,6 @@ function aplicarFiltrosMobile() {
         obtenerTiposSeleccionadosMobile();
 
 
-    // Sincronizar tipos con desktop
     document
         .querySelectorAll('.filtro-tipo')
         .forEach(checkbox => {
@@ -235,17 +264,14 @@ function aplicarFiltrosMobile() {
                 tiposMobile.includes(
                     checkbox.value
                 );
-
         });
 
 
-    // Sincronizar barrio
     filtroBarrio.value =
         filtroBarrioMobile.value;
 
 
     aplicarFiltros();
-
 }
 
 
@@ -268,7 +294,6 @@ function ordenarLocales() {
                     'es'
                 )
         );
-
     }
 
 
@@ -291,10 +316,8 @@ function ordenarLocales() {
                     Number(b.cantidadResenas) -
                     Number(a.cantidadResenas)
                 );
-
             }
         );
-
     }
 
 
@@ -327,12 +350,9 @@ function ordenarLocales() {
                     b.nombre,
                     'es'
                 );
-
             }
         );
-
     }
-
 }
 
 
@@ -374,7 +394,6 @@ function mostrarLocales() {
         paginacionLocales.innerHTML = '';
 
         return;
-
     }
 
 
@@ -411,6 +430,12 @@ function mostrarLocales() {
 
         const cantidadResenas =
             Number(local.cantidadResenas);
+
+
+        const esFavorito =
+            localesFavoritos.includes(
+                Number(local.id)
+            );
 
 
         const textoCalificacion =
@@ -458,72 +483,237 @@ function mostrarLocales() {
 
         columna.innerHTML = `
 
-            <a
-                href="local-detalle.html?id=${local.id}"
-                class="text-decoration-none text-dark"
-            >
+            <div class="position-relative h-100">
 
-                <div
-                    class="card h-100 shadow-sm border-0"
+                <a
+                    href="local-detalle.html?id=${local.id}"
+                    class="text-decoration-none text-dark"
                 >
 
-                    ${imagenLocal}
+                    <div
+                        class="card h-100 shadow-sm border-0"
+                    >
 
-                    <div class="card-body">
+                        ${imagenLocal}
 
-                        <span
-                            class="badge text-bg-success text-white mb-2"
-                        >
-                            ${local.tipoLocal}
-                        </span>
+                        <div class="card-body">
 
-
-                        <h5 class="card-title fw-bold">
-                            ${local.nombre}
-                        </h5>
-
-
-                        <p
-                            class="card-text text-muted small"
-                        >
-                            ${local.descripcion}
-                        </p>
-
-
-                        <div
-                            class="d-flex align-items-center gap-1 mb-2"
-                        >
-                            <i class="bi bi-geo-alt"></i>
-
-                            <span class="small">
-                                ${local.barrio}
+                            <span
+                                class="badge text-bg-success text-white mb-2"
+                            >
+                                ${local.tipoLocal}
                             </span>
-                        </div>
 
 
-                        <div
-                            class="d-flex align-items-center gap-2"
-                        >
-                            ${textoCalificacion}
+                            <h5 class="card-title fw-bold">
+                                ${local.nombre}
+                            </h5>
+
+
+                            <p
+                                class="card-text text-muted small"
+                            >
+                                ${local.descripcion}
+                            </p>
+
+
+                            <div
+                                class="d-flex align-items-center gap-1 mb-2"
+                            >
+                                <i class="bi bi-geo-alt"></i>
+
+                                <span class="small">
+                                    ${local.barrio}
+                                </span>
+                            </div>
+
+
+                            <div
+                                class="d-flex align-items-center gap-2"
+                            >
+                                ${textoCalificacion}
+                            </div>
+
                         </div>
 
                     </div>
 
-                </div>
+                </a>
 
-            </a>
+
+                <button
+                    class="local-fav"
+                    type="button"
+                    data-local-id="${local.id}"
+                    aria-label="${
+                        esFavorito
+                            ? `Quitar ${local.nombre} de favoritos`
+                            : `Agregar ${local.nombre} a favoritos`
+                    }"
+                >
+                    <i
+                        class="bi ${
+                            esFavorito
+                                ? 'bi-heart-fill'
+                                : 'bi-heart'
+                        }"
+                    ></i>
+                </button>
+
+            </div>
         `;
 
 
         contenedorLocales.appendChild(
             columna
         );
+    });
 
+
+    // ======================================
+    // FAVORITOS DE LOCALES
+    // ======================================
+
+    const botonesFavoritos =
+        contenedorLocales.querySelectorAll(
+            '.local-fav'
+        );
+
+
+    botonesFavoritos.forEach(boton => {
+
+        boton.addEventListener(
+            'click',
+            async evento => {
+
+                evento.preventDefault();
+                evento.stopPropagation();
+
+
+                const localId =
+                    Number(
+                        boton.dataset.localId
+                    );
+
+
+                const token =
+                    localStorage.getItem(
+                        'celiaToken'
+                    ) ||
+                    sessionStorage.getItem(
+                        'celiaToken'
+                    );
+
+
+                if (!token) {
+
+                    window.location.href =
+                        'login.html';
+
+                    return;
+                }
+
+
+                const esFavorito =
+                    localesFavoritos.includes(
+                        localId
+                    );
+
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            `${API_LOCALES}/${localId}/favorito`,
+                            {
+                                method:
+                                    esFavorito
+                                        ? 'DELETE'
+                                        : 'POST',
+
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${token}`
+                                }
+                            }
+                        );
+
+
+                    const datos =
+                        await respuesta.json();
+
+
+                    if (!respuesta.ok) {
+
+                        throw new Error(
+                            datos.mensaje ||
+                            'No se pudo actualizar el favorito'
+                        );
+                    }
+
+
+                    const icono =
+                        boton.querySelector('i');
+
+
+                    if (esFavorito) {
+
+                        localesFavoritos =
+                            localesFavoritos.filter(
+                                id => id !== localId
+                            );
+
+
+                        icono.classList.remove(
+                            'bi-heart-fill'
+                        );
+
+                        icono.classList.add(
+                            'bi-heart'
+                        );
+
+
+                        boton.setAttribute(
+                            'aria-label',
+                            'Agregar local a favoritos'
+                        );
+
+                    } else {
+
+                        localesFavoritos.push(
+                            localId
+                        );
+
+
+                        icono.classList.remove(
+                            'bi-heart'
+                        );
+
+                        icono.classList.add(
+                            'bi-heart-fill'
+                        );
+
+
+                        boton.setAttribute(
+                            'aria-label',
+                            'Quitar local de favoritos'
+                        );
+                    }
+
+
+                } catch (error) {
+
+                    console.error(
+                        'Error al actualizar favorito de local:',
+                        error
+                    );
+                }
+            }
+        );
     });
 
 
     generarPaginacion();
-
 }
 
 
@@ -594,7 +784,6 @@ function generarPaginacion() {
                         .scrollIntoView({
                             behavior: 'smooth'
                         });
-
                 }
             );
 
@@ -602,9 +791,7 @@ function generarPaginacion() {
         paginacionLocales.appendChild(
             item
         );
-
     }
-
 }
 
 
@@ -647,7 +834,6 @@ function limpiarFiltros() {
 
 
     aplicarFiltros();
-
 }
 
 
@@ -719,13 +905,11 @@ offcanvasLocales.addEventListener(
                     tiposDesktop.includes(
                         checkbox.value
                     );
-
             });
 
 
         filtroBarrioMobile.value =
             filtroBarrio.value;
-
     }
 );
 

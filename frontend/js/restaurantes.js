@@ -9,6 +9,7 @@ const RESTAURANTES_POR_PAGINA = 9;
 
 let restaurantes = [];
 let restaurantesFiltrados = [];
+let restaurantesFavoritos = [];
 let paginaActual = 1;
 
 
@@ -52,6 +53,46 @@ async function cargarRestaurantes() {
         restaurantes =
             await respuesta.json();
 
+
+        // ======================================
+        // CARGAR FAVORITOS DEL USUARIO
+        // ======================================
+
+        const token =
+            localStorage.getItem('celiaToken') ||
+            sessionStorage.getItem('celiaToken');
+
+        restaurantesFavoritos = [];
+
+        if (token) {
+
+            const respuestaFavoritos =
+                await fetch(
+                    `${API_RESTAURANTES}/favoritos`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            if (respuestaFavoritos.ok) {
+
+                const favoritos =
+                    await respuestaFavoritos.json();
+
+                restaurantesFavoritos =
+                    favoritos.map(
+                        favorito =>
+                            Number(
+                                favorito.restauranteId
+                            )
+                    );
+            }
+        }
+
+
         restaurantesFiltrados =
             [...restaurantes];
 
@@ -76,7 +117,6 @@ async function cargarRestaurantes() {
             </div>
         `;
     }
-
 }
 
 
@@ -119,18 +159,32 @@ function crearTarjetaRestaurante(restaurante) {
         restaurante.imagenExterior &&
         restaurante.imagenExterior.trim() !== '';
 
+    const esFavorito =
+        restaurantesFavoritos.includes(
+            Number(restaurante.id)
+        );
+
     const imagen = tieneImagen
         ? `
             <img
                 src="${restaurante.imagenExterior}"
                 class="card-img-top"
-                style="height: 500px; object-fit: cover; object-position: center;"
+                style="
+                    height: 500px;
+                    object-fit: cover;
+                    object-position: center;
+                "
                 alt="${restaurante.nombre}"
             >
         `
         : `
             <div
-                class="d-flex align-items-center justify-content-center bg-light"
+                class="
+                    d-flex
+                    align-items-center
+                    justify-content-center
+                    bg-light
+                "
                 style="height: 210px;"
             >
                 <i
@@ -144,79 +198,130 @@ function crearTarjetaRestaurante(restaurante) {
     return `
         <div class="col-md-6 col-xl-4">
 
-            <a
-                href="restaurante-detalle.html?id=${restaurante.id}"
-                class="text-decoration-none text-dark"
-            >
+            <div class="position-relative h-100">
 
-                <article class="card h-100 shadow-sm border-0">
+                <a
+                    href="restaurante-detalle.html?id=${restaurante.id}"
+                    class="text-decoration-none text-dark"
+                >
 
-                    ${imagen}
+                    <article
+                        class="card h-100 shadow-sm border-0"
+                    >
 
-                    <div class="card-body d-flex flex-column">
+                        ${imagen}
 
-                        <div class="mb-2">
+                        <div class="card-body d-flex flex-column">
 
-                            <span class="badge text-bg-success text-white">
-                                ${restaurante.tipoRestaurante}
-                            </span>
+                            <div class="mb-2">
 
-                        </div>
+                                <span
+                                    class="
+                                        badge
+                                        text-bg-success
+                                        text-white
+                                    "
+                                >
+                                    ${restaurante.tipoRestaurante}
+                                </span>
 
-
-                        <h5 class="card-title fw-bold">
-                            ${restaurante.nombre}
-                        </h5>
-
-
-                        <p class="card-text text-muted small">
-                            ${restaurante.descripcion || ''}
-                        </p>
+                            </div>
 
 
-                        <div class="mt-auto">
+                            <h5 class="card-title fw-bold">
+                                ${restaurante.nombre}
+                            </h5>
 
-                            <p class="mb-2">
 
-                                <i class="bi bi-geo-alt"></i>
-
-                                ${restaurante.barrio}
-
+                            <p class="card-text text-muted small">
+                                ${restaurante.descripcion || ''}
                             </p>
 
 
-                            <div
-                                class="d-flex align-items-center gap-2"
-                            >
+                            <div class="mt-auto">
 
-                                ${crearEstrellas(
-                                    restaurante.calificacionPromedio
-                                )}
+                                <p class="mb-2">
 
-                                ${
-                                    Number(restaurante.cantidadResenas) > 0
-                                        ? `
-                                            <span class="text-muted small">
-                                                (${restaurante.cantidadResenas}
-                                                ${
-                                                    Number(restaurante.cantidadResenas) === 1
-                                                        ? 'reseña'
-                                                        : 'reseñas'
-                                                })
-                                            </span>
-                                        `
-                                        : ''
-                                }
+                                    <i class="bi bi-geo-alt"></i>
+
+                                    ${restaurante.barrio}
+
+                                </p>
+
+
+                                <div
+                                    class="
+                                        d-flex
+                                        align-items-center
+                                        gap-2
+                                    "
+                                >
+
+                                    ${crearEstrellas(
+                                        restaurante.calificacionPromedio
+                                    )}
+
+                                    ${
+                                        Number(
+                                            restaurante.cantidadResenas
+                                        ) > 0
+                                            ? `
+                                                <span
+                                                    class="
+                                                        text-muted
+                                                        small
+                                                    "
+                                                >
+                                                    (${restaurante.cantidadResenas}
+                                                    ${
+                                                        Number(
+                                                            restaurante.cantidadResenas
+                                                        ) === 1
+                                                            ? 'reseña'
+                                                            : 'reseñas'
+                                                    })
+                                                </span>
+                                            `
+                                            : ''
+                                    }
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                    </div>
+                    </article>
 
-                </article>
+                </a>
 
-            </a>
+
+                <button
+                    class="restaurant-fav"
+                    type="button"
+                    data-restaurante-id="${restaurante.id}"
+                    aria-label="${
+                        esFavorito
+                            ? `Quitar ${restaurante.nombre} de favoritos`
+                            : `Agregar ${restaurante.nombre} a favoritos`
+                    }"
+                    style="
+                        position: absolute;
+                        top: 16px;
+                        right: 16px;
+                        z-index: 10;
+                    "
+                >
+                    <i
+                        class="bi ${
+                            esFavorito
+                                ? 'bi-heart-fill'
+                                : 'bi-heart'
+                        }"
+                    ></i>
+                </button>
+
+            </div>
 
         </div>
     `;
@@ -279,6 +384,141 @@ function mostrarRestaurantes() {
     );
 
 
+    // ======================================
+    // FAVORITOS DE RESTAURANTES
+    // ======================================
+
+    const botonesFavoritos =
+        contenedorRestaurantes.querySelectorAll(
+            '.restaurant-fav'
+        );
+
+    botonesFavoritos.forEach(
+        boton => {
+
+            boton.addEventListener(
+                'click',
+                async evento => {
+
+                    evento.preventDefault();
+                    evento.stopPropagation();
+
+                    const restauranteId =
+                        Number(
+                            boton.dataset.restauranteId
+                        );
+
+                    const token =
+                        localStorage.getItem(
+                            'celiaToken'
+                        ) ||
+                        sessionStorage.getItem(
+                            'celiaToken'
+                        );
+
+                    if (!token) {
+                        window.location.href =
+                            'login.html';
+
+                        return;
+                    }
+
+
+                    const esFavorito =
+                        restaurantesFavoritos.includes(
+                            restauranteId
+                        );
+
+
+                    try {
+
+                        const respuesta =
+                            await fetch(
+                                `${API_RESTAURANTES}/${restauranteId}/favorito`,
+                                {
+                                    method:
+                                        esFavorito
+                                            ? 'DELETE'
+                                            : 'POST',
+
+                                    headers: {
+                                        Authorization:
+                                            `Bearer ${token}`
+                                    }
+                                }
+                            );
+
+
+                        const datos =
+                            await respuesta.json();
+
+
+                        if (!respuesta.ok) {
+                            throw new Error(
+                                datos.mensaje ||
+                                'No se pudo actualizar el favorito'
+                            );
+                        }
+
+
+                        const icono =
+                            boton.querySelector('i');
+
+
+                        if (esFavorito) {
+
+                            restaurantesFavoritos =
+                                restaurantesFavoritos.filter(
+                                    id =>
+                                        id !== restauranteId
+                                );
+
+                            icono.classList.remove(
+                                'bi-heart-fill'
+                            );
+
+                            icono.classList.add(
+                                'bi-heart'
+                            );
+
+                            boton.setAttribute(
+                                'aria-label',
+                                'Agregar restaurante a favoritos'
+                            );
+
+                        } else {
+
+                            restaurantesFavoritos.push(
+                                restauranteId
+                            );
+
+                            icono.classList.remove(
+                                'bi-heart'
+                            );
+
+                            icono.classList.add(
+                                'bi-heart-fill'
+                            );
+
+                            boton.setAttribute(
+                                'aria-label',
+                                'Quitar restaurante de favoritos'
+                            );
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            'Error al actualizar favorito de restaurante:',
+                            error
+                        );
+                    }
+                }
+            );
+        }
+    );
+
+
     contadorRestaurantes.textContent =
         `${restaurantesFiltrados.length} ${
             restaurantesFiltrados.length === 1
@@ -288,7 +528,6 @@ function mostrarRestaurantes() {
 
 
     crearPaginacion();
-
 }
 
 
@@ -360,9 +599,7 @@ function crearPaginacion() {
         paginacionRestaurantes.appendChild(
             item
         );
-
     }
-
 }
 
 
@@ -381,7 +618,6 @@ function obtenerTiposSeleccionados(
     )
         .filter(input => input.checked)
         .map(input => input.value);
-
 }
 
 
@@ -468,7 +704,6 @@ function aplicarFiltrosYOrden() {
                     coincideTipo &&
                     coincideBarrio
                 );
-
             }
         );
 
@@ -478,7 +713,6 @@ function aplicarFiltrosYOrden() {
     paginaActual = 1;
 
     mostrarRestaurantes();
-
 }
 
 
@@ -501,7 +735,6 @@ function ordenarRestaurantes() {
                     'es'
                 )
         );
-
     }
 
 
@@ -516,7 +749,6 @@ function ordenarRestaurantes() {
                     a.calificacionPromedio
                 )
         );
-
     }
 
 
@@ -537,9 +769,7 @@ function ordenarRestaurantes() {
                     'es'
                 )
         );
-
     }
-
 }
 
 
@@ -576,7 +806,6 @@ function limpiarFiltros() {
 
 
     aplicarFiltrosYOrden();
-
 }
 
 

@@ -1,18 +1,15 @@
-const express = require('express');
-const cors = require('cors');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const pool = require('./db');
+const express = require("express");
+const cors = require("cors");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const pool = require("./db");
 
-const usuariosRoutes =
-    require('./routes/usuarios.routes');
+const usuariosRoutes = require("./routes/usuarios.routes");
 
 const app = express();
 const PORT = 3000;
 
-const {
-    verificarAdminOModerador
-} = require('./middleware/auth.middleware');
+const { verificarAdminOModerador } = require("./middleware/auth.middleware");
 
 app.use(cors());
 app.use(express.json());
@@ -21,75 +18,42 @@ app.use(express.json());
 // RUTAS MODULARES
 // ==========================================
 
-app.use(
-    '/api/admin/usuarios',
-    usuariosRoutes
-);
-
+app.use("/api/admin/usuarios", usuariosRoutes);
 
 // ==========================================
 // VERIFICAR TOKEN JWT
 // ==========================================
 
 function verificarToken(req, res, next) {
+  const authorization = req.headers.authorization;
 
-    const authorization =
-        req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).json({
+      mensaje: "Debés iniciar sesión",
+    });
+  }
 
+  const partes = authorization.split(" ");
 
-    if (!authorization) {
+  if (partes.length !== 2 || partes[0] !== "Bearer") {
+    return res.status(401).json({
+      mensaje: "Token inválido",
+    });
+  }
 
-        return res.status(401).json({
-            mensaje: 'Debés iniciar sesión'
-        });
+  const token = partes[1];
 
-    }
+  try {
+    const usuario = jwt.verify(token, process.env.JWT_SECRET);
 
+    req.usuario = usuario;
 
-    const partes =
-        authorization.split(' ');
-
-
-    if (
-        partes.length !== 2 ||
-        partes[0] !== 'Bearer'
-    ) {
-
-        return res.status(401).json({
-            mensaje: 'Token inválido'
-        });
-
-    }
-
-
-    const token =
-        partes[1];
-
-
-    try {
-
-        const usuario =
-            jwt.verify(
-                token,
-                process.env.JWT_SECRET
-            );
-
-
-        req.usuario =
-            usuario;
-
-
-        next();
-
-
-    } catch (error) {
-
-        return res.status(401).json({
-            mensaje: 'Sesión inválida o vencida'
-        });
-
-    }
-
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      mensaje: "Sesión inválida o vencida",
+    });
+  }
 }
 
 // ==========================================
@@ -97,56 +61,41 @@ function verificarToken(req, res, next) {
 // ==========================================
 
 function verificarAdmin(req, res, next) {
+  if (!req.usuario || Number(req.usuario.rolId) !== 1) {
+    return res.status(403).json({
+      mensaje: "No tenés permisos de administrador",
+    });
+  }
 
-    if (
-        !req.usuario ||
-        Number(req.usuario.rolId) !== 1
-    ) {
-
-        return res.status(403).json({
-            mensaje:
-                'No tenés permisos de administrador'
-        });
-
-    }
-
-    next();
+  next();
 }
 
 // ==========================================
 // RUTA DE PRUEBA
 // ==========================================
 
-app.get('/', (req, res) => {
-
-    res.send('CeliaConnect API funcionando');
-
+app.get("/", (req, res) => {
+  res.send("CeliaConnect API funcionando");
 });
-
 
 // ==========================================
 // LOGIN
 // ==========================================
 
-app.post('/api/login', async (req, res) => {
+app.post("/api/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-    try {
+    // Validar campos obligatorios
+    if (!email || !password) {
+      return res.status(400).json({
+        mensaje: "Email y contraseña son obligatorios",
+      });
+    }
 
-        const { email, password } = req.body;
-
-
-        // Validar campos obligatorios
-        if (!email || !password) {
-
-            return res.status(400).json({
-                mensaje: 'Email y contraseña son obligatorios'
-            });
-
-        }
-
-
-        // Buscar usuario por email
-        const [usuarios] = await pool.query(`
+    // Buscar usuario por email
+    const [usuarios] = await pool.query(
+      `
             SELECT
                 id,
                 nombre,
@@ -158,197 +107,139 @@ app.post('/api/login', async (req, res) => {
             FROM usuario
             WHERE email = ?
             LIMIT 1
-        `, [email]);
+        `,
+      [email],
+    );
 
-
-        // Usuario inexistente
-        if (usuarios.length === 0) {
-
-            return res.status(401).json({
-                mensaje: 'Email o contraseña incorrectos'
-            });
-
-        }
-
-
-        const usuario = usuarios[0];
-
-
-        // Verificar que el usuario esté activo
-        if (Number(usuario.esActivo) !== 1) {
-
-            return res.status(403).json({
-                mensaje: 'El usuario se encuentra inactivo'
-            });
-
-        }
-
-
-        // Comparar contraseña con el hash bcrypt
-        const passwordCorrecta =
-            await bcrypt.compare(
-                password,
-                usuario.password
-            );
-
-
-        // Contraseña incorrecta
-        if (!passwordCorrecta) {
-
-            return res.status(401).json({
-                mensaje: 'Email o contraseña incorrectos'
-            });
-
-        }
-
-
-        // Login correcto
-        // Generar token de autenticación
-const token = jwt.sign(
-    {
-        id: usuario.id,
-        rolId: usuario.rolId
-    },
-    process.env.JWT_SECRET,
-    {
-        expiresIn: '8h'
+    // Usuario inexistente
+    if (usuarios.length === 0) {
+      return res.status(401).json({
+        mensaje: "Email o contraseña incorrectos",
+      });
     }
-);
 
+    const usuario = usuarios[0];
 
-// Login correcto
-res.json({
+    // Verificar que el usuario esté activo
+    if (Number(usuario.esActivo) !== 1) {
+      return res.status(403).json({
+        mensaje: "El usuario se encuentra inactivo",
+      });
+    }
 
-    mensaje: 'Inicio de sesión correcto',
+    // Comparar contraseña con el hash bcrypt
+    const passwordCorrecta = await bcrypt.compare(password, usuario.password);
 
-    token: token,
+    // Contraseña incorrecta
+    if (!passwordCorrecta) {
+      return res.status(401).json({
+        mensaje: "Email o contraseña incorrectos",
+      });
+    }
 
-    usuario: {
+    // Login correcto
+    // Generar token de autenticación
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        rolId: usuario.rolId,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "8h",
+      },
+    );
+
+    // Login correcto
+    res.json({
+      mensaje: "Inicio de sesión correcto",
+
+      token: token,
+
+      usuario: {
         id: usuario.id,
         nombre: usuario.nombre,
         apellido: usuario.apellido,
         email: usuario.email,
-        rolId: usuario.rolId
-    }
+        rolId: usuario.rolId,
+      },
+    });
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error);
 
-});
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al iniciar sesión:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje: 'Error al iniciar sesión'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al iniciar sesión",
+    });
+  }
 });
 
 // ==========================================
 // REGISTRO DE USUARIO
 // ==========================================
 
-app.post('/api/registro', async (req, res) => {
+app.post("/api/registro", async (req, res) => {
+  try {
+    const { nombre, apellido, documento, email, password } = req.body;
 
-    try {
+    // Validar campos obligatorios
+    if (!nombre || !apellido || !documento || !email || !password) {
+      return res.status(400).json({
+        mensaje: "Todos los campos son obligatorios",
+      });
+    }
 
-        const {
-            nombre,
-            apellido,
-            documento,
-            email,
-            password
-        } = req.body;
+    // Validar longitud de contraseña
+    if (password.length < 8) {
+      return res.status(400).json({
+        mensaje: "La contraseña debe tener al menos 8 caracteres",
+      });
+    }
 
+    // Normalizar datos
+    const emailNormalizado = email.trim().toLowerCase();
 
-        // Validar campos obligatorios
-        if (
-            !nombre ||
-            !apellido ||
-            !documento ||
-            !email ||
-            !password
-        ) {
+    const documentoNormalizado = documento.trim();
 
-            return res.status(400).json({
-                mensaje: 'Todos los campos son obligatorios'
-            });
-
-        }
-
-
-        // Validar longitud de contraseña
-        if (password.length < 8) {
-
-            return res.status(400).json({
-                mensaje: 'La contraseña debe tener al menos 8 caracteres'
-            });
-
-        }
-
-
-        // Normalizar datos
-        const emailNormalizado =
-            email.trim().toLowerCase();
-
-        const documentoNormalizado =
-            documento.trim();
-
-
-        // Verificar si ya existe el email
-        const [usuariosEmail] =
-            await pool.query(`
+    // Verificar si ya existe el email
+    const [usuariosEmail] = await pool.query(
+      `
                 SELECT id
                 FROM usuario
                 WHERE email = ?
                 LIMIT 1
-            `, [emailNormalizado]);
+            `,
+      [emailNormalizado],
+    );
 
+    if (usuariosEmail.length > 0) {
+      return res.status(409).json({
+        mensaje: "Ya existe una cuenta con ese correo electrónico",
+      });
+    }
 
-        if (usuariosEmail.length > 0) {
-
-            return res.status(409).json({
-                mensaje: 'Ya existe una cuenta con ese correo electrónico'
-            });
-
-        }
-
-
-        // Verificar si ya existe el documento
-        const [usuariosDocumento] =
-            await pool.query(`
+    // Verificar si ya existe el documento
+    const [usuariosDocumento] = await pool.query(
+      `
                 SELECT id
                 FROM usuario
                 WHERE documento = ?
                 LIMIT 1
-            `, [documentoNormalizado]);
+            `,
+      [documentoNormalizado],
+    );
 
+    if (usuariosDocumento.length > 0) {
+      return res.status(409).json({
+        mensaje: "Ya existe una cuenta con ese documento",
+      });
+    }
 
-        if (usuariosDocumento.length > 0) {
+    // Encriptar contraseña
+    const passwordHash = await bcrypt.hash(password, 10);
 
-            return res.status(409).json({
-                mensaje: 'Ya existe una cuenta con ese documento'
-            });
-
-        }
-
-
-        // Encriptar contraseña
-        const passwordHash =
-            await bcrypt.hash(
-                password,
-                10
-            );
-
-
-        // Crear usuario
-        const [resultado] =
-            await pool.query(`
+    // Crear usuario
+    const [resultado] = await pool.query(
+      `
                 INSERT INTO usuario (
                     documento,
                     nombre,
@@ -359,45 +250,35 @@ app.post('/api/registro', async (req, res) => {
                     rolId
                 )
                 VALUES (?, ?, ?, ?, ?, 1, 2)
-            `, [
-                documentoNormalizado,
-                nombre.trim(),
-                apellido.trim(),
-                emailNormalizado,
-                passwordHash
-            ]);
+            `,
+      [
+        documentoNormalizado,
+        nombre.trim(),
+        apellido.trim(),
+        emailNormalizado,
+        passwordHash,
+      ],
+    );
 
+    // Registro correcto
+    res.status(201).json({
+      mensaje: "Cuenta creada correctamente",
 
-        // Registro correcto
-        res.status(201).json({
+      usuario: {
+        id: resultado.insertId,
+        nombre: nombre.trim(),
+        apellido: apellido.trim(),
+        email: emailNormalizado,
+        rolId: 2,
+      },
+    });
+  } catch (error) {
+    console.error("Error al registrar usuario:", error);
 
-            mensaje: 'Cuenta creada correctamente',
-
-            usuario: {
-                id: resultado.insertId,
-                nombre: nombre.trim(),
-                apellido: apellido.trim(),
-                email: emailNormalizado,
-                rolId: 2
-            }
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al registrar usuario:',
-            error
-        );
-
-
-        res.status(500).json({
-            mensaje: 'Error al crear la cuenta'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al crear la cuenta",
+    });
+  }
 });
 
 // ==========================================
@@ -405,15 +286,12 @@ app.post('/api/registro', async (req, res) => {
 // ==========================================
 
 app.get(
-    '/api/admin/comentarios/productos',
-    verificarToken,
-    verificarAdminOModerador,
-    async (req, res) => {
-
-        try {
-
-            const [comentarios] =
-                await pool.query(`
+  "/api/admin/comentarios/productos",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    try {
+      const [comentarios] = await pool.query(`
                     SELECT
                         cp.id,
                         cp.titulo,
@@ -447,25 +325,15 @@ app.get(
                     ORDER BY cp.fechaComentario DESC
                 `);
 
+      res.json(comentarios);
+    } catch (error) {
+      console.error("Error al obtener comentarios pendientes:", error);
 
-            res.json(comentarios);
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al obtener comentarios pendientes:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener los comentarios pendientes'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los comentarios pendientes",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -473,138 +341,98 @@ app.get(
 // ==========================================
 
 app.patch(
-    '/api/admin/comentarios/productos/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/comentarios/productos/:id",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    try {
+      const comentarioId = Number(req.params.id);
 
-        try {
+      const { estado } = req.body;
 
-            const comentarioId =
-                Number(req.params.id);
+      // ==================================
+      // VALIDAR ID
+      // ==================================
 
-            const { estado } =
-                req.body;
+      if (!Number.isInteger(comentarioId) || comentarioId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de comentario inválido",
+        });
+      }
 
+      // ==================================
+      // VALIDAR ESTADO
+      // ==================================
 
-            // ==================================
-            // VALIDAR ID
-            // ==================================
+      if (estado !== "aprobado" && estado !== "rechazado") {
+        return res.status(400).json({
+          mensaje: "Estado de moderación inválido",
+        });
+      }
 
-            if (
-                !Number.isInteger(comentarioId) ||
-                comentarioId <= 0
-            ) {
+      // ==================================
+      // BUSCAR COMENTARIO
+      // ==================================
 
-                return res.status(400).json({
-                    mensaje:
-                        'ID de comentario inválido'
-                });
-
-            }
-
-
-            // ==================================
-            // VALIDAR ESTADO
-            // ==================================
-
-            if (
-                estado !== 'aprobado' &&
-                estado !== 'rechazado'
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Estado de moderación inválido'
-                });
-
-            }
-
-
-            // ==================================
-            // BUSCAR COMENTARIO
-            // ==================================
-
-            const [comentarios] =
-                await pool.query(`
+      const [comentarios] = await pool.query(
+        `
                     SELECT
                         id,
                         estado
                     FROM comentarioProducto
                     WHERE id = ?
                     LIMIT 1
-                `, [comentarioId]);
+                `,
+        [comentarioId],
+      );
 
+      if (comentarios.length === 0) {
+        return res.status(404).json({
+          mensaje: "Comentario no encontrado",
+        });
+      }
 
-            if (comentarios.length === 0) {
+      // ==================================
+      // SOLO MODERAR PENDIENTES
+      // ==================================
 
-                return res.status(404).json({
-                    mensaje:
-                        'Comentario no encontrado'
-                });
+      if (comentarios[0].estado !== "pendiente") {
+        return res.status(409).json({
+          mensaje: "El comentario ya fue moderado",
+        });
+      }
 
-            }
+      // ==================================
+      // ACTUALIZAR ESTADO
+      // ==================================
 
-
-            // ==================================
-            // SOLO MODERAR PENDIENTES
-            // ==================================
-
-            if (
-                comentarios[0].estado !==
-                'pendiente'
-            ) {
-
-                return res.status(409).json({
-                    mensaje:
-                        'El comentario ya fue moderado'
-                });
-
-            }
-
-
-            // ==================================
-            // ACTUALIZAR ESTADO
-            // ==================================
-
-            await pool.query(`
+      await pool.query(
+        `
                 UPDATE comentarioProducto
                 SET estado = ?
                 WHERE id = ?
-            `, [
-                estado,
-                comentarioId
-            ]);
+            `,
+        [estado, comentarioId],
+      );
 
+      // ==================================
+      // RESPUESTA
+      // ==================================
 
-            // ==================================
-            // RESPUESTA
-            // ==================================
+      res.json({
+        mensaje:
+          estado === "aprobado"
+            ? "Comentario aprobado correctamente"
+            : "Comentario rechazado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al moderar comentario:", error);
 
-            res.json({
-                mensaje:
-                    estado === 'aprobado'
-                        ? 'Comentario aprobado correctamente'
-                        : 'Comentario rechazado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al moderar comentario:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al moderar el comentario'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al moderar el comentario",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -613,15 +441,12 @@ app.patch(
 // ==========================================
 
 app.get(
-    '/api/admin/comentarios/restaurantes',
-    verificarToken,
-    verificarAdminOModerador,
-    async (req, res) => {
-
-        try {
-
-            const [comentarios] =
-                await pool.query(`
+  "/api/admin/comentarios/restaurantes",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    try {
+      const [comentarios] = await pool.query(`
                     SELECT
                         cr.id,
                         cr.titulo,
@@ -650,26 +475,18 @@ app.get(
                     ORDER BY cr.fechaComentario DESC
                 `);
 
+      res.json(comentarios);
+    } catch (error) {
+      console.error(
+        "Error al obtener comentarios pendientes de restaurantes:",
+        error,
+      );
 
-            res.json(comentarios);
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al obtener comentarios pendientes de restaurantes:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener los comentarios pendientes de restaurantes'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los comentarios pendientes de restaurantes",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -677,51 +494,32 @@ app.get(
 // ==========================================
 
 app.patch(
-    '/api/admin/comentarios/restaurantes/:id',
-    verificarToken,
-    verificarAdminOModerador,
-    async (req, res) => {
+  "/api/admin/comentarios/restaurantes/:id",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    try {
+      const comentarioId = Number(req.params.id);
 
-        try {
+      const { estado } = req.body;
 
-            const comentarioId =
-                Number(req.params.id);
+      // VALIDAR ID
+      if (!Number.isInteger(comentarioId) || comentarioId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de comentario inválido",
+        });
+      }
 
-            const { estado } =
-                req.body;
+      // VALIDAR ESTADO
+      if (estado !== "aprobado" && estado !== "rechazado") {
+        return res.status(400).json({
+          mensaje: "Estado de moderación inválido",
+        });
+      }
 
-
-            // VALIDAR ID
-            if (
-                !Number.isInteger(comentarioId) ||
-                comentarioId <= 0
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'ID de comentario inválido'
-                });
-
-            }
-
-
-            // VALIDAR ESTADO
-            if (
-                estado !== 'aprobado' &&
-                estado !== 'rechazado'
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Estado de moderación inválido'
-                });
-
-            }
-
-
-            // BUSCAR COMENTARIO
-            const [comentarios] =
-                await pool.query(`
+      // BUSCAR COMENTARIO
+      const [comentarios] = await pool.query(
+        `
                     SELECT
                         id,
                         estado,
@@ -729,52 +527,39 @@ app.patch(
                     FROM comentarioRestaurante
                     WHERE id = ?
                     LIMIT 1
-                `, [comentarioId]);
+                `,
+        [comentarioId],
+      );
 
+      if (comentarios.length === 0) {
+        return res.status(404).json({
+          mensaje: "Comentario no encontrado",
+        });
+      }
 
-            if (comentarios.length === 0) {
+      // SOLO MODERAR PENDIENTES
+      if (comentarios[0].estado !== "pendiente") {
+        return res.status(409).json({
+          mensaje: "El comentario ya fue moderado",
+        });
+      }
 
-                return res.status(404).json({
-                    mensaje:
-                        'Comentario no encontrado'
-                });
+      const restauranteId = comentarios[0].restauranteId;
 
-            }
-
-
-            // SOLO MODERAR PENDIENTES
-            if (
-                comentarios[0].estado !==
-                'pendiente'
-            ) {
-
-                return res.status(409).json({
-                    mensaje:
-                        'El comentario ya fue moderado'
-                });
-
-            }
-
-
-            const restauranteId =
-                comentarios[0].restauranteId;
-
-
-            // ACTUALIZAR ESTADO
-            await pool.query(`
+      // ACTUALIZAR ESTADO
+      await pool.query(
+        `
                 UPDATE comentarioRestaurante
                 SET estado = ?
                 WHERE id = ?
-            `, [
-                estado,
-                comentarioId
-            ]);
+            `,
+        [estado, comentarioId],
+      );
 
-
-            // RECALCULAR PROMEDIO Y CANTIDAD
-            // SOLO CON COMENTARIOS APROBADOS
-            const [resumen] =
-                await pool.query(`
+      // RECALCULAR PROMEDIO Y CANTIDAD
+      // SOLO CON COMENTARIOS APROBADOS
+      const [resumen] = await pool.query(
+        `
                     SELECT
                         COALESCE(
                             AVG(calificacion),
@@ -784,46 +569,39 @@ app.patch(
                     FROM comentarioRestaurante
                     WHERE restauranteId = ?
                         AND estado = 'aprobado'
-                `, [restauranteId]);
+                `,
+        [restauranteId],
+      );
 
-
-            await pool.query(`
+      await pool.query(
+        `
                 UPDATE restaurante
                 SET
                     calificacionPromedio = ?,
                     cantidadResenas = ?
                 WHERE id = ?
-            `, [
-                Number(resumen[0].promedio),
-                Number(resumen[0].cantidad),
-                restauranteId
-            ]);
+            `,
+        [
+          Number(resumen[0].promedio),
+          Number(resumen[0].cantidad),
+          restauranteId,
+        ],
+      );
 
+      res.json({
+        mensaje:
+          estado === "aprobado"
+            ? "Comentario aprobado correctamente"
+            : "Comentario rechazado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al moderar comentario de restaurante:", error);
 
-            res.json({
-                mensaje:
-                    estado === 'aprobado'
-                        ? 'Comentario aprobado correctamente'
-                        : 'Comentario rechazado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al moderar comentario de restaurante:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al moderar el comentario'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al moderar el comentario",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -832,15 +610,12 @@ app.patch(
 // ==========================================
 
 app.get(
-    '/api/admin/comentarios/locales',
-    verificarToken,
-    verificarAdminOModerador,
-    async (req, res) => {
-
-        try {
-
-            const [comentarios] =
-                await pool.query(`
+  "/api/admin/comentarios/locales",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    try {
+      const [comentarios] = await pool.query(`
                     SELECT
                         cl.id,
                         cl.titulo,
@@ -869,88 +644,60 @@ app.get(
                     ORDER BY cl.fechaComentario DESC
                 `);
 
+      res.json(comentarios);
+    } catch (error) {
+      console.error(
+        "Error al obtener comentarios pendientes de locales:",
+        error,
+      );
 
-            res.json(comentarios);
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al obtener comentarios pendientes de locales:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener los comentarios pendientes de locales'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los comentarios pendientes de locales",
+      });
     }
+  },
 );
-
 
 // ==========================================
 // ADMIN - MODERAR COMENTARIO DE LOCAL
 // ==========================================
 
 app.patch(
-    '/api/admin/comentarios/locales/:id',
-    verificarToken,
-    verificarAdminOModerador,
-    async (req, res) => {
+  "/api/admin/comentarios/locales/:id",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    try {
+      const comentarioId = Number(req.params.id);
 
-        try {
+      const { estado } = req.body;
 
-            const comentarioId =
-                Number(req.params.id);
+      // ==================================
+      // VALIDAR ID
+      // ==================================
 
-            const { estado } =
-                req.body;
+      if (!Number.isInteger(comentarioId) || comentarioId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de comentario inválido",
+        });
+      }
 
+      // ==================================
+      // VALIDAR ESTADO
+      // ==================================
 
-            // ==================================
-            // VALIDAR ID
-            // ==================================
+      if (estado !== "aprobado" && estado !== "rechazado") {
+        return res.status(400).json({
+          mensaje: "Estado de moderación inválido",
+        });
+      }
 
-            if (
-                !Number.isInteger(comentarioId) ||
-                comentarioId <= 0
-            ) {
+      // ==================================
+      // BUSCAR COMENTARIO
+      // ==================================
 
-                return res.status(400).json({
-                    mensaje:
-                        'ID de comentario inválido'
-                });
-
-            }
-
-
-            // ==================================
-            // VALIDAR ESTADO
-            // ==================================
-
-            if (
-                estado !== 'aprobado' &&
-                estado !== 'rechazado'
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Estado de moderación inválido'
-                });
-
-            }
-
-
-            // ==================================
-            // BUSCAR COMENTARIO
-            // ==================================
-
-            const [comentarios] =
-                await pool.query(`
+      const [comentarios] = await pool.query(
+        `
                     SELECT
                         id,
                         estado,
@@ -958,61 +705,48 @@ app.patch(
                     FROM comentarioLocal
                     WHERE id = ?
                     LIMIT 1
-                `, [comentarioId]);
+                `,
+        [comentarioId],
+      );
 
+      if (comentarios.length === 0) {
+        return res.status(404).json({
+          mensaje: "Comentario no encontrado",
+        });
+      }
 
-            if (comentarios.length === 0) {
+      // ==================================
+      // SOLO MODERAR PENDIENTES
+      // ==================================
 
-                return res.status(404).json({
-                    mensaje:
-                        'Comentario no encontrado'
-                });
+      if (comentarios[0].estado !== "pendiente") {
+        return res.status(409).json({
+          mensaje: "El comentario ya fue moderado",
+        });
+      }
 
-            }
+      const localId = comentarios[0].localId;
 
+      // ==================================
+      // ACTUALIZAR ESTADO
+      // ==================================
 
-            // ==================================
-            // SOLO MODERAR PENDIENTES
-            // ==================================
-
-            if (
-                comentarios[0].estado !==
-                'pendiente'
-            ) {
-
-                return res.status(409).json({
-                    mensaje:
-                        'El comentario ya fue moderado'
-                });
-
-            }
-
-
-            const localId =
-                comentarios[0].localId;
-
-
-            // ==================================
-            // ACTUALIZAR ESTADO
-            // ==================================
-
-            await pool.query(`
+      await pool.query(
+        `
                 UPDATE comentarioLocal
                 SET estado = ?
                 WHERE id = ?
-            `, [
-                estado,
-                comentarioId
-            ]);
+            `,
+        [estado, comentarioId],
+      );
 
+      // ==================================
+      // RECALCULAR PROMEDIO Y CANTIDAD
+      // SOLO CON COMENTARIOS APROBADOS
+      // ==================================
 
-            // ==================================
-            // RECALCULAR PROMEDIO Y CANTIDAD
-            // SOLO CON COMENTARIOS APROBADOS
-            // ==================================
-
-            const [resumen] =
-                await pool.query(`
+      const [resumen] = await pool.query(
+        `
                     SELECT
                         COALESCE(
                             AVG(calificacion),
@@ -1022,65 +756,52 @@ app.patch(
                     FROM comentarioLocal
                     WHERE localId = ?
                         AND estado = 'aprobado'
-                `, [localId]);
+                `,
+        [localId],
+      );
 
+      // ==================================
+      // ACTUALIZAR LOCAL
+      // ==================================
 
-            // ==================================
-            // ACTUALIZAR LOCAL
-            // ==================================
-
-            await pool.query(`
+      await pool.query(
+        `
                 UPDATE local
                 SET
                     calificacionPromedio = ?,
                     cantidadResenas = ?
                 WHERE id = ?
-            `, [
-                Number(resumen[0].promedio),
-                Number(resumen[0].cantidad),
-                localId
-            ]);
+            `,
+        [Number(resumen[0].promedio), Number(resumen[0].cantidad), localId],
+      );
 
+      // ==================================
+      // RESPUESTA
+      // ==================================
 
-            // ==================================
-            // RESPUESTA
-            // ==================================
+      res.json({
+        mensaje:
+          estado === "aprobado"
+            ? "Comentario aprobado correctamente"
+            : "Comentario rechazado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al moderar comentario de local:", error);
 
-            res.json({
-                mensaje:
-                    estado === 'aprobado'
-                        ? 'Comentario aprobado correctamente'
-                        : 'Comentario rechazado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al moderar comentario de local:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al moderar el comentario'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al moderar el comentario",
+      });
     }
+  },
 );
 
 // ==========================================
 // OBTENER TODOS LOS PRODUCTOS
 // ==========================================
 
-app.get('/api/productos', async (req, res) => {
-
-    try {
-
-        const [productos] = await pool.query(`
+app.get("/api/productos", async (req, res) => {
+  try {
+    const [productos] = await pool.query(`
             SELECT
                 p.id,
                 p.nombre,
@@ -1140,53 +861,204 @@ app.get('/api/productos', async (req, res) => {
             ORDER BY p.id
         `);
 
-        res.json(productos);
+    res.json(productos);
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
 
-    } catch (error) {
-
-        console.error(
-            'Error al obtener productos:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje: 'Error al obtener los productos'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al obtener los productos",
+    });
+  }
 });
 
+// ==========================================
+// AGREGAR PRODUCTO A FAVORITOS
+// ==========================================
 
+app.post(
+  "/api/productos/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const productoId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      // Validar ID del producto
+      if (!Number.isInteger(productoId) || productoId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de producto inválido",
+        });
+      }
+
+      // Verificar que el producto exista
+      const [productos] = await pool.query(
+        `
+          SELECT id
+          FROM producto
+          WHERE id = ?
+          LIMIT 1
+        `,
+        [productoId],
+      );
+
+      if (productos.length === 0) {
+        return res.status(404).json({
+          mensaje: "Producto no encontrado",
+        });
+      }
+
+      // Verificar si ya está en favoritos
+      const [favoritos] = await pool.query(
+        `
+          SELECT usuarioId, productoId
+          FROM favoritoProducto
+          WHERE usuarioId = ?
+            AND productoId = ?
+          LIMIT 1
+        `,
+        [usuarioId, productoId],
+      );
+
+      if (favoritos.length > 0) {
+        return res.status(409).json({
+          mensaje: "El producto ya está en favoritos",
+        });
+      }
+
+      // Agregar a favoritos
+      await pool.query(
+        `
+          INSERT INTO favoritoProducto (
+            usuarioId,
+            productoId
+          )
+          VALUES (?, ?)
+        `,
+        [usuarioId, productoId],
+      );
+
+      res.status(201).json({
+        mensaje: "Producto agregado a favoritos",
+      });
+    } catch (error) {
+      console.error(
+        "Error al agregar producto a favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al agregar el producto a favoritos",
+      });
+    }
+  },
+);
+
+// ==========================================
+// QUITAR PRODUCTO DE FAVORITOS
+// ==========================================
+
+app.delete(
+  "/api/productos/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const productoId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      if (!Number.isInteger(productoId) || productoId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de producto inválido",
+        });
+      }
+
+      const [resultado] = await pool.query(
+        `
+          DELETE FROM favoritoProducto
+          WHERE usuarioId = ?
+            AND productoId = ?
+        `,
+        [usuarioId, productoId],
+      );
+
+      if (resultado.affectedRows === 0) {
+        return res.status(404).json({
+          mensaje: "El producto no estaba en favoritos",
+        });
+      }
+
+      res.json({
+        mensaje: "Producto eliminado de favoritos",
+      });
+    } catch (error) {
+      console.error(
+        "Error al quitar producto de favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al quitar el producto de favoritos",
+      });
+    }
+  },
+);
+
+// ==========================================
+// OBTENER PRODUCTOS FAVORITOS DEL USUARIO
+// ==========================================
+
+app.get(
+  "/api/productos/favoritos",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuario.id;
+
+      const [favoritos] = await pool.query(
+        `
+          SELECT
+            fp.productoId,
+            fp.fechaAgregado
+          FROM favoritoProducto fp
+          WHERE fp.usuarioId = ?
+          ORDER BY fp.fechaAgregado DESC
+        `,
+        [usuarioId],
+      );
+
+      res.json(favoritos);
+    } catch (error) {
+      console.error(
+        "Error al obtener productos favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al obtener los productos favoritos",
+      });
+    }
+  },
+);
 
 // ==========================================
 // OBTENER COMENTARIOS APROBADOS DE UN PRODUCTO
 // ==========================================
 
-app.get('/api/productos/:id/comentarios', async (req, res) => {
+app.get("/api/productos/:id/comentarios", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-    try {
+    const productoId = Number(id);
 
-        const { id } = req.params;
+    // Validar ID
+    if (!Number.isInteger(productoId) || productoId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de producto inválido",
+      });
+    }
 
-        const productoId = Number(id);
-
-
-        // Validar ID
-        if (
-            !Number.isInteger(productoId) ||
-            productoId <= 0
-        ) {
-
-            return res.status(400).json({
-                mensaje: 'ID de producto inválido'
-            });
-
-        }
-
-
-        // Buscar comentarios aprobados
-        const [comentarios] = await pool.query(`
+    // Buscar comentarios aprobados
+    const [comentarios] = await pool.query(
+      `
             SELECT
                 cp.id,
                 cp.titulo,
@@ -1201,167 +1073,113 @@ app.get('/api/productos/:id/comentarios', async (req, res) => {
             WHERE cp.productoId = ?
                 AND cp.estado = 'aprobado'
             ORDER BY cp.fechaComentario DESC
-        `, [productoId]);
+        `,
+      [productoId],
+    );
 
+    res.json(comentarios);
+  } catch (error) {
+    console.error("Error al obtener comentarios:", error);
 
-        res.json(comentarios);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener comentarios:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje: 'Error al obtener los comentarios'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al obtener los comentarios",
+    });
+  }
 });
 
 // ==========================================
 // CREAR COMENTARIO DE UN PRODUCTO
 // ==========================================
 
-app.post(
-    '/api/productos/:id/comentarios',
-    verificarToken,
-    async (req, res) => {
+app.post("/api/productos/:id/comentarios", verificarToken, async (req, res) => {
+  try {
+    const { id } = req.params;
 
-        try {
+    const { titulo, comentario, calificacion } = req.body;
 
-            const { id } = req.params;
+    const productoId = Number(id);
 
-            const {
-                titulo,
-                comentario,
-                calificacion
-            } = req.body;
+    const usuarioId = Number(req.usuario.id);
 
+    const calificacionNumero = Number(calificacion);
 
-            const productoId =
-                Number(id);
+    // ==================================
+    // VALIDAR PRODUCTO
+    // ==================================
 
-            const usuarioId =
-                Number(req.usuario.id);
+    if (!Number.isInteger(productoId) || productoId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de producto inválido",
+      });
+    }
 
-            const calificacionNumero =
-                Number(calificacion);
+    // ==================================
+    // VALIDAR CAMPOS
+    // ==================================
 
+    if (!titulo || !titulo.trim() || !comentario || !comentario.trim()) {
+      return res.status(400).json({
+        mensaje: "Título y comentario son obligatorios",
+      });
+    }
 
-            // ==================================
-            // VALIDAR PRODUCTO
-            // ==================================
+    if (
+      !Number.isInteger(calificacionNumero) ||
+      calificacionNumero < 1 ||
+      calificacionNumero > 5
+    ) {
+      return res.status(400).json({
+        mensaje: "La calificación debe ser entre 1 y 5 estrellas",
+      });
+    }
 
-            if (
-                !Number.isInteger(productoId) ||
-                productoId <= 0
-            ) {
+    // ==================================
+    // VERIFICAR QUE EXISTA EL PRODUCTO
+    // ==================================
 
-                return res.status(400).json({
-                    mensaje:
-                        'ID de producto inválido'
-                });
-
-            }
-
-
-            // ==================================
-            // VALIDAR CAMPOS
-            // ==================================
-
-            if (
-                !titulo ||
-                !titulo.trim() ||
-                !comentario ||
-                !comentario.trim()
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Título y comentario son obligatorios'
-                });
-
-            }
-
-
-            if (
-                !Number.isInteger(
-                    calificacionNumero
-                ) ||
-                calificacionNumero < 1 ||
-                calificacionNumero > 5
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'La calificación debe ser entre 1 y 5 estrellas'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR QUE EXISTA EL PRODUCTO
-            // ==================================
-
-            const [productos] =
-                await pool.query(`
+    const [productos] = await pool.query(
+      `
                     SELECT id
                     FROM producto
                     WHERE id = ?
                     LIMIT 1
-                `, [productoId]);
+                `,
+      [productoId],
+    );
 
+    if (productos.length === 0) {
+      return res.status(404).json({
+        mensaje: "Producto no encontrado",
+      });
+    }
 
-            if (productos.length === 0) {
+    // ==================================
+    // VERIFICAR COMENTARIO EXISTENTE
+    // ==================================
 
-                return res.status(404).json({
-                    mensaje:
-                        'Producto no encontrado'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR COMENTARIO EXISTENTE
-            // ==================================
-
-            const [comentariosExistentes] =
-                await pool.query(`
+    const [comentariosExistentes] = await pool.query(
+      `
                     SELECT id
                     FROM comentarioProducto
                     WHERE usuarioId = ?
                         AND productoId = ?
                     LIMIT 1
-                `, [
-                    usuarioId,
-                    productoId
-                ]);
+                `,
+      [usuarioId, productoId],
+    );
 
+    if (comentariosExistentes.length > 0) {
+      return res.status(409).json({
+        mensaje: "Ya dejaste una opinión para este producto",
+      });
+    }
 
-            if (
-                comentariosExistentes.length > 0
-            ) {
+    // ==================================
+    // CREAR COMENTARIO
+    // ==================================
 
-                return res.status(409).json({
-                    mensaje:
-                        'Ya dejaste una opinión para este producto'
-                });
-
-            }
-
-
-            // ==================================
-            // CREAR COMENTARIO
-            // ==================================
-
-            const [resultado] =
-                await pool.query(`
+    const [resultado] = await pool.query(
+      `
                     INSERT INTO comentarioProducto (
                         titulo,
                         comentario,
@@ -1371,84 +1189,60 @@ app.post(
                         productoId
                     )
                     VALUES (?, ?, ?, 'pendiente', ?, ?)
-                `, [
-                    titulo.trim(),
-                    comentario.trim(),
-                    calificacionNumero,
-                    usuarioId,
-                    productoId
-                ]);
+                `,
+      [
+        titulo.trim(),
+        comentario.trim(),
+        calificacionNumero,
+        usuarioId,
+        productoId,
+      ],
+    );
 
+    // ==================================
+    // RESPUESTA
+    // ==================================
 
-            // ==================================
-            // RESPUESTA
-            // ==================================
+    res.status(201).json({
+      mensaje: "Tu opinión fue enviada y está pendiente de aprobación",
 
-            res.status(201).json({
+      comentario: {
+        id: resultado.insertId,
+        titulo: titulo.trim(),
+        comentario: comentario.trim(),
+        calificacion: calificacionNumero,
+        estado: "pendiente",
+        productoId: productoId,
+      },
+    });
+  } catch (error) {
+    console.error("Error al crear comentario:", error);
 
-                mensaje:
-                    'Tu opinión fue enviada y está pendiente de aprobación',
-
-                comentario: {
-                    id: resultado.insertId,
-                    titulo: titulo.trim(),
-                    comentario:
-                        comentario.trim(),
-                    calificacion:
-                        calificacionNumero,
-                    estado: 'pendiente',
-                    productoId:
-                        productoId
-                }
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear comentario:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al enviar la opinión'
-            });
-
-        }
-
-    }
-);
+    res.status(500).json({
+      mensaje: "Error al enviar la opinión",
+    });
+  }
+});
 
 // ==========================================
 // OBTENER UN PRODUCTO POR ID
 // ==========================================
 
-app.get('/api/productos/:id', async (req, res) => {
+app.get("/api/productos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-    try {
+    // Validar que el ID sea un número válido
+    const productoId = Number(id);
 
-        const { id } = req.params;
+    if (!Number.isInteger(productoId) || productoId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de producto inválido",
+      });
+    }
 
-
-        // Validar que el ID sea un número válido
-        const productoId = Number(id);
-
-        if (
-            !Number.isInteger(productoId) ||
-            productoId <= 0
-        ) {
-
-            return res.status(400).json({
-                mensaje: 'ID de producto inválido'
-            });
-
-        }
-
-
-        const [productos] = await pool.query(`
+    const [productos] = await pool.query(
+      `
             SELECT
                 p.id,
                 p.nombre,
@@ -1468,47 +1262,35 @@ app.get('/api/productos/:id', async (req, res) => {
             INNER JOIN categoria c
                 ON p.categoriaId = c.id
             WHERE p.id = ?
-        `, [productoId]);
+        `,
+      [productoId],
+    );
 
-
-        // Si el producto no existe
-        if (productos.length === 0) {
-
-            return res.status(404).json({
-                mensaje: 'Producto no encontrado'
-            });
-
-        }
-
-
-        // Devolver un solo producto
-        res.json(productos[0]);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener el producto:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje: 'Error al obtener el producto'
-        });
-
+    // Si el producto no existe
+    if (productos.length === 0) {
+      return res.status(404).json({
+        mensaje: "Producto no encontrado",
+      });
     }
 
+    // Devolver un solo producto
+    res.json(productos[0]);
+  } catch (error) {
+    console.error("Error al obtener el producto:", error);
+
+    res.status(500).json({
+      mensaje: "Error al obtener el producto",
+    });
+  }
 });
 
 // ==========================================
 // OBTENER TODOS LOS RESTAURANTES VERIFICADOS
 // ==========================================
 
-app.get('/api/restaurantes', async (req, res) => {
-
-    try {
-
-        const [restaurantes] = await pool.query(`
+app.get("/api/restaurantes", async (req, res) => {
+  try {
+    const [restaurantes] = await pool.query(`
             SELECT
                 r.id,
                 r.nombre,
@@ -1537,50 +1319,198 @@ app.get('/api/restaurantes', async (req, res) => {
             ORDER BY r.nombre ASC
         `);
 
-        res.json(restaurantes);
+    res.json(restaurantes);
+  } catch (error) {
+    console.error("Error al obtener restaurantes:", error);
 
-    } catch (error) {
-
-        console.error(
-            'Error al obtener restaurantes:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje: 'Error al obtener los restaurantes'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al obtener los restaurantes",
+    });
+  }
 });
+
+// ==========================================
+// AGREGAR RESTAURANTE A FAVORITOS
+// ==========================================
+
+app.post(
+  "/api/restaurantes/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const restauranteId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de restaurante inválido",
+        });
+      }
+
+      const [restaurantes] = await pool.query(
+        `
+          SELECT id
+          FROM restaurante
+          WHERE id = ?
+          LIMIT 1
+        `,
+        [restauranteId],
+      );
+
+      if (restaurantes.length === 0) {
+        return res.status(404).json({
+          mensaje: "Restaurante no encontrado",
+        });
+      }
+
+      const [favoritos] = await pool.query(
+        `
+          SELECT usuarioId, restauranteId
+          FROM favoritoRestaurante
+          WHERE usuarioId = ?
+            AND restauranteId = ?
+          LIMIT 1
+        `,
+        [usuarioId, restauranteId],
+      );
+
+      if (favoritos.length > 0) {
+        return res.status(409).json({
+          mensaje: "El restaurante ya está en favoritos",
+        });
+      }
+
+      await pool.query(
+        `
+          INSERT INTO favoritoRestaurante (
+            usuarioId,
+            restauranteId
+          )
+          VALUES (?, ?)
+        `,
+        [usuarioId, restauranteId],
+      );
+
+      res.status(201).json({
+        mensaje: "Restaurante agregado a favoritos",
+      });
+    } catch (error) {
+      console.error(
+        "Error al agregar restaurante a favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al agregar el restaurante a favoritos",
+      });
+    }
+  },
+);
+
+// ==========================================
+// QUITAR RESTAURANTE DE FAVORITOS
+// ==========================================
+
+app.delete(
+  "/api/restaurantes/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const restauranteId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de restaurante inválido",
+        });
+      }
+
+      const [resultado] = await pool.query(
+        `
+          DELETE FROM favoritoRestaurante
+          WHERE usuarioId = ?
+            AND restauranteId = ?
+        `,
+        [usuarioId, restauranteId],
+      );
+
+      if (resultado.affectedRows === 0) {
+        return res.status(404).json({
+          mensaje: "El restaurante no estaba en favoritos",
+        });
+      }
+
+      res.json({
+        mensaje: "Restaurante eliminado de favoritos",
+      });
+    } catch (error) {
+      console.error(
+        "Error al quitar restaurante de favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al quitar el restaurante de favoritos",
+      });
+    }
+  },
+);
+
+// ==========================================
+// OBTENER RESTAURANTES FAVORITOS DEL USUARIO
+// ==========================================
+
+app.get(
+  "/api/restaurantes/favoritos",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuario.id;
+
+      const [favoritos] = await pool.query(
+        `
+          SELECT
+            fr.restauranteId,
+            fr.fechaAgregado
+          FROM favoritoRestaurante fr
+          WHERE fr.usuarioId = ?
+          ORDER BY fr.fechaAgregado DESC
+        `,
+        [usuarioId],
+      );
+
+      res.json(favoritos);
+    } catch (error) {
+      console.error(
+        "Error al obtener restaurantes favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al obtener los restaurantes favoritos",
+      });
+    }
+  },
+);
 
 // ==========================================
 // OBTENER COMENTARIOS APROBADOS DE UN RESTAURANTE
 // ==========================================
 
-app.get('/api/restaurantes/:id/comentarios', async (req, res) => {
+app.get("/api/restaurantes/:id/comentarios", async (req, res) => {
+  try {
+    const restauranteId = Number(req.params.id);
 
-    try {
+    // Validar ID
+    if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de restaurante inválido",
+      });
+    }
 
-        const restauranteId =
-            Number(req.params.id);
-
-
-        // Validar ID
-        if (
-            !Number.isInteger(restauranteId) ||
-            restauranteId <= 0
-        ) {
-
-            return res.status(400).json({
-                mensaje: 'ID de restaurante inválido'
-            });
-
-        }
-
-
-        // Buscar comentarios aprobados
-        const [comentarios] = await pool.query(`
+    // Buscar comentarios aprobados
+    const [comentarios] = await pool.query(
+      `
             SELECT
                 cr.id,
                 cr.titulo,
@@ -1598,25 +1528,18 @@ app.get('/api/restaurantes/:id/comentarios', async (req, res) => {
                 AND cr.estado = 'aprobado'
                 AND r.estadoVerificacion = 'verificado'
             ORDER BY cr.fechaComentario DESC
-        `, [restauranteId]);
+        `,
+      [restauranteId],
+    );
 
+    res.json(comentarios);
+  } catch (error) {
+    console.error("Error al obtener comentarios del restaurante:", error);
 
-        res.json(comentarios);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener comentarios del restaurante:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje: 'Error al obtener los comentarios'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al obtener los comentarios",
+    });
+  }
 });
 
 // ==========================================
@@ -1624,145 +1547,102 @@ app.get('/api/restaurantes/:id/comentarios', async (req, res) => {
 // ==========================================
 
 app.post(
-    '/api/restaurantes/:id/comentarios',
-    verificarToken,
-    async (req, res) => {
+  "/api/restaurantes/:id/comentarios",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const restauranteId = Number(req.params.id);
 
-        try {
+      const usuarioId = Number(req.usuario.id);
 
-            const restauranteId =
-                Number(req.params.id);
+      const { titulo, comentario, calificacion } = req.body;
 
-            const usuarioId =
-                Number(req.usuario.id);
+      const calificacionNumero = Number(calificacion);
 
-            const {
-                titulo,
-                comentario,
-                calificacion
-            } = req.body;
+      // ==================================
+      // VALIDAR RESTAURANTE
+      // ==================================
 
-            const calificacionNumero =
-                Number(calificacion);
+      if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de restaurante inválido",
+        });
+      }
 
+      // ==================================
+      // VALIDAR CAMPOS
+      // ==================================
 
-            // ==================================
-            // VALIDAR RESTAURANTE
-            // ==================================
+      if (!titulo || !titulo.trim() || !comentario || !comentario.trim()) {
+        return res.status(400).json({
+          mensaje: "Título y comentario son obligatorios",
+        });
+      }
 
-            if (
-                !Number.isInteger(restauranteId) ||
-                restauranteId <= 0
-            ) {
+      if (titulo.trim().length > 150) {
+        return res.status(400).json({
+          mensaje: "El título no puede superar los 150 caracteres",
+        });
+      }
 
-                return res.status(400).json({
-                    mensaje:
-                        'ID de restaurante inválido'
-                });
+      if (
+        !Number.isInteger(calificacionNumero) ||
+        calificacionNumero < 1 ||
+        calificacionNumero > 5
+      ) {
+        return res.status(400).json({
+          mensaje: "La calificación debe ser entre 1 y 5 estrellas",
+        });
+      }
 
-            }
+      // ==================================
+      // VERIFICAR RESTAURANTE
+      // ==================================
 
-
-            // ==================================
-            // VALIDAR CAMPOS
-            // ==================================
-
-            if (
-                !titulo ||
-                !titulo.trim() ||
-                !comentario ||
-                !comentario.trim()
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Título y comentario son obligatorios'
-                });
-
-            }
-
-
-            if (titulo.trim().length > 150) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'El título no puede superar los 150 caracteres'
-                });
-
-            }
-
-
-            if (
-                !Number.isInteger(calificacionNumero) ||
-                calificacionNumero < 1 ||
-                calificacionNumero > 5
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'La calificación debe ser entre 1 y 5 estrellas'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR RESTAURANTE
-            // ==================================
-
-            const [restaurantes] =
-                await pool.query(`
+      const [restaurantes] = await pool.query(
+        `
                     SELECT id
                     FROM restaurante
                     WHERE id = ?
                         AND estadoVerificacion = 'verificado'
                     LIMIT 1
-                `, [restauranteId]);
+                `,
+        [restauranteId],
+      );
 
+      if (restaurantes.length === 0) {
+        return res.status(404).json({
+          mensaje: "Restaurante no encontrado",
+        });
+      }
 
-            if (restaurantes.length === 0) {
+      // ==================================
+      // VERIFICAR OPINIÓN EXISTENTE
+      // ==================================
 
-                return res.status(404).json({
-                    mensaje:
-                        'Restaurante no encontrado'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR OPINIÓN EXISTENTE
-            // ==================================
-
-            const [comentariosExistentes] =
-                await pool.query(`
+      const [comentariosExistentes] = await pool.query(
+        `
                     SELECT id
                     FROM comentarioRestaurante
                     WHERE usuarioId = ?
                         AND restauranteId = ?
                     LIMIT 1
-                `, [
-                    usuarioId,
-                    restauranteId
-                ]);
+                `,
+        [usuarioId, restauranteId],
+      );
 
+      if (comentariosExistentes.length > 0) {
+        return res.status(409).json({
+          mensaje: "Ya dejaste una opinión para este restaurante",
+        });
+      }
 
-            if (comentariosExistentes.length > 0) {
+      // ==================================
+      // CREAR COMENTARIO
+      // ==================================
 
-                return res.status(409).json({
-                    mensaje:
-                        'Ya dejaste una opinión para este restaurante'
-                });
-
-            }
-
-
-            // ==================================
-            // CREAR COMENTARIO
-            // ==================================
-
-            const [resultado] =
-                await pool.query(`
+      const [resultado] = await pool.query(
+        `
                     INSERT INTO comentarioRestaurante (
                         titulo,
                         comentario,
@@ -1772,198 +1652,140 @@ app.post(
                         restauranteId
                     )
                     VALUES (?, ?, ?, 'pendiente', ?, ?)
-                `, [
-                    titulo.trim(),
-                    comentario.trim(),
-                    calificacionNumero,
-                    usuarioId,
-                    restauranteId
-                ]);
+                `,
+        [
+          titulo.trim(),
+          comentario.trim(),
+          calificacionNumero,
+          usuarioId,
+          restauranteId,
+        ],
+      );
 
+      // ==================================
+      // RESPUESTA
+      // ==================================
 
-            // ==================================
-            // RESPUESTA
-            // ==================================
+      res.status(201).json({
+        mensaje: "Tu opinión fue enviada y está pendiente de aprobación",
 
-            res.status(201).json({
+        comentario: {
+          id: resultado.insertId,
+          titulo: titulo.trim(),
+          comentario: comentario.trim(),
+          calificacion: calificacionNumero,
+          estado: "pendiente",
+          restauranteId: restauranteId,
+        },
+      });
+    } catch (error) {
+      console.error("Error al crear comentario de restaurante:", error);
 
-                mensaje:
-                    'Tu opinión fue enviada y está pendiente de aprobación',
-
-                comentario: {
-                    id: resultado.insertId,
-                    titulo: titulo.trim(),
-                    comentario: comentario.trim(),
-                    calificacion: calificacionNumero,
-                    estado: 'pendiente',
-                    restauranteId: restauranteId
-                }
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear comentario de restaurante:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al enviar la opinión'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al enviar la opinión",
+      });
     }
+  },
 );
 
 // ==========================================
 // CREAR COMENTARIO DE LOCAL
 // ==========================================
 
-app.post(
-    '/api/locales/:id/comentarios',
-    verificarToken,
-    async (req, res) => {
+app.post("/api/locales/:id/comentarios", verificarToken, async (req, res) => {
+  try {
+    const localId = Number(req.params.id);
 
-        try {
+    const usuarioId = Number(req.usuario.id);
 
-            const localId =
-                Number(req.params.id);
+    const { titulo, comentario, calificacion } = req.body;
 
-            const usuarioId =
-                Number(req.usuario.id);
+    const calificacionNumero = Number(calificacion);
 
-            const {
-                titulo,
-                comentario,
-                calificacion
-            } = req.body;
+    // ==================================
+    // VALIDAR LOCAL
+    // ==================================
 
-            const calificacionNumero =
-                Number(calificacion);
+    if (!Number.isInteger(localId) || localId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de local inválido",
+      });
+    }
 
+    // ==================================
+    // VALIDAR CAMPOS
+    // ==================================
 
-            // ==================================
-            // VALIDAR LOCAL
-            // ==================================
+    if (!titulo || !titulo.trim() || !comentario || !comentario.trim()) {
+      return res.status(400).json({
+        mensaje: "Título y comentario son obligatorios",
+      });
+    }
 
-            if (
-                !Number.isInteger(localId) ||
-                localId <= 0
-            ) {
+    if (titulo.trim().length > 150) {
+      return res.status(400).json({
+        mensaje: "El título no puede superar los 150 caracteres",
+      });
+    }
 
-                return res.status(400).json({
-                    mensaje:
-                        'ID de local inválido'
-                });
+    if (
+      !Number.isInteger(calificacionNumero) ||
+      calificacionNumero < 1 ||
+      calificacionNumero > 5
+    ) {
+      return res.status(400).json({
+        mensaje: "La calificación debe ser entre 1 y 5 estrellas",
+      });
+    }
 
-            }
+    // ==================================
+    // VERIFICAR LOCAL
+    // ==================================
 
-
-            // ==================================
-            // VALIDAR CAMPOS
-            // ==================================
-
-            if (
-                !titulo ||
-                !titulo.trim() ||
-                !comentario ||
-                !comentario.trim()
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Título y comentario son obligatorios'
-                });
-
-            }
-
-
-            if (titulo.trim().length > 150) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'El título no puede superar los 150 caracteres'
-                });
-
-            }
-
-
-            if (
-                !Number.isInteger(calificacionNumero) ||
-                calificacionNumero < 1 ||
-                calificacionNumero > 5
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'La calificación debe ser entre 1 y 5 estrellas'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR LOCAL
-            // ==================================
-
-            const [locales] =
-                await pool.query(`
+    const [locales] = await pool.query(
+      `
                     SELECT id
                     FROM local
                     WHERE id = ?
                         AND estadoVerificacion = 'verificado'
                     LIMIT 1
-                `, [localId]);
+                `,
+      [localId],
+    );
 
+    if (locales.length === 0) {
+      return res.status(404).json({
+        mensaje: "Local no encontrado",
+      });
+    }
 
-            if (locales.length === 0) {
+    // ==================================
+    // VERIFICAR OPINIÓN EXISTENTE
+    // ==================================
 
-                return res.status(404).json({
-                    mensaje:
-                        'Local no encontrado'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR OPINIÓN EXISTENTE
-            // ==================================
-
-            const [comentariosExistentes] =
-                await pool.query(`
+    const [comentariosExistentes] = await pool.query(
+      `
                     SELECT id
                     FROM comentarioLocal
                     WHERE usuarioId = ?
                         AND localId = ?
                     LIMIT 1
-                `, [
-                    usuarioId,
-                    localId
-                ]);
+                `,
+      [usuarioId, localId],
+    );
 
+    if (comentariosExistentes.length > 0) {
+      return res.status(409).json({
+        mensaje: "Ya dejaste una opinión para este local",
+      });
+    }
 
-            if (comentariosExistentes.length > 0) {
+    // ==================================
+    // CREAR COMENTARIO
+    // ==================================
 
-                return res.status(409).json({
-                    mensaje:
-                        'Ya dejaste una opinión para este local'
-                });
-
-            }
-
-
-            // ==================================
-            // CREAR COMENTARIO
-            // ==================================
-
-            const [resultado] =
-                await pool.query(`
+    const [resultado] = await pool.query(
+      `
                     INSERT INTO comentarioLocal (
                         titulo,
                         comentario,
@@ -1973,123 +1795,96 @@ app.post(
                         localId
                     )
                     VALUES (?, ?, ?, 'pendiente', ?, ?)
-                `, [
-                    titulo.trim(),
-                    comentario.trim(),
-                    calificacionNumero,
-                    usuarioId,
-                    localId
-                ]);
+                `,
+      [
+        titulo.trim(),
+        comentario.trim(),
+        calificacionNumero,
+        usuarioId,
+        localId,
+      ],
+    );
 
+    // ==================================
+    // RESPUESTA
+    // ==================================
 
-            // ==================================
-            // RESPUESTA
-            // ==================================
+    res.status(201).json({
+      mensaje: "Tu opinión fue enviada y está pendiente de aprobación",
 
-            res.status(201).json({
+      comentario: {
+        id: resultado.insertId,
+        titulo: titulo.trim(),
+        comentario: comentario.trim(),
+        calificacion: calificacionNumero,
+        estado: "pendiente",
+        localId: localId,
+      },
+    });
+  } catch (error) {
+    console.error("Error al crear comentario de local:", error);
 
-                mensaje:
-                    'Tu opinión fue enviada y está pendiente de aprobación',
-
-                comentario: {
-                    id: resultado.insertId,
-                    titulo: titulo.trim(),
-                    comentario: comentario.trim(),
-                    calificacion: calificacionNumero,
-                    estado: 'pendiente',
-                    localId: localId
-                }
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear comentario de local:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al enviar la opinión'
-            });
-
-        }
-
-    }
-);
+    res.status(500).json({
+      mensaje: "Error al enviar la opinión",
+    });
+  }
+});
 
 // Actualizar local
 app.put(
-    '/api/admin/locales/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/locales/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const localId = Number(req.params.id);
 
-        try {
+      if (!Number.isInteger(localId) || localId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de local inválido",
+        });
+      }
 
-            const localId =
-                Number(req.params.id);
+      const {
+        nombre,
+        descripcion,
+        imagen,
+        direccion,
+        telefono,
+        email,
+        instagram,
+        sitioWeb,
+        horario,
+        latitud,
+        longitud,
+        estadoVerificacion,
+        tipoLocalId,
+        barrioId,
+      } = req.body;
 
-            if (!Number.isInteger(localId) || localId <= 0) {
-                return res.status(400).json({
-                    mensaje: 'ID de local inválido'
-                });
-            }
+      if (!nombre || !tipoLocalId || !barrioId) {
+        return res.status(400).json({
+          mensaje: "Nombre, tipo de local y barrio son obligatorios",
+        });
+      }
 
-
-            const {
-                nombre,
-                descripcion,
-                imagen,
-                direccion,
-                telefono,
-                email,
-                instagram,
-                sitioWeb,
-                horario,
-                latitud,
-                longitud,
-                estadoVerificacion,
-                tipoLocalId,
-                barrioId
-            } = req.body;
-
-
-            if (!nombre || !tipoLocalId || !barrioId) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, tipo de local y barrio son obligatorios'
-                });
-
-            }
-
-
-            const [existente] =
-                await pool.query(
-                    `
+      const [existente] = await pool.query(
+        `
                     SELECT id
                     FROM local
                     WHERE id = ?
                     `,
-                    [localId]
-                );
+        [localId],
+      );
 
+      if (existente.length === 0) {
+        return res.status(404).json({
+          mensaje: "Local no encontrado",
+        });
+      }
 
-            if (existente.length === 0) {
-
-                return res.status(404).json({
-                    mensaje: 'Local no encontrado'
-                });
-
-            }
-
-
-            await pool.query(
-                `
+      await pool.query(
+        `
                 UPDATE local
                 SET
                     nombre = ?,
@@ -2108,148 +1903,109 @@ app.put(
                     barrioId = ?
                 WHERE id = ?
                 `,
-                [
-                    nombre,
-                    descripcion || null,
-                    imagen || null,
-                    direccion || null,
-                    telefono || null,
-                    email || null,
-                    instagram || null,
-                    sitioWeb || null,
-                    horario || null,
-                    latitud || null,
-                    longitud || null,
-                    estadoVerificacion || 'pendiente',
-                    tipoLocalId,
-                    barrioId,
-                    localId
-                ]
-            );
+        [
+          nombre,
+          descripcion || null,
+          imagen || null,
+          direccion || null,
+          telefono || null,
+          email || null,
+          instagram || null,
+          sitioWeb || null,
+          horario || null,
+          latitud || null,
+          longitud || null,
+          estadoVerificacion || "pendiente",
+          tipoLocalId,
+          barrioId,
+          localId,
+        ],
+      );
 
+      res.json({
+        mensaje: "Local actualizado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al actualizar local:", error);
 
-            res.json({
-                mensaje: 'Local actualizado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al actualizar local:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al actualizar el local'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al actualizar el local",
+      });
     }
+  },
 );
 
 // Eliminar local
 app.delete(
-    '/api/admin/locales/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/locales/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const localId = Number(req.params.id);
 
-        try {
+      if (!Number.isInteger(localId) || localId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de local inválido",
+        });
+      }
 
-            const localId =
-                Number(req.params.id);
-
-
-            if (!Number.isInteger(localId) || localId <= 0) {
-
-                return res.status(400).json({
-                    mensaje: 'ID de local inválido'
-                });
-
-            }
-
-
-            const [existente] =
-                await pool.query(
-                    `
+      const [existente] = await pool.query(
+        `
                     SELECT id
                     FROM local
                     WHERE id = ?
                     `,
-                    [localId]
-                );
+        [localId],
+      );
 
+      if (existente.length === 0) {
+        return res.status(404).json({
+          mensaje: "Local no encontrado",
+        });
+      }
 
-            if (existente.length === 0) {
-
-                return res.status(404).json({
-                    mensaje: 'Local no encontrado'
-                });
-
-            }
-
-
-            await pool.query(
-                `
+      await pool.query(
+        `
                 DELETE FROM local
                 WHERE id = ?
                 `,
-                [localId]
-            );
+        [localId],
+      );
 
+      res.json({
+        mensaje: "Local eliminado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al eliminar local:", error);
 
-            res.json({
-                mensaje: 'Local eliminado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al eliminar local:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al eliminar el local'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al eliminar el local",
+      });
     }
+  },
 );
-
-
 
 // ==========================================
 // OBTENER UN RESTAURANTE POR ID
 // ==========================================
 
-app.get('/api/restaurantes/:id', async (req, res) => {
+app.get("/api/restaurantes/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
 
-    try {
+    const restauranteId = Number(id);
 
-        const { id } = req.params;
+    // Validar ID
+    if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de restaurante inválido",
+      });
+    }
 
-        const restauranteId = Number(id);
-
-        // Validar ID
-        if (
-            !Number.isInteger(restauranteId) ||
-            restauranteId <= 0
-        ) {
-
-            return res.status(400).json({
-                mensaje: 'ID de restaurante inválido'
-            });
-
-        }
-
-
-        // Buscar restaurante
-        const [restaurantes] = await pool.query(`
+    // Buscar restaurante
+    const [restaurantes] = await pool.query(
+      `
             SELECT
                 r.id,
                 r.nombre,
@@ -2277,47 +2033,35 @@ app.get('/api/restaurantes/:id', async (req, res) => {
             WHERE r.id = ?
                 AND r.estadoVerificacion = 'verificado'
             LIMIT 1
-        `, [restauranteId]);
+        `,
+      [restauranteId],
+    );
 
-
-        // Restaurante inexistente o no verificado
-        if (restaurantes.length === 0) {
-
-            return res.status(404).json({
-                mensaje: 'Restaurante no encontrado'
-            });
-
-        }
-
-
-        // Devolver un solo restaurante
-        res.json(restaurantes[0]);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener el restaurante:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje: 'Error al obtener el restaurante'
-        });
-
+    // Restaurante inexistente o no verificado
+    if (restaurantes.length === 0) {
+      return res.status(404).json({
+        mensaje: "Restaurante no encontrado",
+      });
     }
 
+    // Devolver un solo restaurante
+    res.json(restaurantes[0]);
+  } catch (error) {
+    console.error("Error al obtener el restaurante:", error);
+
+    res.status(500).json({
+      mensaje: "Error al obtener el restaurante",
+    });
+  }
 });
 
 // ==========================================
 // OBTENER TODOS LOS LOCALES VERIFICADOS
 // ==========================================
 
-app.get('/api/locales', async (req, res) => {
-
-    try {
-
-        const [locales] = await pool.query(`
+app.get("/api/locales", async (req, res) => {
+  try {
+    const [locales] = await pool.query(`
             SELECT
                 l.id,
                 l.nombre,
@@ -2350,48 +2094,32 @@ app.get('/api/locales', async (req, res) => {
             ORDER BY l.nombre ASC
         `);
 
+    res.json(locales);
+  } catch (error) {
+    console.error("Error al obtener locales:", error);
 
-        res.json(locales);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener locales:',
-            error
-        );
-
-
-        res.status(500).json({
-            mensaje:
-                'Error al obtener los locales'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al obtener los locales",
+    });
+  }
 });
 
 // ==========================================
 // OBTENER COMENTARIOS APROBADOS DE UN LOCAL
 // ==========================================
 
-app.get('/api/locales/:id/comentarios', async (req, res) => {
+app.get("/api/locales/:id/comentarios", async (req, res) => {
+  try {
+    const localId = Number(req.params.id);
 
-    try {
+    if (!Number.isInteger(localId) || localId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de local inválido",
+      });
+    }
 
-        const localId = Number(req.params.id);
-
-        if (
-            !Number.isInteger(localId) ||
-            localId <= 0
-        ) {
-            return res.status(400).json({
-                mensaje: 'ID de local inválido'
-            });
-        }
-
-
-        const [comentarios] = await pool.query(`
+    const [comentarios] = await pool.query(
+      `
             SELECT
                 cl.id,
                 cl.titulo,
@@ -2414,56 +2142,204 @@ app.get('/api/locales/:id/comentarios', async (req, res) => {
                 AND l.estadoVerificacion = 'verificado'
 
             ORDER BY cl.fechaComentario DESC
-        `, [localId]);
+        `,
+      [localId],
+    );
 
+    res.json(comentarios);
+  } catch (error) {
+    console.error("Error al obtener comentarios del local:", error);
 
-        res.json(comentarios);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener comentarios del local:',
-            error
-        );
-
-        res.status(500).json({
-            mensaje:
-                'Error al obtener los comentarios del local'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al obtener los comentarios del local",
+    });
+  }
 });
+
+// ==========================================
+// AGREGAR LOCAL A FAVORITOS
+// ==========================================
+
+app.post(
+  "/api/locales/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const localId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      if (!Number.isInteger(localId) || localId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de local inválido",
+        });
+      }
+
+      const [locales] = await pool.query(
+        `
+          SELECT id
+          FROM local
+          WHERE id = ?
+          LIMIT 1
+        `,
+        [localId],
+      );
+
+      if (locales.length === 0) {
+        return res.status(404).json({
+          mensaje: "Local no encontrado",
+        });
+      }
+
+      const [favoritos] = await pool.query(
+        `
+          SELECT usuarioId, localId
+          FROM favoritoLocal
+          WHERE usuarioId = ?
+            AND localId = ?
+          LIMIT 1
+        `,
+        [usuarioId, localId],
+      );
+
+      if (favoritos.length > 0) {
+        return res.status(409).json({
+          mensaje: "El local ya está en favoritos",
+        });
+      }
+
+      await pool.query(
+        `
+          INSERT INTO favoritoLocal (
+            usuarioId,
+            localId
+          )
+          VALUES (?, ?)
+        `,
+        [usuarioId, localId],
+      );
+
+      res.status(201).json({
+        mensaje: "Local agregado a favoritos",
+      });
+    } catch (error) {
+      console.error(
+        "Error al agregar local a favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al agregar el local a favoritos",
+      });
+    }
+  },
+);
+
+
+// ==========================================
+// QUITAR LOCAL DE FAVORITOS
+// ==========================================
+
+app.delete(
+  "/api/locales/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const localId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      if (!Number.isInteger(localId) || localId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de local inválido",
+        });
+      }
+
+      const [resultado] = await pool.query(
+        `
+          DELETE FROM favoritoLocal
+          WHERE usuarioId = ?
+            AND localId = ?
+        `,
+        [usuarioId, localId],
+      );
+
+      if (resultado.affectedRows === 0) {
+        return res.status(404).json({
+          mensaje: "El local no estaba en favoritos",
+        });
+      }
+
+      res.json({
+        mensaje: "Local eliminado de favoritos",
+      });
+    } catch (error) {
+      console.error(
+        "Error al quitar local de favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al quitar el local de favoritos",
+      });
+    }
+  },
+);
+
+
+// ==========================================
+// OBTENER LOCALES FAVORITOS DEL USUARIO
+// ==========================================
+
+app.get(
+  "/api/locales/favoritos",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuario.id;
+
+      const [favoritos] = await pool.query(
+        `
+          SELECT
+            fl.localId,
+            fl.fechaAgregado
+          FROM favoritoLocal fl
+          WHERE fl.usuarioId = ?
+          ORDER BY fl.fechaAgregado DESC
+        `,
+        [usuarioId],
+      );
+
+      res.json(favoritos);
+    } catch (error) {
+      console.error(
+        "Error al obtener locales favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje: "Error al obtener los locales favoritos",
+      });
+    }
+  },
+);
 
 // ==========================================
 // OBTENER UN LOCAL POR ID
 // ==========================================
 
-app.get('/api/locales/:id', async (req, res) => {
+app.get("/api/locales/:id", async (req, res) => {
+  try {
+    const localId = Number(req.params.id);
 
-    try {
+    // VALIDAR ID
+    if (!Number.isInteger(localId) || localId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de local inválido",
+      });
+    }
 
-        const localId =
-            Number(req.params.id);
-
-
-        // VALIDAR ID
-        if (
-            !Number.isInteger(localId) ||
-            localId <= 0
-        ) {
-
-            return res.status(400).json({
-                mensaje: 'ID de local inválido'
-            });
-
-        }
-
-
-        // BUSCAR LOCAL
-        const [locales] =
-            await pool.query(`
+    // BUSCAR LOCAL
+    const [locales] = await pool.query(
+      `
                 SELECT
                     l.id,
                     l.nombre,
@@ -2495,47 +2371,33 @@ app.get('/api/locales/:id', async (req, res) => {
                     AND l.estadoVerificacion = 'verificado'
 
                 LIMIT 1
-            `, [localId]);
+            `,
+      [localId],
+    );
 
-
-        if (locales.length === 0) {
-
-            return res.status(404).json({
-                mensaje: 'Local no encontrado'
-            });
-
-        }
-
-
-        res.json(locales[0]);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener el local:',
-            error
-        );
-
-
-        res.status(500).json({
-            mensaje: 'Error al obtener el local'
-        });
-
+    if (locales.length === 0) {
+      return res.status(404).json({
+        mensaje: "Local no encontrado",
+      });
     }
 
+    res.json(locales[0]);
+  } catch (error) {
+    console.error("Error al obtener el local:", error);
+
+    res.status(500).json({
+      mensaje: "Error al obtener el local",
+    });
+  }
 });
 
 // ==========================================
 // OBTENER NUTRICIONISTAS VERIFICADOS
 // ==========================================
 
-app.get('/api/nutricionistas', async (req, res) => {
-
-    try {
-
-        const [nutricionistas] =
-            await pool.query(`
+app.get("/api/nutricionistas", async (req, res) => {
+  try {
+    const [nutricionistas] = await pool.query(`
                 SELECT
                     n.id,
                     n.nombre,
@@ -2567,56 +2429,219 @@ app.get('/api/nutricionistas', async (req, res) => {
                 ORDER BY n.apellido ASC, n.nombre ASC
             `);
 
+    res.json(nutricionistas);
+  } catch (error) {
+    console.error("Error al obtener nutricionistas:", error);
 
-        res.json(nutricionistas);
+    res.status(500).json({
+      mensaje: "Error al obtener los nutricionistas",
+    });
+  }
+});
 
+// ==========================================
+// AGREGAR NUTRICIONISTA A FAVORITOS
+// ==========================================
+
+app.post(
+  "/api/nutricionistas/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const nutricionistaId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      if (
+        !Number.isInteger(nutricionistaId) ||
+        nutricionistaId <= 0
+      ) {
+        return res.status(400).json({
+          mensaje: "ID de nutricionista inválido",
+        });
+      }
+
+      const [nutricionistas] = await pool.query(
+        `
+          SELECT id
+          FROM nutricionista
+          WHERE id = ?
+          LIMIT 1
+        `,
+        [nutricionistaId],
+      );
+
+      if (nutricionistas.length === 0) {
+        return res.status(404).json({
+          mensaje: "Nutricionista no encontrado",
+        });
+      }
+
+      const [favoritos] = await pool.query(
+        `
+          SELECT usuarioId, nutricionistaId
+          FROM favoritoNutricionista
+          WHERE usuarioId = ?
+            AND nutricionistaId = ?
+          LIMIT 1
+        `,
+        [usuarioId, nutricionistaId],
+      );
+
+      if (favoritos.length > 0) {
+        return res.status(409).json({
+          mensaje:
+            "El nutricionista ya está en favoritos",
+        });
+      }
+
+      await pool.query(
+        `
+          INSERT INTO favoritoNutricionista (
+            usuarioId,
+            nutricionistaId
+          )
+          VALUES (?, ?)
+        `,
+        [usuarioId, nutricionistaId],
+      );
+
+      res.status(201).json({
+        mensaje:
+          "Nutricionista agregado a favoritos",
+      });
 
     } catch (error) {
 
-        console.error(
-            'Error al obtener nutricionistas:',
-            error
-        );
+      console.error(
+        "Error al agregar nutricionista a favoritos:",
+        error,
+      );
 
-
-        res.status(500).json({
-            mensaje:
-                'Error al obtener los nutricionistas'
-        });
-
+      res.status(500).json({
+        mensaje:
+          "Error al agregar el nutricionista a favoritos",
+      });
     }
+  },
+);
 
-});
+
+// ==========================================
+// QUITAR NUTRICIONISTA DE FAVORITOS
+// ==========================================
+
+app.delete(
+  "/api/nutricionistas/:id/favorito",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const nutricionistaId = Number(req.params.id);
+      const usuarioId = req.usuario.id;
+
+      if (
+        !Number.isInteger(nutricionistaId) ||
+        nutricionistaId <= 0
+      ) {
+        return res.status(400).json({
+          mensaje: "ID de nutricionista inválido",
+        });
+      }
+
+      const [resultado] = await pool.query(
+        `
+          DELETE FROM favoritoNutricionista
+          WHERE usuarioId = ?
+            AND nutricionistaId = ?
+        `,
+        [usuarioId, nutricionistaId],
+      );
+
+      if (resultado.affectedRows === 0) {
+        return res.status(404).json({
+          mensaje:
+            "El nutricionista no estaba en favoritos",
+        });
+      }
+
+      res.json({
+        mensaje:
+          "Nutricionista eliminado de favoritos",
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Error al quitar nutricionista de favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje:
+          "Error al quitar el nutricionista de favoritos",
+      });
+    }
+  },
+);
+
+
+// ==========================================
+// OBTENER NUTRICIONISTAS FAVORITOS DEL USUARIO
+// ==========================================
+
+app.get(
+  "/api/nutricionistas/favoritos",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const usuarioId = req.usuario.id;
+
+      const [favoritos] = await pool.query(
+        `
+          SELECT
+            fn.nutricionistaId,
+            fn.fechaAgregado
+          FROM favoritoNutricionista fn
+          WHERE fn.usuarioId = ?
+          ORDER BY fn.fechaAgregado DESC
+        `,
+        [usuarioId],
+      );
+
+      res.json(favoritos);
+
+    } catch (error) {
+
+      console.error(
+        "Error al obtener nutricionistas favoritos:",
+        error,
+      );
+
+      res.status(500).json({
+        mensaje:
+          "Error al obtener los nutricionistas favoritos",
+      });
+    }
+  },
+);
 
 // ==========================================
 // OBTENER UN NUTRICIONISTA POR ID
 // ==========================================
 
-app.get('/api/nutricionistas/:id', async (req, res) => {
+app.get("/api/nutricionistas/:id", async (req, res) => {
+  try {
+    const nutricionistaId = Number(req.params.id);
 
-    try {
+    // VALIDAR ID
+    if (!Number.isInteger(nutricionistaId) || nutricionistaId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de nutricionista inválido",
+      });
+    }
 
-        const nutricionistaId =
-            Number(req.params.id);
-
-
-        // VALIDAR ID
-        if (
-            !Number.isInteger(nutricionistaId) ||
-            nutricionistaId <= 0
-        ) {
-
-            return res.status(400).json({
-                mensaje:
-                    'ID de nutricionista inválido'
-            });
-
-        }
-
-
-        // BUSCAR NUTRICIONISTA
-        const [nutricionistas] =
-            await pool.query(`
+    // BUSCAR NUTRICIONISTA
+    const [nutricionistas] = await pool.query(
+      `
                 SELECT
                     n.id,
                     n.nombre,
@@ -2647,88 +2672,61 @@ app.get('/api/nutricionistas/:id', async (req, res) => {
                     AND n.estadoVerificacion = 'verificado'
 
                 LIMIT 1
-            `, [nutricionistaId]);
+            `,
+      [nutricionistaId],
+    );
 
-
-        if (nutricionistas.length === 0) {
-
-            return res.status(404).json({
-                mensaje:
-                    'Nutricionista no encontrado'
-            });
-
-        }
-
-
-        res.json(nutricionistas[0]);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener el nutricionista:',
-            error
-        );
-
-
-        res.status(500).json({
-            mensaje:
-                'Error al obtener el nutricionista'
-        });
-
+    if (nutricionistas.length === 0) {
+      return res.status(404).json({
+        mensaje: "Nutricionista no encontrado",
+      });
     }
 
+    res.json(nutricionistas[0]);
+  } catch (error) {
+    console.error("Error al obtener el nutricionista:", error);
+
+    res.status(500).json({
+      mensaje: "Error al obtener el nutricionista",
+    });
+  }
 });
 
 // ==========================================
 // OBTENER COMENTARIOS DE UN NUTRICIONISTA
 // ==========================================
 
-app.get('/api/nutricionistas/:id/comentarios', async (req, res) => {
+app.get("/api/nutricionistas/:id/comentarios", async (req, res) => {
+  try {
+    const nutricionistaId = Number(req.params.id);
 
-    try {
+    if (!Number.isInteger(nutricionistaId) || nutricionistaId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de nutricionista inválido",
+      });
+    }
 
-        const nutricionistaId =
-            Number(req.params.id);
-
-
-        if (
-            !Number.isInteger(nutricionistaId) ||
-            nutricionistaId <= 0
-        ) {
-
-            return res.status(400).json({
-                mensaje:
-                    'ID de nutricionista inválido'
-            });
-
-        }
-
-
-        // VERIFICAR QUE EL NUTRICIONISTA SEA PÚBLICO
-        const [nutricionistas] =
-            await pool.query(`
+    // VERIFICAR QUE EL NUTRICIONISTA SEA PÚBLICO
+    const [nutricionistas] = await pool.query(
+      `
                 SELECT id
                 FROM nutricionista
                 WHERE id = ?
                     AND estadoVerificacion = 'verificado'
                 LIMIT 1
-            `, [nutricionistaId]);
+            `,
+      [nutricionistaId],
+    );
 
+    if (nutricionistas.length === 0) {
+      return res.status(404).json({
+        mensaje: "Nutricionista no encontrado",
+      });
+    }
 
-        if (nutricionistas.length === 0) {
-
-            return res.status(404).json({
-                mensaje:
-                    'Nutricionista no encontrado'
-            });
-
-        }
-
-
-        // OBTENER SOLO COMENTARIOS APROBADOS
-        const [comentarios] =
-            await pool.query(`
+    // OBTENER SOLO COMENTARIOS APROBADOS
+    const [comentarios] = await pool.query(
+      `
                 SELECT
                     cn.id,
                     cn.titulo,
@@ -2747,27 +2745,18 @@ app.get('/api/nutricionistas/:id/comentarios', async (req, res) => {
                     AND cn.estado = 'aprobado'
 
                 ORDER BY cn.fechaComentario DESC
-            `, [nutricionistaId]);
+            `,
+      [nutricionistaId],
+    );
 
+    res.json(comentarios);
+  } catch (error) {
+    console.error("Error al obtener comentarios del nutricionista:", error);
 
-        res.json(comentarios);
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al obtener comentarios del nutricionista:',
-            error
-        );
-
-
-        res.status(500).json({
-            mensaje:
-                'Error al obtener los comentarios'
-        });
-
-    }
-
+    res.status(500).json({
+      mensaje: "Error al obtener los comentarios",
+    });
+  }
 });
 
 // ==========================================
@@ -2775,145 +2764,102 @@ app.get('/api/nutricionistas/:id/comentarios', async (req, res) => {
 // ==========================================
 
 app.post(
-    '/api/nutricionistas/:id/comentarios',
-    verificarToken,
-    async (req, res) => {
+  "/api/nutricionistas/:id/comentarios",
+  verificarToken,
+  async (req, res) => {
+    try {
+      const nutricionistaId = Number(req.params.id);
 
-        try {
+      const usuarioId = Number(req.usuario.id);
 
-            const nutricionistaId =
-                Number(req.params.id);
+      const { titulo, comentario, calificacion } = req.body;
 
-            const usuarioId =
-                Number(req.usuario.id);
+      const calificacionNumero = Number(calificacion);
 
-            const {
-                titulo,
-                comentario,
-                calificacion
-            } = req.body;
+      // ==================================
+      // VALIDAR NUTRICIONISTA
+      // ==================================
 
-            const calificacionNumero =
-                Number(calificacion);
+      if (!Number.isInteger(nutricionistaId) || nutricionistaId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de nutricionista inválido",
+        });
+      }
 
+      // ==================================
+      // VALIDAR CAMPOS
+      // ==================================
 
-            // ==================================
-            // VALIDAR NUTRICIONISTA
-            // ==================================
+      if (!titulo || !titulo.trim() || !comentario || !comentario.trim()) {
+        return res.status(400).json({
+          mensaje: "Título y comentario son obligatorios",
+        });
+      }
 
-            if (
-                !Number.isInteger(nutricionistaId) ||
-                nutricionistaId <= 0
-            ) {
+      if (titulo.trim().length > 150) {
+        return res.status(400).json({
+          mensaje: "El título no puede superar los 150 caracteres",
+        });
+      }
 
-                return res.status(400).json({
-                    mensaje:
-                        'ID de nutricionista inválido'
-                });
+      if (
+        !Number.isInteger(calificacionNumero) ||
+        calificacionNumero < 1 ||
+        calificacionNumero > 5
+      ) {
+        return res.status(400).json({
+          mensaje: "La calificación debe ser entre 1 y 5 estrellas",
+        });
+      }
 
-            }
+      // ==================================
+      // VERIFICAR NUTRICIONISTA
+      // ==================================
 
-
-            // ==================================
-            // VALIDAR CAMPOS
-            // ==================================
-
-            if (
-                !titulo ||
-                !titulo.trim() ||
-                !comentario ||
-                !comentario.trim()
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Título y comentario son obligatorios'
-                });
-
-            }
-
-
-            if (titulo.trim().length > 150) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'El título no puede superar los 150 caracteres'
-                });
-
-            }
-
-
-            if (
-                !Number.isInteger(calificacionNumero) ||
-                calificacionNumero < 1 ||
-                calificacionNumero > 5
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'La calificación debe ser entre 1 y 5 estrellas'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR NUTRICIONISTA
-            // ==================================
-
-            const [nutricionistas] =
-                await pool.query(`
+      const [nutricionistas] = await pool.query(
+        `
                     SELECT id
                     FROM nutricionista
                     WHERE id = ?
                         AND estadoVerificacion = 'verificado'
                     LIMIT 1
-                `, [nutricionistaId]);
+                `,
+        [nutricionistaId],
+      );
 
+      if (nutricionistas.length === 0) {
+        return res.status(404).json({
+          mensaje: "Nutricionista no encontrado",
+        });
+      }
 
-            if (nutricionistas.length === 0) {
+      // ==================================
+      // VERIFICAR OPINIÓN EXISTENTE
+      // ==================================
 
-                return res.status(404).json({
-                    mensaje:
-                        'Nutricionista no encontrado'
-                });
-
-            }
-
-
-            // ==================================
-            // VERIFICAR OPINIÓN EXISTENTE
-            // ==================================
-
-            const [comentariosExistentes] =
-                await pool.query(`
+      const [comentariosExistentes] = await pool.query(
+        `
                     SELECT id
                     FROM comentarioNutricionista
                     WHERE usuarioId = ?
                         AND nutricionistaId = ?
                     LIMIT 1
-                `, [
-                    usuarioId,
-                    nutricionistaId
-                ]);
+                `,
+        [usuarioId, nutricionistaId],
+      );
 
+      if (comentariosExistentes.length > 0) {
+        return res.status(409).json({
+          mensaje: "Ya dejaste una opinión para este nutricionista",
+        });
+      }
 
-            if (comentariosExistentes.length > 0) {
+      // ==================================
+      // CREAR COMENTARIO
+      // ==================================
 
-                return res.status(409).json({
-                    mensaje:
-                        'Ya dejaste una opinión para este nutricionista'
-                });
-
-            }
-
-
-            // ==================================
-            // CREAR COMENTARIO
-            // ==================================
-
-            const [resultado] =
-                await pool.query(`
+      const [resultado] = await pool.query(
+        `
                     INSERT INTO comentarioNutricionista (
                         titulo,
                         comentario,
@@ -2923,117 +2869,91 @@ app.post(
                         nutricionistaId
                     )
                     VALUES (?, ?, ?, 'pendiente', ?, ?)
-                `, [
-                    titulo.trim(),
-                    comentario.trim(),
-                    calificacionNumero,
-                    usuarioId,
-                    nutricionistaId
-                ]);
+                `,
+        [
+          titulo.trim(),
+          comentario.trim(),
+          calificacionNumero,
+          usuarioId,
+          nutricionistaId,
+        ],
+      );
 
+      // ==================================
+      // RESPUESTA
+      // ==================================
 
-            // ==================================
-            // RESPUESTA
-            // ==================================
+      res.status(201).json({
+        mensaje: "Tu opinión fue enviada y está pendiente de aprobación",
 
-            res.status(201).json({
+        comentario: {
+          id: resultado.insertId,
+          titulo: titulo.trim(),
+          comentario: comentario.trim(),
+          calificacion: calificacionNumero,
+          estado: "pendiente",
+          nutricionistaId: nutricionistaId,
+        },
+      });
+    } catch (error) {
+      console.error("Error al crear comentario de nutricionista:", error);
 
-                mensaje:
-                    'Tu opinión fue enviada y está pendiente de aprobación',
-
-                comentario: {
-                    id: resultado.insertId,
-                    titulo: titulo.trim(),
-                    comentario: comentario.trim(),
-                    calificacion: calificacionNumero,
-                    estado: 'pendiente',
-                    nutricionistaId: nutricionistaId
-                }
-
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear comentario de nutricionista:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al enviar la opinión'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al enviar la opinión",
+      });
     }
+  },
 );
 
 // ADMIN - CREAR NUTRICIONISTA
 app.post(
-    '/api/admin/nutricionistas',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-        try {
+  "/api/admin/nutricionistas",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const {
+        nombre,
+        apellido,
+        matricula,
+        descripcion,
+        fotoPerfil,
+        direccion,
+        telefono,
+        tieneWhatsapp,
+        email,
+        instagram,
+        sitioWeb,
+        horario,
+        latitud,
+        longitud,
+        estadoVerificacion,
+        barrioId,
+      } = req.body;
 
-            const {
-                nombre,
-                apellido,
-                matricula,
-                descripcion,
-                fotoPerfil,
-                direccion,
-                telefono,
-                tieneWhatsapp,
-                email,
-                instagram,
-                sitioWeb,
-                horario,
-                latitud,
-                longitud,
-                estadoVerificacion,
-                barrioId
-            } = req.body;
+      if (!nombre || !apellido || !matricula || !barrioId) {
+        return res.status(400).json({
+          mensaje: "Nombre, apellido, matrícula y barrio son obligatorios",
+        });
+      }
 
-
-            if (
-                !nombre ||
-                !apellido ||
-                !matricula ||
-                !barrioId
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, apellido, matrícula y barrio son obligatorios'
-                });
-            }
-
-
-            const [matriculaExistente] =
-                await pool.query(
-                    `
+      const [matriculaExistente] = await pool.query(
+        `
                     SELECT id
                     FROM nutricionista
                     WHERE matricula = ?
                     `,
-                    [matricula]
-                );
+        [matricula],
+      );
 
+      if (matriculaExistente.length > 0) {
+        return res.status(409).json({
+          mensaje: "Ya existe un nutricionista con esa matrícula",
+        });
+      }
 
-            if (matriculaExistente.length > 0) {
-                return res.status(409).json({
-                    mensaje:
-                        'Ya existe un nutricionista con esa matrícula'
-                });
-            }
-
-
-            const [resultado] =
-                await pool.query(
-                    `
+      const [resultado] = await pool.query(
+        `
                     INSERT INTO nutricionista (
                         nombre,
                         apellido,
@@ -3060,147 +2980,113 @@ app.post(
                         ?, ?, ?, ?, ?, 0, 0, ?, NOW()
                     )
                     `,
-                    [
-                        nombre,
-                        apellido,
-                        matricula,
-                        descripcion || null,
-                        fotoPerfil || null,
-                        direccion || null,
-                        telefono || null,
-                        tieneWhatsapp ? 1 : 0,
-                        email || null,
-                        instagram || null,
-                        sitioWeb || null,
-                        horario || null,
-                        latitud || null,
-                        longitud || null,
-                        estadoVerificacion || 'pendiente',
-                        barrioId
-                    ]
-                );
+        [
+          nombre,
+          apellido,
+          matricula,
+          descripcion || null,
+          fotoPerfil || null,
+          direccion || null,
+          telefono || null,
+          tieneWhatsapp ? 1 : 0,
+          email || null,
+          instagram || null,
+          sitioWeb || null,
+          horario || null,
+          latitud || null,
+          longitud || null,
+          estadoVerificacion || "pendiente",
+          barrioId,
+        ],
+      );
 
+      res.status(201).json({
+        mensaje: "Nutricionista creado correctamente",
+        id: resultado.insertId,
+      });
+    } catch (error) {
+      console.error("Error al crear nutricionista:", error);
 
-            res.status(201).json({
-                mensaje:
-                    'Nutricionista creado correctamente',
-                id: resultado.insertId
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear nutricionista:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al crear el nutricionista'
-            });
-
-        }
+      res.status(500).json({
+        mensaje: "Error al crear el nutricionista",
+      });
     }
+  },
 );
 
 // ADMIN - ACTUALIZAR NUTRICIONISTA
 app.put(
-    '/api/admin/nutricionistas/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-        try {
+  "/api/admin/nutricionistas/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const nutricionistaId = Number(req.params.id);
 
-            const nutricionistaId =
-                Number(req.params.id);
+      if (!Number.isInteger(nutricionistaId) || nutricionistaId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de nutricionista inválido",
+        });
+      }
 
-            if (
-                !Number.isInteger(nutricionistaId) ||
-                nutricionistaId <= 0
-            ) {
-                return res.status(400).json({
-                    mensaje: 'ID de nutricionista inválido'
-                });
-            }
+      const {
+        nombre,
+        apellido,
+        matricula,
+        descripcion,
+        fotoPerfil,
+        direccion,
+        telefono,
+        tieneWhatsapp,
+        email,
+        instagram,
+        sitioWeb,
+        horario,
+        latitud,
+        longitud,
+        estadoVerificacion,
+        barrioId,
+      } = req.body;
 
+      if (!nombre || !apellido || !matricula || !barrioId) {
+        return res.status(400).json({
+          mensaje: "Nombre, apellido, matrícula y barrio son obligatorios",
+        });
+      }
 
-            const {
-                nombre,
-                apellido,
-                matricula,
-                descripcion,
-                fotoPerfil,
-                direccion,
-                telefono,
-                tieneWhatsapp,
-                email,
-                instagram,
-                sitioWeb,
-                horario,
-                latitud,
-                longitud,
-                estadoVerificacion,
-                barrioId
-            } = req.body;
-
-
-            if (
-                !nombre ||
-                !apellido ||
-                !matricula ||
-                !barrioId
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, apellido, matrícula y barrio son obligatorios'
-                });
-            }
-
-
-            const [existente] =
-                await pool.query(
-                    `
+      const [existente] = await pool.query(
+        `
                     SELECT id
                     FROM nutricionista
                     WHERE id = ?
                     `,
-                    [nutricionistaId]
-                );
+        [nutricionistaId],
+      );
 
+      if (existente.length === 0) {
+        return res.status(404).json({
+          mensaje: "Nutricionista no encontrado",
+        });
+      }
 
-            if (existente.length === 0) {
-                return res.status(404).json({
-                    mensaje: 'Nutricionista no encontrado'
-                });
-            }
-
-
-            const [matriculaExistente] =
-                await pool.query(
-                    `
+      const [matriculaExistente] = await pool.query(
+        `
                     SELECT id
                     FROM nutricionista
                     WHERE matricula = ?
                     AND id <> ?
                     `,
-                    [
-                        matricula,
-                        nutricionistaId
-                    ]
-                );
+        [matricula, nutricionistaId],
+      );
 
+      if (matriculaExistente.length > 0) {
+        return res.status(409).json({
+          mensaje: "Ya existe otro nutricionista con esa matrícula",
+        });
+      }
 
-            if (matriculaExistente.length > 0) {
-                return res.status(409).json({
-                    mensaje:
-                        'Ya existe otro nutricionista con esa matrícula'
-                });
-            }
-
-
-            await pool.query(
-                `
+      await pool.query(
+        `
                 UPDATE nutricionista
                 SET
                     nombre = ?,
@@ -3221,138 +3107,107 @@ app.put(
                     barrioId = ?
                 WHERE id = ?
                 `,
-                [
-                    nombre,
-                    apellido,
-                    matricula,
-                    descripcion || null,
-                    fotoPerfil || null,
-                    direccion || null,
-                    telefono || null,
-                    tieneWhatsapp ? 1 : 0,
-                    email || null,
-                    instagram || null,
-                    sitioWeb || null,
-                    horario || null,
-                    latitud || null,
-                    longitud || null,
-                    estadoVerificacion || 'pendiente',
-                    barrioId,
-                    nutricionistaId
-                ]
-            );
+        [
+          nombre,
+          apellido,
+          matricula,
+          descripcion || null,
+          fotoPerfil || null,
+          direccion || null,
+          telefono || null,
+          tieneWhatsapp ? 1 : 0,
+          email || null,
+          instagram || null,
+          sitioWeb || null,
+          horario || null,
+          latitud || null,
+          longitud || null,
+          estadoVerificacion || "pendiente",
+          barrioId,
+          nutricionistaId,
+        ],
+      );
 
+      res.json({
+        mensaje: "Nutricionista actualizado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al actualizar nutricionista:", error);
 
-            res.json({
-                mensaje:
-                    'Nutricionista actualizado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al actualizar nutricionista:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al actualizar el nutricionista'
-            });
-
-        }
+      res.status(500).json({
+        mensaje: "Error al actualizar el nutricionista",
+      });
     }
+  },
 );
 
 // ADMIN - ELIMINAR NUTRICIONISTA
 app.delete(
-    '/api/admin/nutricionistas/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-        try {
+  "/api/admin/nutricionistas/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const nutricionistaId = Number(req.params.id);
 
-            const nutricionistaId =
-                Number(req.params.id);
+      if (!Number.isInteger(nutricionistaId) || nutricionistaId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de nutricionista inválido",
+        });
+      }
 
-            if (
-                !Number.isInteger(nutricionistaId) ||
-                nutricionistaId <= 0
-            ) {
-                return res.status(400).json({
-                    mensaje: 'ID de nutricionista inválido'
-                });
-            }
-
-
-            const [existente] =
-                await pool.query(
-                    `
+      const [existente] = await pool.query(
+        `
                     SELECT id, nombre, apellido
                     FROM nutricionista
                     WHERE id = ?
                     `,
-                    [nutricionistaId]
-                );
+        [nutricionistaId],
+      );
 
+      if (existente.length === 0) {
+        return res.status(404).json({
+          mensaje: "Nutricionista no encontrado",
+        });
+      }
 
-            if (existente.length === 0) {
-                return res.status(404).json({
-                    mensaje: 'Nutricionista no encontrado'
-                });
-            }
-
-
-            // Eliminar relaciones asociadas
-            await pool.query(
-                `
+      // Eliminar relaciones asociadas
+      await pool.query(
+        `
                 DELETE FROM comentarionutricionista
                 WHERE nutricionistaId = ?
                 `,
-                [nutricionistaId]
-            );
+        [nutricionistaId],
+      );
 
-
-            await pool.query(
-                `
+      await pool.query(
+        `
                 DELETE FROM favoritonutricionista
                 WHERE nutricionistaId = ?
                 `,
-                [nutricionistaId]
-            );
+        [nutricionistaId],
+      );
 
-
-            // Eliminar nutricionista
-            await pool.query(
-                `
+      // Eliminar nutricionista
+      await pool.query(
+        `
                 DELETE FROM nutricionista
                 WHERE id = ?
                 `,
-                [nutricionistaId]
-            );
+        [nutricionistaId],
+      );
 
+      res.json({
+        mensaje: "Nutricionista eliminado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al eliminar nutricionista:", error);
 
-            res.json({
-                mensaje:
-                    'Nutricionista eliminado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al eliminar nutricionista:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al eliminar el nutricionista'
-            });
-
-        }
+      res.status(500).json({
+        mensaje: "Error al eliminar el nutricionista",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -3360,15 +3215,12 @@ app.delete(
 // ==========================================
 
 app.get(
-    '/api/admin/comentarios/nutricionistas',
-    verificarToken,
-    verificarAdminOModerador,
-    async (req, res) => {
-
-        try {
-
-            const [comentarios] =
-                await pool.query(`
+  "/api/admin/comentarios/nutricionistas",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    try {
+      const [comentarios] = await pool.query(`
                     SELECT
                         cn.id,
                         cn.titulo,
@@ -3402,131 +3254,92 @@ app.get(
                         cn.id DESC
                 `);
 
+      res.json(comentarios);
+    } catch (error) {
+      console.error("Error al obtener comentarios de nutricionistas:", error);
 
-            res.json(comentarios);
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al obtener comentarios de nutricionistas:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener comentarios de nutricionistas'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener comentarios de nutricionistas",
+      });
     }
+  },
 );
-
 
 // ==========================================
 // ADMIN - MODERAR COMENTARIO NUTRICIONISTA
 // ==========================================
 
 app.patch(
-    '/api/admin/comentarios/nutricionistas/:id',
-    verificarToken,
-    verificarAdminOModerador,
-    async (req, res) => {
+  "/api/admin/comentarios/nutricionistas/:id",
+  verificarToken,
+  verificarAdminOModerador,
+  async (req, res) => {
+    const conexion = await pool.getConnection();
 
-        const conexion =
-            await pool.getConnection();
+    try {
+      const comentarioId = Number(req.params.id);
 
-        try {
+      const { estado } = req.body;
 
-            const comentarioId =
-                Number(req.params.id);
+      if (!Number.isInteger(comentarioId) || comentarioId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de comentario inválido",
+        });
+      }
 
-            const { estado } =
-                req.body;
+      if (!["aprobado", "rechazado"].includes(estado)) {
+        return res.status(400).json({
+          mensaje: "Estado inválido",
+        });
+      }
 
+      await conexion.beginTransaction();
 
-            if (
-                !Number.isInteger(comentarioId) ||
-                comentarioId <= 0
-            ) {
+      // ==================================
+      // BUSCAR COMENTARIO
+      // ==================================
 
-                return res.status(400).json({
-                    mensaje:
-                        'ID de comentario inválido'
-                });
-
-            }
-
-
-            if (
-                !['aprobado', 'rechazado']
-                    .includes(estado)
-            ) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Estado inválido'
-                });
-
-            }
-
-
-            await conexion.beginTransaction();
-
-
-            // ==================================
-            // BUSCAR COMENTARIO
-            // ==================================
-
-            const [comentarios] =
-                await conexion.query(`
+      const [comentarios] = await conexion.query(
+        `
                     SELECT
                         id,
                         nutricionistaId
                     FROM comentarioNutricionista
                     WHERE id = ?
                     LIMIT 1
-                `, [comentarioId]);
+                `,
+        [comentarioId],
+      );
 
+      if (comentarios.length === 0) {
+        await conexion.rollback();
 
-            if (comentarios.length === 0) {
+        return res.status(404).json({
+          mensaje: "Comentario no encontrado",
+        });
+      }
 
-                await conexion.rollback();
+      const nutricionistaId = comentarios[0].nutricionistaId;
 
-                return res.status(404).json({
-                    mensaje:
-                        'Comentario no encontrado'
-                });
+      // ==================================
+      // ACTUALIZAR ESTADO
+      // ==================================
 
-            }
-
-
-            const nutricionistaId =
-                comentarios[0].nutricionistaId;
-
-
-            // ==================================
-            // ACTUALIZAR ESTADO
-            // ==================================
-
-            await conexion.query(`
+      await conexion.query(
+        `
                 UPDATE comentarioNutricionista
                 SET estado = ?
                 WHERE id = ?
-            `, [
-                estado,
-                comentarioId
-            ]);
+            `,
+        [estado, comentarioId],
+      );
 
+      // ==================================
+      // RECALCULAR CALIFICACIÓN
+      // ==================================
 
-            // ==================================
-            // RECALCULAR CALIFICACIÓN
-            // ==================================
-
-            const [resumen] =
-                await conexion.query(`
+      const [resumen] = await conexion.query(
+        `
                     SELECT
                         COALESCE(
                             AVG(calificacion),
@@ -3539,72 +3352,49 @@ app.patch(
 
                     WHERE nutricionistaId = ?
                         AND estado = 'aprobado'
-                `, [nutricionistaId]);
+                `,
+        [nutricionistaId],
+      );
 
+      const promedio = Number(resumen[0].promedio || 0);
 
-            const promedio =
-                Number(
-                    resumen[0].promedio || 0
-                );
+      const cantidad = Number(resumen[0].cantidad || 0);
 
-            const cantidad =
-                Number(
-                    resumen[0].cantidad || 0
-                );
+      // ==================================
+      // ACTUALIZAR NUTRICIONISTA
+      // ==================================
 
-
-            // ==================================
-            // ACTUALIZAR NUTRICIONISTA
-            // ==================================
-
-            await conexion.query(`
+      await conexion.query(
+        `
                 UPDATE nutricionista
                 SET
                     calificacionPromedio = ?,
                     cantidadResenas = ?
                 WHERE id = ?
-            `, [
-                promedio,
-                cantidad,
-                nutricionistaId
-            ]);
+            `,
+        [promedio, cantidad, nutricionistaId],
+      );
 
+      await conexion.commit();
 
-            await conexion.commit();
+      res.json({
+        mensaje:
+          estado === "aprobado"
+            ? "Comentario aprobado correctamente"
+            : "Comentario rechazado correctamente",
+      });
+    } catch (error) {
+      await conexion.rollback();
 
+      console.error("Error al moderar comentario de nutricionista:", error);
 
-            res.json({
-                mensaje:
-                    estado === 'aprobado'
-                        ? 'Comentario aprobado correctamente'
-                        : 'Comentario rechazado correctamente'
-            });
-
-
-        } catch (error) {
-
-            await conexion.rollback();
-
-
-            console.error(
-                'Error al moderar comentario de nutricionista:',
-                error
-            );
-
-
-            res.status(500).json({
-                mensaje:
-                    'Error al moderar comentario de nutricionista'
-            });
-
-
-        } finally {
-
-            conexion.release();
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al moderar comentario de nutricionista",
+      });
+    } finally {
+      conexion.release();
     }
+  },
 );
 
 // ==========================================
@@ -3612,171 +3402,120 @@ app.patch(
 // ==========================================
 
 app.get(
-    '/api/admin/marcas',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [marcas] =
-                await pool.query(`
+  "/api/admin/marcas",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [marcas] = await pool.query(`
                     SELECT id, nombre
                     FROM marca
                     ORDER BY nombre ASC
                 `);
 
-            res.json(marcas);
+      res.json(marcas);
+    } catch (error) {
+      console.error("Error al obtener marcas:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener marcas:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al obtener las marcas'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener las marcas",
+      });
     }
+  },
 );
-
 
 // ==========================================
 // ADMIN - CATEGORÍAS
 // ==========================================
 
 app.get(
-    '/api/admin/categorias',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [categorias] =
-                await pool.query(`
+  "/api/admin/categorias",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [categorias] = await pool.query(`
                     SELECT id, nombre
                     FROM categoria
                     ORDER BY nombre ASC
                 `);
 
-            res.json(categorias);
+      res.json(categorias);
+    } catch (error) {
+      console.error("Error al obtener categorías:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener categorías:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al obtener las categorías'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener las categorías",
+      });
     }
+  },
 );
-
-
 
 // ==========================================
 // ADMIN - TIPOS DE RESTAURANTE
 // ==========================================
 
 app.get(
-    '/api/admin/tipos-restaurante',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [tipos] =
-                await pool.query(`
+  "/api/admin/tipos-restaurante",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [tipos] = await pool.query(`
                     SELECT id, nombre
                     FROM tipoRestaurante
                     ORDER BY nombre ASC
                 `);
 
-            res.json(tipos);
+      res.json(tipos);
+    } catch (error) {
+      console.error("Error al obtener tipos de restaurante:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener tipos de restaurante:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener los tipos de restaurante'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los tipos de restaurante",
+      });
     }
+  },
 );
-
 
 // ==========================================
 // ADMIN - BARRIOS
 // ==========================================
 
 app.get(
-    '/api/admin/barrios',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [barrios] =
-                await pool.query(`
+  "/api/admin/barrios",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [barrios] = await pool.query(`
                     SELECT id, nombre
                     FROM barrio
                     ORDER BY nombre ASC
                 `);
 
-            res.json(barrios);
+      res.json(barrios);
+    } catch (error) {
+      console.error("Error al obtener barrios:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener barrios:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener los barrios'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los barrios",
+      });
     }
+  },
 );
-
-
 
 // ==========================================
 // ADMIN - LISTAR TODOS LOS RESTAURANTES
 // ==========================================
 
 app.get(
-    '/api/admin/restaurantes',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [restaurantes] =
-                await pool.query(`
+  "/api/admin/restaurantes",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [restaurantes] = await pool.query(`
                     SELECT
                         r.id,
                         r.nombre,
@@ -3807,23 +3546,15 @@ app.get(
                     ORDER BY r.nombre ASC
                 `);
 
-            res.json(restaurantes);
+      res.json(restaurantes);
+    } catch (error) {
+      console.error("Error al obtener restaurantes para admin:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener restaurantes para admin:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener los restaurantes'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los restaurantes",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -3831,79 +3562,61 @@ app.get(
 // ==========================================
 
 app.put(
-    '/api/admin/restaurantes/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/restaurantes/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const restauranteId = Number(req.params.id);
 
-        try {
+      if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de restaurante inválido",
+        });
+      }
 
-            const restauranteId =
-                Number(req.params.id);
+      const {
+        nombre,
+        descripcion,
+        direccion,
+        imagenExterior,
+        imagenInterior,
+        sitioWeb,
+        horario,
+        latitud,
+        longitud,
+        instagram,
+        email,
+        telefono,
+        estadoVerificacion,
+        tipoRestauranteId,
+        barrioId,
+      } = req.body;
 
-            if (
-                !Number.isInteger(restauranteId) ||
-                restauranteId <= 0
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'ID de restaurante inválido'
-                });
-            }
+      if (!nombre || !direccion || !tipoRestauranteId || !barrioId) {
+        return res.status(400).json({
+          mensaje: "Nombre, dirección, tipo y barrio son obligatorios",
+        });
+      }
 
-
-            const {
-                nombre,
-                descripcion,
-                direccion,
-                imagenExterior,
-                imagenInterior,
-                sitioWeb,
-                horario,
-                latitud,
-                longitud,
-                instagram,
-                email,
-                telefono,
-                estadoVerificacion,
-                tipoRestauranteId,
-                barrioId
-            } = req.body;
-
-
-            if (
-                !nombre ||
-                !direccion ||
-                !tipoRestauranteId ||
-                !barrioId
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, dirección, tipo y barrio son obligatorios'
-                });
-            }
-
-
-            const [restaurantes] =
-                await pool.query(`
+      const [restaurantes] = await pool.query(
+        `
                     SELECT id
                     FROM restaurante
                     WHERE id = ?
                     LIMIT 1
-                `, [restauranteId]);
+                `,
+        [restauranteId],
+      );
 
+      if (restaurantes.length === 0) {
+        return res.status(404).json({
+          mensaje: "Restaurante no encontrado",
+        });
+      }
 
-            if (restaurantes.length === 0) {
-
-                return res.status(404).json({
-                    mensaje:
-                        'Restaurante no encontrado'
-                });
-
-            }
-
-
-            await pool.query(`
+      await pool.query(
+        `
                 UPDATE restaurante
                 SET
                     nombre = ?,
@@ -3922,47 +3635,38 @@ app.put(
                     tipoRestauranteId = ?,
                     barrioId = ?
                 WHERE id = ?
-            `, [
-                nombre.trim(),
-                descripcion || null,
-                direccion.trim(),
-                imagenExterior || null,
-                imagenInterior || null,
-                sitioWeb || null,
-                horario || null,
-                latitud || null,
-                longitud || null,
-                instagram || null,
-                email || null,
-                telefono || null,
-                estadoVerificacion || 'pendiente',
-                Number(tipoRestauranteId),
-                Number(barrioId),
-                restauranteId
-            ]);
+            `,
+        [
+          nombre.trim(),
+          descripcion || null,
+          direccion.trim(),
+          imagenExterior || null,
+          imagenInterior || null,
+          sitioWeb || null,
+          horario || null,
+          latitud || null,
+          longitud || null,
+          instagram || null,
+          email || null,
+          telefono || null,
+          estadoVerificacion || "pendiente",
+          Number(tipoRestauranteId),
+          Number(barrioId),
+          restauranteId,
+        ],
+      );
 
+      res.json({
+        mensaje: "Restaurante actualizado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al actualizar restaurante:", error);
 
-            res.json({
-                mensaje:
-                    'Restaurante actualizado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al actualizar restaurante:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al actualizar el restaurante'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al actualizar el restaurante",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -3970,47 +3674,37 @@ app.put(
 // ==========================================
 
 app.post(
-    '/api/admin/restaurantes',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/restaurantes",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const {
+        nombre,
+        descripcion,
+        direccion,
+        imagenExterior,
+        imagenInterior,
+        sitioWeb,
+        horario,
+        latitud,
+        longitud,
+        instagram,
+        email,
+        telefono,
+        estadoVerificacion,
+        tipoRestauranteId,
+        barrioId,
+      } = req.body;
 
-        try {
+      if (!nombre || !direccion || !tipoRestauranteId || !barrioId) {
+        return res.status(400).json({
+          mensaje: "Nombre, dirección, tipo y barrio son obligatorios",
+        });
+      }
 
-            const {
-                nombre,
-                descripcion,
-                direccion,
-                imagenExterior,
-                imagenInterior,
-                sitioWeb,
-                horario,
-                latitud,
-                longitud,
-                instagram,
-                email,
-                telefono,
-                estadoVerificacion,
-                tipoRestauranteId,
-                barrioId
-            } = req.body;
-
-
-            if (
-                !nombre ||
-                !direccion ||
-                !tipoRestauranteId ||
-                !barrioId
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, dirección, tipo y barrio son obligatorios'
-                });
-            }
-
-
-            const [resultado] =
-                await pool.query(`
+      const [resultado] = await pool.query(
+        `
                     INSERT INTO restaurante (
                         nombre,
                         descripcion,
@@ -4036,49 +3730,39 @@ app.post(
                         ?, ?, ?, ?, ?, ?,
                         ?, 0, 0, ?, ?, NOW()
                     )
-                `, [
-                    nombre.trim(),
-                    descripcion || null,
-                    direccion.trim(),
-                    imagenExterior || null,
-                    imagenInterior || null,
-                    sitioWeb || null,
-                    horario || null,
-                    latitud || null,
-                    longitud || null,
-                    instagram || null,
-                    email || null,
-                    telefono || null,
-                    estadoVerificacion || 'pendiente',
-                    Number(tipoRestauranteId),
-                    Number(barrioId)
-                ]);
+                `,
+        [
+          nombre.trim(),
+          descripcion || null,
+          direccion.trim(),
+          imagenExterior || null,
+          imagenInterior || null,
+          sitioWeb || null,
+          horario || null,
+          latitud || null,
+          longitud || null,
+          instagram || null,
+          email || null,
+          telefono || null,
+          estadoVerificacion || "pendiente",
+          Number(tipoRestauranteId),
+          Number(barrioId),
+        ],
+      );
 
+      res.status(201).json({
+        mensaje: "Restaurante creado correctamente",
 
-            res.status(201).json({
-                mensaje:
-                    'Restaurante creado correctamente',
+        id: resultado.insertId,
+      });
+    } catch (error) {
+      console.error("Error al crear restaurante:", error);
 
-                id:
-                    resultado.insertId
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear restaurante:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al crear el restaurante'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al crear el restaurante",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -4086,40 +3770,31 @@ app.post(
 // ==========================================
 
 app.post(
-    '/api/admin/productos',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/productos",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const {
+        nombre,
+        descripcion,
+        ingredientes,
+        informacionNutricional,
+        imagen,
+        codigoBarras,
+        certificadoSinTacc,
+        marcaId,
+        categoriaId,
+      } = req.body;
 
-        try {
+      if (!nombre || !marcaId || !categoriaId) {
+        return res.status(400).json({
+          mensaje: "Nombre, marca y categoría son obligatorios",
+        });
+      }
 
-            const {
-                nombre,
-                descripcion,
-                ingredientes,
-                informacionNutricional,
-                imagen,
-                codigoBarras,
-                certificadoSinTacc,
-                marcaId,
-                categoriaId
-            } = req.body;
-
-
-            if (
-                !nombre ||
-                !marcaId ||
-                !categoriaId
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, marca y categoría son obligatorios'
-                });
-            }
-
-
-            const [resultado] =
-                await pool.query(`
+      const [resultado] = await pool.query(
+        `
                     INSERT INTO producto (
                         nombre,
                         descripcion,
@@ -4133,43 +3808,33 @@ app.post(
                         categoriaId
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
-                `, [
-                    nombre.trim(),
-                    descripcion || null,
-                    ingredientes || null,
-                    informacionNutricional || null,
-                    imagen || null,
-                    codigoBarras || null,
-                    Number(certificadoSinTacc) === 1 ? 1 : 0,
-                    Number(marcaId),
-                    Number(categoriaId)
-                ]);
+                `,
+        [
+          nombre.trim(),
+          descripcion || null,
+          ingredientes || null,
+          informacionNutricional || null,
+          imagen || null,
+          codigoBarras || null,
+          Number(certificadoSinTacc) === 1 ? 1 : 0,
+          Number(marcaId),
+          Number(categoriaId),
+        ],
+      );
 
+      res.status(201).json({
+        mensaje: "Producto creado correctamente",
 
-            res.status(201).json({
-                mensaje:
-                    'Producto creado correctamente',
+        id: resultado.insertId,
+      });
+    } catch (error) {
+      console.error("Error al crear producto:", error);
 
-                id:
-                    resultado.insertId
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear producto:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al crear el producto'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al crear el producto",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -4177,68 +3842,55 @@ app.post(
 // ==========================================
 
 app.put(
-    '/api/admin/productos/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/productos/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const productoId = Number(req.params.id);
 
-        try {
+      if (!Number.isInteger(productoId) || productoId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de producto inválido",
+        });
+      }
 
-            const productoId =
-                Number(req.params.id);
+      const {
+        nombre,
+        descripcion,
+        ingredientes,
+        informacionNutricional,
+        imagen,
+        codigoBarras,
+        certificadoSinTacc,
+        marcaId,
+        categoriaId,
+      } = req.body;
 
-            if (
-                !Number.isInteger(productoId) ||
-                productoId <= 0
-            ) {
-                return res.status(400).json({
-                    mensaje: 'ID de producto inválido'
-                });
-            }
+      if (!nombre || !marcaId || !categoriaId) {
+        return res.status(400).json({
+          mensaje: "Nombre, marca y categoría son obligatorios",
+        });
+      }
 
-
-            const {
-                nombre,
-                descripcion,
-                ingredientes,
-                informacionNutricional,
-                imagen,
-                codigoBarras,
-                certificadoSinTacc,
-                marcaId,
-                categoriaId
-            } = req.body;
-
-
-            if (
-                !nombre ||
-                !marcaId ||
-                !categoriaId
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, marca y categoría son obligatorios'
-                });
-            }
-
-
-            const [productos] =
-                await pool.query(`
+      const [productos] = await pool.query(
+        `
                     SELECT id
                     FROM producto
                     WHERE id = ?
                     LIMIT 1
-                `, [productoId]);
+                `,
+        [productoId],
+      );
 
+      if (productos.length === 0) {
+        return res.status(404).json({
+          mensaje: "Producto no encontrado",
+        });
+      }
 
-            if (productos.length === 0) {
-                return res.status(404).json({
-                    mensaje: 'Producto no encontrado'
-                });
-            }
-
-
-            await pool.query(`
+      await pool.query(
+        `
                 UPDATE producto
                 SET
                     nombre = ?,
@@ -4251,116 +3903,87 @@ app.put(
                     marcaId = ?,
                     categoriaId = ?
                 WHERE id = ?
-            `, [
-                nombre.trim(),
-                descripcion || null,
-                ingredientes || null,
-                informacionNutricional || null,
-                imagen || null,
-                codigoBarras || null,
-                Number(certificadoSinTacc) === 1 ? 1 : 0,
-                Number(marcaId),
-                Number(categoriaId),
-                productoId
-            ]);
+            `,
+        [
+          nombre.trim(),
+          descripcion || null,
+          ingredientes || null,
+          informacionNutricional || null,
+          imagen || null,
+          codigoBarras || null,
+          Number(certificadoSinTacc) === 1 ? 1 : 0,
+          Number(marcaId),
+          Number(categoriaId),
+          productoId,
+        ],
+      );
 
+      res.json({
+        mensaje: "Producto actualizado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al actualizar producto:", error);
 
-            res.json({
-                mensaje: 'Producto actualizado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al actualizar producto:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al actualizar el producto'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al actualizar el producto",
+      });
     }
+  },
 );
-
-
 
 // ==========================================
 // ADMIN - ELIMINAR RESTAURANTE
 // ==========================================
 
 app.delete(
-    '/api/admin/restaurantes/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/restaurantes/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const restauranteId = Number(req.params.id);
 
-        try {
+      if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de restaurante inválido",
+        });
+      }
 
-            const restauranteId =
-                Number(req.params.id);
-
-
-            if (
-                !Number.isInteger(restauranteId) ||
-                restauranteId <= 0
-            ) {
-                return res.status(400).json({
-                    mensaje:
-                        'ID de restaurante inválido'
-                });
-            }
-
-
-            const [restaurantes] =
-                await pool.query(`
+      const [restaurantes] = await pool.query(
+        `
                     SELECT id
                     FROM restaurante
                     WHERE id = ?
                     LIMIT 1
-                `, [restauranteId]);
+                `,
+        [restauranteId],
+      );
 
+      if (restaurantes.length === 0) {
+        return res.status(404).json({
+          mensaje: "Restaurante no encontrado",
+        });
+      }
 
-            if (restaurantes.length === 0) {
-
-                return res.status(404).json({
-                    mensaje:
-                        'Restaurante no encontrado'
-                });
-
-            }
-
-
-            await pool.query(`
+      await pool.query(
+        `
                 DELETE FROM restaurante
                 WHERE id = ?
-            `, [restauranteId]);
+            `,
+        [restauranteId],
+      );
 
+      res.json({
+        mensaje: "Restaurante eliminado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al eliminar restaurante:", error);
 
-            res.json({
-                mensaje:
-                    'Restaurante eliminado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al eliminar restaurante:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al eliminar el restaurante'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al eliminar el restaurante",
+      });
     }
+  },
 );
 
 /* =====================================================
@@ -4369,15 +3992,12 @@ app.delete(
 
 // Obtener todos los locales para administración
 app.get(
-    '/api/admin/locales',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [locales] =
-                await pool.query(`
+  "/api/admin/locales",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [locales] = await pool.query(`
                     SELECT
                         l.id,
                         l.nombre,
@@ -4407,64 +4027,49 @@ app.get(
                     ORDER BY l.nombre ASC
                 `);
 
-            res.json(locales);
+      res.json(locales);
+    } catch (error) {
+      console.error("Error al obtener locales para admin:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener locales para admin:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al obtener los locales'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los locales",
+      });
     }
+  },
 );
 
 // Crear nuevo local
 app.post(
-    '/api/admin/locales',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/locales",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const {
+        nombre,
+        descripcion,
+        imagen,
+        direccion,
+        telefono,
+        email,
+        instagram,
+        sitioWeb,
+        horario,
+        latitud,
+        longitud,
+        estadoVerificacion,
+        tipoLocalId,
+        barrioId,
+      } = req.body;
 
-        try {
+      if (!nombre || !tipoLocalId || !barrioId) {
+        return res.status(400).json({
+          mensaje: "Nombre, tipo de local y barrio son obligatorios",
+        });
+      }
 
-            const {
-                nombre,
-                descripcion,
-                imagen,
-                direccion,
-                telefono,
-                email,
-                instagram,
-                sitioWeb,
-                horario,
-                latitud,
-                longitud,
-                estadoVerificacion,
-                tipoLocalId,
-                barrioId
-            } = req.body;
-
-
-            if (!nombre || !tipoLocalId || !barrioId) {
-
-                return res.status(400).json({
-                    mensaje:
-                        'Nombre, tipo de local y barrio son obligatorios'
-                });
-
-            }
-
-
-            const [resultado] =
-                await pool.query(
-                    `
+      const [resultado] = await pool.query(
+        `
                     INSERT INTO local (
                         nombre,
                         descripcion,
@@ -4489,79 +4094,60 @@ app.post(
                         ?, 0, 0, ?, ?, NOW()
                     )
                     `,
-                    [
-                        nombre,
-                        descripcion || null,
-                        imagen || null,
-                        direccion || null,
-                        telefono || null,
-                        email || null,
-                        instagram || null,
-                        sitioWeb || null,
-                        horario || null,
-                        latitud || null,
-                        longitud || null,
-                        estadoVerificacion || 'pendiente',
-                        tipoLocalId,
-                        barrioId
-                    ]
-                );
+        [
+          nombre,
+          descripcion || null,
+          imagen || null,
+          direccion || null,
+          telefono || null,
+          email || null,
+          instagram || null,
+          sitioWeb || null,
+          horario || null,
+          latitud || null,
+          longitud || null,
+          estadoVerificacion || "pendiente",
+          tipoLocalId,
+          barrioId,
+        ],
+      );
 
+      res.status(201).json({
+        mensaje: "Local creado correctamente",
+        id: resultado.insertId,
+      });
+    } catch (error) {
+      console.error("Error al crear local:", error);
 
-            res.status(201).json({
-                mensaje: 'Local creado correctamente',
-                id: resultado.insertId
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al crear local:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al crear el local'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al crear el local",
+      });
     }
+  },
 );
 
 // Obtener tipos de local para administración
 app.get(
-    '/api/admin/tipos-local',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [tipos] =
-                await pool.query(`
+  "/api/admin/tipos-local",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [tipos] = await pool.query(`
                     SELECT id, nombre
                     FROM tipolocal
                     ORDER BY nombre ASC
                 `);
 
-            res.json(tipos);
+      res.json(tipos);
+    } catch (error) {
+      console.error("Error al obtener tipos de local:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener tipos de local:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al obtener los tipos de local'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener los tipos de local",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -4569,69 +4155,54 @@ app.get(
 // ==========================================
 
 app.delete(
-    '/api/admin/productos/:id',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
+  "/api/admin/productos/:id",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const productoId = Number(req.params.id);
 
-        try {
+      if (!Number.isInteger(productoId) || productoId <= 0) {
+        return res.status(400).json({
+          mensaje: "ID de producto inválido",
+        });
+      }
 
-            const productoId =
-                Number(req.params.id);
-
-            if (
-                !Number.isInteger(productoId) ||
-                productoId <= 0
-            ) {
-                return res.status(400).json({
-                    mensaje: 'ID de producto inválido'
-                });
-            }
-
-
-            const [productos] =
-                await pool.query(`
+      const [productos] = await pool.query(
+        `
                     SELECT id
                     FROM producto
                     WHERE id = ?
                     LIMIT 1
-                `, [productoId]);
+                `,
+        [productoId],
+      );
 
+      if (productos.length === 0) {
+        return res.status(404).json({
+          mensaje: "Producto no encontrado",
+        });
+      }
 
-            if (productos.length === 0) {
-                return res.status(404).json({
-                    mensaje: 'Producto no encontrado'
-                });
-            }
-
-
-            await pool.query(`
+      await pool.query(
+        `
                 DELETE FROM producto
                 WHERE id = ?
-            `, [productoId]);
+            `,
+        [productoId],
+      );
 
+      res.json({
+        mensaje: "Producto eliminado correctamente",
+      });
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
 
-            res.json({
-                mensaje:
-                    'Producto eliminado correctamente'
-            });
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al eliminar producto:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al eliminar el producto'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al eliminar el producto",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -4639,77 +4210,66 @@ app.delete(
 // ==========================================
 
 app.get(
-    '/api/admin/dashboard',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [productos] = await pool.query(`
+  "/api/admin/dashboard",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [productos] = await pool.query(`
                 SELECT COUNT(*) AS total
                 FROM producto
                 WHERE certificadoSinTacc = 1
             `);
 
-            const [restaurantes] = await pool.query(`
+      const [restaurantes] = await pool.query(`
                 SELECT COUNT(*) AS total
                 FROM restaurante
                 WHERE estadoVerificacion = 'verificado'
             `);
 
-            const [locales] = await pool.query(`
+      const [locales] = await pool.query(`
                 SELECT COUNT(*) AS total
                 FROM local
                 WHERE estadoVerificacion = 'verificado'
             `);
 
-            const [nutricionistas] = await pool.query(`
+      const [nutricionistas] = await pool.query(`
                 SELECT COUNT(*) AS total
                 FROM nutricionista
                 WHERE estadoVerificacion = 'verificado'
             `);
 
-            const [usuarios] = await pool.query(`
+      const [usuarios] = await pool.query(`
                 SELECT COUNT(*) AS total
                 FROM usuario
                 WHERE esActivo = 1
             `);
 
-            res.json({
-                productos: Number(productos[0].total),
-                restaurantes: Number(restaurantes[0].total),
-                locales: Number(locales[0].total),
-                nutricionistas: Number(nutricionistas[0].total),
-                usuarios: Number(usuarios[0].total)
-            });
+      res.json({
+        productos: Number(productos[0].total),
+        restaurantes: Number(restaurantes[0].total),
+        locales: Number(locales[0].total),
+        nutricionistas: Number(nutricionistas[0].total),
+        usuarios: Number(usuarios[0].total),
+      });
+    } catch (error) {
+      console.error("Error al obtener estadísticas del dashboard:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener estadísticas del dashboard:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener las estadísticas del dashboard'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener las estadísticas del dashboard",
+      });
     }
+  },
 );
 
 // ADMIN - OBTENER NUTRICIONISTAS
 app.get(
-    '/api/admin/nutricionistas',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-        try {
-
-            const [nutricionistas] = await pool.query(`
+  "/api/admin/nutricionistas",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [nutricionistas] = await pool.query(`
                 SELECT
                     n.id,
                     n.nombre,
@@ -4738,21 +4298,15 @@ app.get(
                 ORDER BY n.apellido ASC, n.nombre ASC
             `);
 
-            res.json(nutricionistas);
+      res.json(nutricionistas);
+    } catch (error) {
+      console.error("Error al obtener nutricionistas para admin:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener nutricionistas para admin:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje: 'Error al obtener los nutricionistas'
-            });
-
-        }
+      res.status(500).json({
+        mensaje: "Error al obtener los nutricionistas",
+      });
     }
+  },
 );
 
 // ==========================================
@@ -4760,14 +4314,12 @@ app.get(
 // ==========================================
 
 app.get(
-    '/api/admin/ultimas-altas',
-    verificarToken,
-    verificarAdmin,
-    async (req, res) => {
-
-        try {
-
-            const [altas] = await pool.query(`
+  "/api/admin/ultimas-altas",
+  verificarToken,
+  verificarAdmin,
+  async (req, res) => {
+    try {
+      const [altas] = await pool.query(`
                 SELECT *
                 FROM (
                     SELECT
@@ -4820,35 +4372,21 @@ app.get(
                 LIMIT 6
             `);
 
-            res.json(altas);
+      res.json(altas);
+    } catch (error) {
+      console.error("Error al obtener últimas altas:", error);
 
-        } catch (error) {
-
-            console.error(
-                'Error al obtener últimas altas:',
-                error
-            );
-
-            res.status(500).json({
-                mensaje:
-                    'Error al obtener las últimas altas'
-            });
-
-        }
-
+      res.status(500).json({
+        mensaje: "Error al obtener las últimas altas",
+      });
     }
+  },
 );
-
-
 
 // ==========================================
 // INICIAR SERVIDOR
 // ==========================================
 
 app.listen(PORT, () => {
-
-    console.log(
-        `CeliaConnect API funcionando en http://localhost:${PORT}`
-    );
-
+  console.log(`CeliaConnect API funcionando en http://localhost:${PORT}`);
 });

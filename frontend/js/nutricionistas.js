@@ -7,6 +7,7 @@ const API_NUTRICIONISTAS =
 
 let nutricionistas = [];
 let nutricionistasFiltrados = [];
+let nutricionistasFavoritos = [];
 
 let paginaActual = 1;
 const porPagina = 9;
@@ -58,6 +59,46 @@ async function cargarNutricionistas() {
         nutricionistas =
             await respuesta.json();
 
+
+        // ======================================
+        // CARGAR FAVORITOS DEL USUARIO
+        // ======================================
+
+        const token =
+            localStorage.getItem('celiaToken') ||
+            sessionStorage.getItem('celiaToken');
+
+        nutricionistasFavoritos = [];
+
+        if (token) {
+
+            const respuestaFavoritos =
+                await fetch(
+                    `${API_NUTRICIONISTAS}/favoritos`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            if (respuestaFavoritos.ok) {
+
+                const favoritos =
+                    await respuestaFavoritos.json();
+
+                nutricionistasFavoritos =
+                    favoritos.map(
+                        favorito =>
+                            Number(
+                                favorito.nutricionistaId
+                            )
+                    );
+            }
+        }
+
+
         nutricionistasFiltrados =
             [...nutricionistas];
 
@@ -80,9 +121,7 @@ async function cargarNutricionistas() {
                 </div>
             </div>
         `;
-
     }
-
 }
 
 
@@ -134,7 +173,6 @@ function aplicarFiltros() {
                 coincideTexto &&
                 coincideBarrio
             );
-
         });
 
 
@@ -143,7 +181,6 @@ function aplicarFiltros() {
     paginaActual = 1;
 
     mostrarNutricionistas();
-
 }
 
 
@@ -183,9 +220,7 @@ function ordenarNutricionistas() {
                 Number(b.cantidadResenas || 0) -
                 Number(a.cantidadResenas || 0)
         );
-
     }
-
 }
 
 
@@ -221,7 +256,6 @@ function mostrarNutricionistas() {
         paginacion.innerHTML = '';
 
         return;
-
     }
 
 
@@ -264,9 +298,37 @@ function mostrarNutricionistas() {
                 : 'assets/img/nutricionista-placeholder.png';
 
 
+        const esFavorito =
+            nutricionistasFavoritos.includes(
+                Number(nutricionista.id)
+            );
+
+
         columna.innerHTML = `
 
-            <div class="card h-100 shadow-sm border-0">
+            <div
+                class="card h-100 shadow-sm border-0 position-relative"
+            >
+
+                <button
+                    class="nutricionista-fav"
+                    type="button"
+                    data-nutricionista-id="${nutricionista.id}"
+                    aria-label="${
+                        esFavorito
+                            ? `Quitar ${nutricionista.nombre} ${nutricionista.apellido} de favoritos`
+                            : `Agregar ${nutricionista.nombre} ${nutricionista.apellido} a favoritos`
+                    }"
+                >
+                    <i
+                        class="bi ${
+                            esFavorito
+                                ? 'bi-heart-fill'
+                                : 'bi-heart'
+                        }"
+                    ></i>
+                </button>
+
 
                 <img
                     src="${foto}"
@@ -276,25 +338,35 @@ function mostrarNutricionistas() {
                     onerror="this.style.display='none'"
                 >
 
+
                 <div class="card-body d-flex flex-column">
 
-                    <span class="badge bg-success-subtle text-success align-self-start mb-2">
+                    <span
+                        class="badge bg-success-subtle text-success align-self-start mb-2"
+                    >
                         Profesional verificado
                     </span>
+
 
                     <h5 class="card-title fw-bold">
                         ${nutricionista.nombre}
                         ${nutricionista.apellido}
                     </h5>
 
+
                     <p class="text-muted small mb-2">
                         <i class="bi bi-geo-alt"></i>
                         ${nutricionista.barrio || 'Buenos Aires'}
                     </p>
 
+
                     <p class="card-text text-muted">
-                        ${nutricionista.descripcion || 'Profesional de nutrición.'}
+                        ${
+                            nutricionista.descripcion ||
+                            'Profesional de nutrición.'
+                        }
                     </p>
+
 
                     <div class="mt-auto">
 
@@ -310,6 +382,7 @@ function mostrarNutricionistas() {
                             </span>
 
                         </div>
+
 
                         <a
                             href="nutricionista-detalle.html?id=${nutricionista.id}"
@@ -327,12 +400,153 @@ function mostrarNutricionistas() {
 
 
         contenedor.appendChild(columna);
+    });
 
+
+    // ======================================
+    // FAVORITOS DE NUTRICIONISTAS
+    // ======================================
+
+    const botonesFavoritos =
+        contenedor.querySelectorAll(
+            '.nutricionista-fav'
+        );
+
+
+    botonesFavoritos.forEach((boton) => {
+
+        boton.addEventListener(
+            'click',
+            async (evento) => {
+
+                evento.preventDefault();
+                evento.stopPropagation();
+
+
+                const nutricionistaId =
+                    Number(
+                        boton.dataset.nutricionistaId
+                    );
+
+
+                const token =
+                    localStorage.getItem(
+                        'celiaToken'
+                    ) ||
+                    sessionStorage.getItem(
+                        'celiaToken'
+                    );
+
+
+                if (!token) {
+
+                    window.location.href =
+                        'login.html';
+
+                    return;
+                }
+
+
+                const esFavorito =
+                    nutricionistasFavoritos.includes(
+                        nutricionistaId
+                    );
+
+
+                try {
+
+                    const respuesta =
+                        await fetch(
+                            `${API_NUTRICIONISTAS}/${nutricionistaId}/favorito`,
+                            {
+                                method:
+                                    esFavorito
+                                        ? 'DELETE'
+                                        : 'POST',
+
+                                headers: {
+                                    Authorization:
+                                        `Bearer ${token}`
+                                }
+                            }
+                        );
+
+
+                    const datos =
+                        await respuesta.json();
+
+
+                    if (!respuesta.ok) {
+
+                        throw new Error(
+                            datos.mensaje ||
+                            'No se pudo actualizar el favorito'
+                        );
+                    }
+
+
+                    const icono =
+                        boton.querySelector('i');
+
+
+                    if (esFavorito) {
+
+                        nutricionistasFavoritos =
+                            nutricionistasFavoritos.filter(
+                                id =>
+                                    id !== nutricionistaId
+                            );
+
+
+                        icono.classList.remove(
+                            'bi-heart-fill'
+                        );
+
+                        icono.classList.add(
+                            'bi-heart'
+                        );
+
+
+                        boton.setAttribute(
+                            'aria-label',
+                            'Agregar nutricionista a favoritos'
+                        );
+
+                    } else {
+
+                        nutricionistasFavoritos.push(
+                            nutricionistaId
+                        );
+
+
+                        icono.classList.remove(
+                            'bi-heart'
+                        );
+
+                        icono.classList.add(
+                            'bi-heart-fill'
+                        );
+
+
+                        boton.setAttribute(
+                            'aria-label',
+                            'Quitar nutricionista de favoritos'
+                        );
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        'Error al actualizar favorito de nutricionista:',
+                        error
+                    );
+                }
+            }
+        );
     });
 
 
     mostrarPaginacion();
-
 }
 
 
@@ -359,14 +573,11 @@ function generarEstrellas(calificacion) {
 
             estrellas +=
                 '<i class="bi bi-star"></i>';
-
         }
-
     }
 
 
     return estrellas;
-
 }
 
 
@@ -430,15 +641,12 @@ function mostrarPaginacion() {
                     top: 0,
                     behavior: 'smooth'
                 });
-
             }
         );
 
 
         paginacion.appendChild(item);
-
     }
-
 }
 
 
@@ -482,7 +690,6 @@ document
             orden.value = 'relevantes';
 
             aplicarFiltros();
-
         }
     );
 
@@ -499,7 +706,6 @@ document
                 filtroBarrioMobile.value;
 
             aplicarFiltros();
-
         }
     );
 
@@ -518,7 +724,6 @@ document
             orden.value = 'relevantes';
 
             aplicarFiltros();
-
         }
     );
 

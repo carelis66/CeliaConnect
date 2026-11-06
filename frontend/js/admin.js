@@ -5149,7 +5149,7 @@ if (
 ) {
 
     apiModeracion =
-        API_ADMIN_COMENTARIOS_PRODUCTOS;
+        API_ADMIN_PRODUCTOS
 
 } else if (
     tipoComentarioSeleccionado ===
