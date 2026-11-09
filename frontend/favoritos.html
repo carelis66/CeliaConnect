@@ -66,8 +66,8 @@
 
 
                 <p class="text-muted mb-0">
-                    Tus productos, restaurantes, locales y
-                    nutricionistas favoritos en un solo lugar.
+                    Todo lo que guardaste en CeliaConnect,
+                    en un solo lugar.
                 </p>
 
             </div>
@@ -81,7 +81,7 @@
             <div class="container">
 
 
-                <!-- ================= ESTADO DE CARGA ================= -->
+                <!-- ================= CARGANDO ================= -->
 
                 <div
                     id="favoritos-loading"
@@ -111,17 +111,15 @@
                     class="text-center py-5 d-none"
                 >
 
-                    <i
-                        class="bi bi-heart fs-1 text-muted"
-                    ></i>
+                    <i class="bi bi-heart fs-1 text-muted"></i>
 
                     <h3 class="fw-bold mt-3">
                         Todavía no tenés favoritos
                     </h3>
 
                     <p class="text-muted mb-4">
-                        Explorá CeliaConnect y guardá los lugares,
-                        productos y profesionales que más te interesen.
+                        Explorá CeliaConnect y guardá los productos,
+                        lugares y profesionales que más te interesen.
                     </p>
 
                     <a
@@ -146,44 +144,54 @@
 
                     <section
                         id="favoritos-productos-seccion"
-                        class="mb-5"
+                        class="favoritos-seccion"
                     >
 
-                        <div
-                            class="favoritos-seccion-header d-flex justify-content-between align-items-center mb-4"
-                        >
+                        <div class="favoritos-seccion-header">
 
-                            <div>
+                            <div class="favoritos-titulo-wrap">
 
-                                <h2 class="h4 fw-bold mb-1">
-                                    <i
-                                        class="bi bi-box-seam me-2"
-                                    ></i>
-                                    Productos
-                                </h2>
+                                <div class="favoritos-icono">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
 
-                                <p class="text-muted mb-0">
-                                    Tus productos Sin TACC guardados.
-                                </p>
+                                <div>
+
+                                    <h2 class="favoritos-titulo">
+                                        Productos
+
+                                        <span
+                                            id="cantidad-productos"
+                                            class="favoritos-cantidad"
+                                        ></span>
+                                    </h2>
+
+                                    <p class="favoritos-subtitulo">
+                                        Tus productos Sin TACC guardados.
+                                    </p>
+
+                                </div>
 
                             </div>
-
-
-                            <a
-                                href="productos.html"
-                                class="btn btn-outline-success btn-sm"
-                            >
-                                Ver productos
-                            </a>
 
                         </div>
 
 
                         <div
                             id="favoritos-productos"
-                            class="row g-4 favoritos-grid"
+                            class="row g-3 favoritos-grid"
+                        ></div>
+
+
+                        <nav
+                            class="mt-4"
+                            aria-label="Paginación de productos favoritos"
                         >
-                        </div>
+                            <ul
+                                id="favoritos-productos-paginacion"
+                                class="pagination justify-content-center mb-0"
+                            ></ul>
+                        </nav>
 
                     </section>
 
@@ -192,44 +200,54 @@
 
                     <section
                         id="favoritos-restaurantes-seccion"
-                        class="mb-5"
+                        class="favoritos-seccion"
                     >
 
-                        <div
-                            class="favoritos-seccion-header d-flex justify-content-between align-items-center mb-4"
-                        >
+                        <div class="favoritos-seccion-header">
 
-                            <div>
+                            <div class="favoritos-titulo-wrap">
 
-                                <h2 class="h4 fw-bold mb-1">
-                                    <i
-                                        class="bi bi-cup-hot me-2"
-                                    ></i>
-                                    Restaurantes
-                                </h2>
+                                <div class="favoritos-icono">
+                                    <i class="bi bi-cup-hot"></i>
+                                </div>
 
-                                <p class="text-muted mb-0">
-                                    Tus restaurantes favoritos.
-                                </p>
+                                <div>
+
+                                    <h2 class="favoritos-titulo">
+                                        Restaurantes
+
+                                        <span
+                                            id="cantidad-restaurantes"
+                                            class="favoritos-cantidad"
+                                        ></span>
+                                    </h2>
+
+                                    <p class="favoritos-subtitulo">
+                                        Tus restaurantes favoritos.
+                                    </p>
+
+                                </div>
 
                             </div>
-
-
-                            <a
-                                href="restaurantes.html"
-                                class="btn btn-outline-success btn-sm"
-                            >
-                                Ver restaurantes
-                            </a>
 
                         </div>
 
 
                         <div
                             id="favoritos-restaurantes"
-                            class="row g-4 favoritos-grid"
+                            class="row g-3 favoritos-grid"
+                        ></div>
+
+
+                        <nav
+                            class="mt-4"
+                            aria-label="Paginación de restaurantes favoritos"
                         >
-                        </div>
+                            <ul
+                                id="favoritos-restaurantes-paginacion"
+                                class="pagination justify-content-center mb-0"
+                            ></ul>
+                        </nav>
 
                     </section>
 
@@ -238,44 +256,54 @@
 
                     <section
                         id="favoritos-locales-seccion"
-                        class="mb-5"
+                        class="favoritos-seccion"
                     >
 
-                        <div
-                            class="favoritos-seccion-header d-flex justify-content-between align-items-center mb-4"
-                        >
+                        <div class="favoritos-seccion-header">
 
-                            <div>
+                            <div class="favoritos-titulo-wrap">
 
-                                <h2 class="h4 fw-bold mb-1">
-                                    <i
-                                        class="bi bi-shop me-2"
-                                    ></i>
-                                    Locales
-                                </h2>
+                                <div class="favoritos-icono">
+                                    <i class="bi bi-shop"></i>
+                                </div>
 
-                                <p class="text-muted mb-0">
-                                    Tus locales favoritos.
-                                </p>
+                                <div>
+
+                                    <h2 class="favoritos-titulo">
+                                        Locales
+
+                                        <span
+                                            id="cantidad-locales"
+                                            class="favoritos-cantidad"
+                                        ></span>
+                                    </h2>
+
+                                    <p class="favoritos-subtitulo">
+                                        Tus locales favoritos.
+                                    </p>
+
+                                </div>
 
                             </div>
-
-
-                            <a
-                                href="locales.html"
-                                class="btn btn-outline-success btn-sm"
-                            >
-                                Ver locales
-                            </a>
 
                         </div>
 
 
                         <div
                             id="favoritos-locales"
-                            class="row g-4 favoritos-grid"
+                            class="row g-3 favoritos-grid"
+                        ></div>
+
+
+                        <nav
+                            class="mt-4"
+                            aria-label="Paginación de locales favoritos"
                         >
-                        </div>
+                            <ul
+                                id="favoritos-locales-paginacion"
+                                class="pagination justify-content-center mb-0"
+                            ></ul>
+                        </nav>
 
                     </section>
 
@@ -284,44 +312,54 @@
 
                     <section
                         id="favoritos-nutricionistas-seccion"
-                        class="mb-3"
+                        class="favoritos-seccion"
                     >
 
-                        <div
-                            class="favoritos-seccion-header d-flex justify-content-between align-items-center mb-4"
-                        >
+                        <div class="favoritos-seccion-header">
 
-                            <div>
+                            <div class="favoritos-titulo-wrap">
 
-                                <h2 class="h4 fw-bold mb-1">
-                                    <i
-                                        class="bi bi-person-heart me-2"
-                                    ></i>
-                                    Nutricionistas
-                                </h2>
+                                <div class="favoritos-icono">
+                                    <i class="bi bi-person-heart"></i>
+                                </div>
 
-                                <p class="text-muted mb-0">
-                                    Tus profesionales guardados.
-                                </p>
+                                <div>
+
+                                    <h2 class="favoritos-titulo">
+                                        Nutricionistas
+
+                                        <span
+                                            id="cantidad-nutricionistas"
+                                            class="favoritos-cantidad"
+                                        ></span>
+                                    </h2>
+
+                                    <p class="favoritos-subtitulo">
+                                        Tus profesionales guardados.
+                                    </p>
+
+                                </div>
 
                             </div>
-
-
-                            <a
-                                href="nutricionistas.html"
-                                class="btn btn-outline-success btn-sm"
-                            >
-                                Ver nutricionistas
-                            </a>
 
                         </div>
 
 
                         <div
                             id="favoritos-nutricionistas"
-                            class="row g-4 favoritos-grid"
+                            class="row g-3 favoritos-grid"
+                        ></div>
+
+
+                        <nav
+                            class="mt-4"
+                            aria-label="Paginación de nutricionistas favoritos"
                         >
-                        </div>
+                            <ul
+                                id="favoritos-nutricionistas-paginacion"
+                                class="pagination justify-content-center mb-0"
+                            ></ul>
+                        </nav>
 
                     </section>
 

@@ -1,638 +1,428 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-
-<head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
 
     <title>Productos | Admin CeliaConnect</title>
 
     <!-- Bootstrap CSS -->
     <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
     <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
-    >
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
 
     <!-- Estilos CeliaConnect -->
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+  </head>
 
-</head>
-
-<body>
-
+  <body>
     <div class="admin-layout">
+      <!-- SIDEBAR -->
+      <aside id="admin-sidebar-placeholder" class="admin-sidebar"></aside>
 
-        <!-- SIDEBAR -->
-        <aside
-            id="admin-sidebar-placeholder"
-            class="admin-sidebar"
-        ></aside>
+      <!-- OVERLAY MOBILE -->
+      <div class="admin-overlay" id="adminOverlay"></div>
 
-        <!-- OVERLAY MOBILE -->
-        <div
-            class="admin-overlay"
-            id="adminOverlay"
-        ></div>
+      <!-- CONTENIDO PRINCIPAL -->
+      <div class="admin-main">
+        <!-- BARRA SUPERIOR -->
+        <div class="admin-topbar">
+          <div class="admin-topbar-left">
+            <button
+              type="button"
+              class="admin-menu-btn"
+              id="adminMenuToggle"
+              aria-label="Abrir menú"
+            >
+              <i class="bi bi-list"></i>
+            </button>
 
+            <h2 class="admin-topbar-title">Panel de administración</h2>
+          </div>
 
-        <!-- CONTENIDO PRINCIPAL -->
-        <div class="admin-main">
+          <div class="admin-topbar-right">
+            <div class="admin-user">
+              <span class="admin-avatar"> AD </span>
 
-            <!-- BARRA SUPERIOR -->
-            <div class="admin-topbar">
+              <span class="admin-user-info">
+                <span class="admin-user-name"> Administrador </span>
 
-                <div class="admin-topbar-left">
-
-                    <button
-                        type="button"
-                        class="admin-menu-btn"
-                        id="adminMenuToggle"
-                        aria-label="Abrir menú"
-                    >
-                        <i class="bi bi-list"></i>
-                    </button>
-
-                    <h2 class="admin-topbar-title">
-                        Panel de administración
-                    </h2>
-
-                </div>
-
-
-                <div class="admin-topbar-right">
-
-
-                    <div class="admin-user">
-
-                        <span class="admin-avatar">
-                            AD
-                        </span>
-
-                        <span class="admin-user-info">
-
-                            <span class="admin-user-name">
-                                Administrador
-                            </span>
-
-                            <span class="admin-user-role">
-                                Rol: admin
-                            </span>
-
-                        </span>
-
-                    </div>
-
-                </div>
-
+                <span class="admin-user-role"> Rol: admin </span>
+              </span>
             </div>
-
-
-            <!-- PÁGINA -->
-            <main class="admin-content">
-
-                <!-- ENCABEZADO -->
-                <div class="admin-page-head">
-
-                    <div>
-
-                        <h1 class="admin-title">
-                            Productos
-                        </h1>
-
-                        <p class="admin-subtitle">
-                            Administrá los productos registrados
-                            en CeliaConnect.
-                        </p>
-
-                    </div>
-
-
-                    <div class="admin-page-actions">
-
-                        <button
-                            type="button"
-                            class="btn btn-warning"
-                            id="btnNuevoProducto"
-                        >
-                            <i class="bi bi-plus-lg"></i>
-                            Nuevo producto
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- PANEL PRODUCTOS -->
-                <div class="admin-panel">
-
-                    <div class="admin-panel-head">
-
-                        <div>
-
-                            <h3 class="admin-panel-title mb-1">
-                                Catálogo de productos
-                            </h3>
-
-                            <p class="text-muted mb-0">
-                                Productos registrados en la base de datos.
-                            </p>
-
-                        </div>
-
-
-                        <!-- BUSCADOR -->
-                        <div
-                            class="input-group"
-                            style="max-width: 320px;"
-                        >
-
-                            <span class="input-group-text bg-white">
-                                <i class="bi bi-search"></i>
-                            </span>
-
-                            <input
-                                type="search"
-                                class="form-control"
-                                id="buscarProductoAdmin"
-                                placeholder="Buscar producto..."
-                            >
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- TABLA -->
-                    <div class="table-responsive">
-
-                        <table class="admin-table">
-
-                            <thead>
-
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Marca</th>
-                                    <th>Categoría</th>
-                                    <th>Certificación</th>
-                                    <th class="text-end">
-                                        Acciones
-                                    </th>
-                                </tr>
-
-                            </thead>
-
-
-                            <tbody id="tablaProductosAdmin">
-
-                                <tr>
-
-                                    <td
-                                        colspan="5"
-                                        class="text-center py-5 text-muted"
-                                    >
-
-                                        <div
-                                            class="spinner-border spinner-border-sm me-2"
-                                            role="status"
-                                        ></div>
-
-                                        Cargando productos...
-
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-            </main>
-
+          </div>
         </div>
 
-    </div>
+        <!-- PÁGINA -->
+        <main class="admin-content">
+          <!-- ENCABEZADO -->
+          <div class="admin-page-head">
+            <div>
+              <h1 class="admin-title">Productos</h1>
 
+              <p class="admin-subtitle">
+                Administrá los productos registrados en CeliaConnect.
+              </p>
+            </div>
+
+            <div class="admin-page-actions">
+              <button
+                type="button"
+                class="btn btn-warning"
+                id="btnNuevoProducto"
+              >
+                <i class="bi bi-plus-lg"></i>
+                Nuevo producto
+              </button>
+            </div>
+          </div>
+
+          <!-- PANEL PRODUCTOS -->
+          <div class="admin-panel">
+            <div class="admin-panel-head">
+              <div>
+                <h3 class="admin-panel-title mb-1">Catálogo de productos</h3>
+
+                <p class="text-muted mb-0">
+                  Productos registrados en la base de datos.
+                </p>
+              </div>
+
+              <!-- BUSCADOR -->
+              <div class="input-group" style="max-width: 320px">
+                <span class="input-group-text bg-white">
+                  <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                  type="search"
+                  class="form-control"
+                  id="buscarProductoAdmin"
+                  placeholder="Buscar producto..."
+                />
+              </div>
+            </div>
+
+            <!-- TABLA -->
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Certificación</th>
+                    <th class="text-end">Acciones</th>
+                  </tr>
+                </thead>
+
+                <tbody id="tablaProductosAdmin">
+                  <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                      <div
+                        class="spinner-border spinner-border-sm me-2"
+                        role="status"
+                      ></div>
+
+                      Cargando productos...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
 
     <!-- ==========================================
          MODAL CREAR / EDITAR PRODUCTO
     =========================================== -->
 
     <div
-        class="modal fade"
-        id="modalProducto"
-        tabindex="-1"
-        aria-labelledby="modalProductoTitulo"
-        aria-hidden="true"
+      class="modal fade"
+      id="modalProducto"
+      tabindex="-1"
+      aria-labelledby="modalProductoTitulo"
+      aria-hidden="true"
     >
+      <div
+        class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold" id="modalProductoTitulo">
+              Nuevo producto
+            </h5>
 
-        <div
-            class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
-        >
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Cerrar"
+            ></button>
+          </div>
 
-            <div class="modal-content border-0 shadow">
+          <div class="modal-body">
+            <form id="formProducto">
+              <input type="hidden" id="productoId" />
 
-                <div class="modal-header border-0">
+              <div class="row g-3">
+                <!-- NOMBRE -->
+                <div class="col-md-6">
+                  <label for="productoNombre" class="form-label">
+                    Nombre
+                  </label>
 
-                    <h5
-                        class="modal-title fw-bold"
-                        id="modalProductoTitulo"
-                    >
-                        Nuevo producto
-                    </h5>
-
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Cerrar"
-                    ></button>
-
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productoNombre"
+                    required
+                  />
                 </div>
 
+                <!-- CÓDIGO -->
+                <div class="col-md-6">
+                  <label for="productoCodigoBarras" class="form-label">
+                    Código de barras
+                  </label>
 
-                <div class="modal-body">
-
-                    <form id="formProducto">
-
-                        <input
-                            type="hidden"
-                            id="productoId"
-                        >
-
-
-                        <div class="row g-3">
-
-                            <!-- NOMBRE -->
-                            <div class="col-md-6">
-
-                                <label
-                                    for="productoNombre"
-                                    class="form-label"
-                                >
-                                    Nombre
-                                </label>
-
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="productoNombre"
-                                    required
-                                >
-
-                            </div>
-
-
-                            <!-- CÓDIGO -->
-                            <div class="col-md-6">
-
-                                <label
-                                    for="productoCodigoBarras"
-                                    class="form-label"
-                                >
-                                    Código de barras
-                                </label>
-
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="productoCodigoBarras"
-                                >
-
-                            </div>
-
-
-                            <!-- MARCA -->
-                            <div class="col-md-6">
-
-                                <label
-                                    for="productoMarca"
-                                    class="form-label"
-                                >
-                                    Marca
-                                </label>
-
-                                <select
-                                    class="form-select"
-                                    id="productoMarca"
-                                    required
-                                >
-
-                                    <option value="">
-                                        Seleccionar marca
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-                            <!-- CATEGORÍA -->
-                            <div class="col-md-6">
-
-                                <label
-                                    for="productoCategoria"
-                                    class="form-label"
-                                >
-                                    Categoría
-                                </label>
-
-                                <select
-                                    class="form-select"
-                                    id="productoCategoria"
-                                    required
-                                >
-
-                                    <option value="">
-                                        Seleccionar categoría
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-
-                            <!-- DESCRIPCIÓN -->
-                            <div class="col-12">
-
-                                <label
-                                    for="productoDescripcion"
-                                    class="form-label"
-                                >
-                                    Descripción
-                                </label>
-
-                                <textarea
-                                    class="form-control"
-                                    id="productoDescripcion"
-                                    rows="3"
-                                ></textarea>
-
-                            </div>
-
-
-                            <!-- INGREDIENTES -->
-                            <div class="col-12">
-
-                                <label
-                                    for="productoIngredientes"
-                                    class="form-label"
-                                >
-                                    Ingredientes
-                                </label>
-
-                                <textarea
-                                    class="form-control"
-                                    id="productoIngredientes"
-                                    rows="3"
-                                ></textarea>
-
-                            </div>
-
-
-                            <!-- INFORMACIÓN NUTRICIONAL -->
-                            <div class="col-12">
-
-                                <label
-                                    for="productoInfoNutricional"
-                                    class="form-label"
-                                >
-                                    Información nutricional
-                                </label>
-
-                                <textarea
-                                    class="form-control"
-                                    id="productoInfoNutricional"
-                                    rows="3"
-                                ></textarea>
-
-                            </div>
-
-
-                            <!-- IMAGEN -->
-                            <div class="col-md-8">
-
-                                <label
-                                    for="productoImagen"
-                                    class="form-label"
-                                >
-                                    Ruta de imagen
-                                </label>
-
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    id="productoImagen"
-                                    placeholder="assets/images/productos/..."
-                                >
-
-                            </div>
-
-
-                            <!-- CERTIFICACIÓN -->
-                            <div
-                                class="col-md-4 d-flex align-items-end"
-                            >
-
-                                <div class="form-check form-switch mb-2">
-
-                                    <input
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        role="switch"
-                                        id="productoCertificado"
-                                    >
-
-                                    <label
-                                        class="form-check-label"
-                                        for="productoCertificado"
-                                    >
-                                        Certificado Sin TACC
-                                    </label>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </form>
-
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productoCodigoBarras"
+                  />
                 </div>
 
+                <!-- MARCA -->
+                <div class="col-md-6">
+                  <label for="productoMarca" class="form-label"> Marca </label>
 
-                <div class="modal-footer border-0">
-
-                    <button
-                        type="button"
-                        class="btn btn-light"
-                        data-bs-dismiss="modal"
-                    >
-                        Cancelar
-                    </button>
-
-                    <button
-                        type="submit"
-                        form="formProducto"
-                        class="btn btn-warning"
-                        id="btnGuardarProducto"
-                    >
-                        <i class="bi bi-check-lg"></i>
-                        Guardar producto
-                    </button>
-
+                  <select class="form-select" id="productoMarca" required>
+                    <option value="">Seleccionar marca</option>
+                  </select>
                 </div>
 
-            </div>
+                <!-- CATEGORÍA -->
+                <div class="col-md-6">
+                  <label for="productoCategoria" class="form-label">
+                    Categoría
+                  </label>
 
+                  <select class="form-select" id="productoCategoria" required>
+                    <option value="">Seleccionar categoría</option>
+                  </select>
+                </div>
+
+                <!-- DESCRIPCIÓN -->
+                <div class="col-12">
+                  <label for="productoDescripcion" class="form-label">
+                    Descripción
+                  </label>
+
+                  <textarea
+                    class="form-control"
+                    id="productoDescripcion"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <!-- INGREDIENTES -->
+                <div class="col-12">
+                  <label for="productoIngredientes" class="form-label">
+                    Ingredientes
+                  </label>
+
+                  <textarea
+                    class="form-control"
+                    id="productoIngredientes"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <!-- INFORMACIÓN NUTRICIONAL -->
+                <div class="col-12">
+                  <label for="productoInfoNutricional" class="form-label">
+                    Información nutricional
+                  </label>
+
+                  <textarea
+                    class="form-control"
+                    id="productoInfoNutricional"
+                    rows="3"
+                  ></textarea>
+                </div>
+
+                <!-- IMAGEN -->
+                <div class="col-md-8">
+                  <label for="productoImagen" class="form-label">
+                    Ruta de imagen
+                  </label>
+
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productoImagen"
+                    placeholder="assets/images/productos/..."
+                  />
+                </div>
+
+                <!-- CERTIFICACIÓN -->
+                <div class="col-md-4 d-flex align-items-end">
+                  <div class="form-check form-switch mb-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="productoCertificado"
+                    />
+                    <div class="mb-3">
+                      <label for="productoEstado" class="form-label">
+                        Estado de verificación
+                      </label>
+
+                      <select class="form-select" id="productoEstado">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="verificado">Verificado</option>
+                        <option value="rechazado">Rechazado</option>
+                      </select>
+                    </div>
+
+                    <label class="form-check-label" for="productoCertificado">
+                      Certificado Sin TACC
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+
+            <button
+              type="submit"
+              form="formProducto"
+              class="btn btn-warning"
+              id="btnGuardarProducto"
+            >
+              <i class="bi bi-check-lg"></i>
+              Guardar producto
+            </button>
+          </div>
         </div>
-
+      </div>
     </div>
-
 
     <!-- ==========================================
          MODAL ELIMINAR PRODUCTO
     =========================================== -->
 
     <div
-        class="modal fade"
-        id="modalEliminarProducto"
-        tabindex="-1"
-        aria-labelledby="modalEliminarProductoTitulo"
-        aria-hidden="true"
+      class="modal fade"
+      id="modalEliminarProducto"
+      tabindex="-1"
+      aria-labelledby="modalEliminarProductoTitulo"
+      aria-hidden="true"
     >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold" id="modalEliminarProductoTitulo">
+              Eliminar producto
+            </h5>
 
-        <div class="modal-dialog modal-dialog-centered">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Cerrar"
+            ></button>
+          </div>
 
-            <div class="modal-content border-0 shadow">
+          <div class="modal-body">
+            <p class="mb-2">
+              ¿Seguro que querés eliminar
+              <strong id="nombreProductoEliminar"></strong>?
+            </p>
 
-                <div class="modal-header border-0">
+            <p class="text-muted small mb-0">
+              Esta acción no se puede deshacer.
+            </p>
+          </div>
 
-                    <h5
-                        class="modal-title fw-bold"
-                        id="modalEliminarProductoTitulo"
-                    >
-                        Eliminar producto
-                    </h5>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+              Cancelar
+            </button>
 
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Cerrar"
-                    ></button>
-
-                </div>
-
-
-                <div class="modal-body">
-
-                    <p class="mb-2">
-                        ¿Seguro que querés eliminar
-                        <strong id="nombreProductoEliminar"></strong>?
-                    </p>
-
-                    <p class="text-muted small mb-0">
-                        Esta acción no se puede deshacer.
-                    </p>
-
-                </div>
-
-
-                <div class="modal-footer border-0">
-
-                    <button
-                        type="button"
-                        class="btn btn-light"
-                        data-bs-dismiss="modal"
-                    >
-                        Cancelar
-                    </button>
-
-                    <button
-                        type="button"
-                        class="btn btn-danger"
-                        id="btnConfirmarEliminarProducto"
-                    >
-                        <i class="bi bi-trash3"></i>
-                        Eliminar
-                    </button>
-
-                </div>
-
-            </div>
-
+            <button
+              type="button"
+              class="btn btn-danger"
+              id="btnConfirmarEliminarProducto"
+            >
+              <i class="bi bi-trash3"></i>
+              Eliminar
+            </button>
+          </div>
         </div>
-
+      </div>
     </div>
 
     <!-- ==========================================
      MODAL CONFIRMACIÓN
 =========================================== -->
 
-<div
-    class="modal fade"
-    id="modalProductoExito"
-    tabindex="-1"
-    aria-hidden="true"
->
-    <div class="modal-dialog modal-dialog-centered">
-
+    <div
+      class="modal fade"
+      id="modalProductoExito"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-
-            <div class="modal-body text-center p-4">
-
-                <div class="mb-3">
-                    <i
-                        class="bi bi-check-circle-fill text-success"
-                        style="font-size: 3rem;"
-                    ></i>
-                </div>
-
-                <h5 class="fw-bold">
-                    Producto actualizado
-                </h5>
-
-                <p class="text-muted mb-4">
-                    Los cambios se guardaron correctamente.
-                </p>
-
-                <button
-                    type="button"
-                    class="btn btn-warning px-4"
-                    data-bs-dismiss="modal"
-                >
-                    Aceptar
-                </button>
-
+          <div class="modal-body text-center p-4">
+            <div class="mb-3">
+              <i
+                class="bi bi-check-circle-fill text-success"
+                style="font-size: 3rem"
+              ></i>
             </div>
 
-        </div>
+            <h5 class="fw-bold">Producto actualizado</h5>
 
+            <p class="text-muted mb-4">
+              Los cambios se guardaron correctamente.
+            </p>
+
+            <button
+              type="button"
+              class="btn btn-warning px-4"
+              data-bs-dismiss="modal"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
 
     <!-- Bootstrap JS -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
-    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- JavaScript CeliaConnect -->
     <script src="../js/app.js"></script>
     <script src="../js/admin.js"></script>
-
-</body>
-
+  </body>
 </html>

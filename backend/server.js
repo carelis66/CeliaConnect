@@ -811,6 +811,7 @@ app.get("/api/productos", async (req, res) => {
                 p.imagen,
                 p.codigoBarras,
                 p.certificadoSinTacc,
+                p.estadoVerificacion,
                 p.marcaId,
                 P.categoriaId,
                 m.nombre AS marca,
@@ -853,6 +854,7 @@ app.get("/api/productos", async (req, res) => {
                 p.imagen,
                 p.codigoBarras,
                 p.certificadoSinTacc,
+                p.estadoVerificacion,
                 p.marcaId,
                 p.categoriaId,
                 m.nombre,
@@ -875,146 +877,129 @@ app.get("/api/productos", async (req, res) => {
 // AGREGAR PRODUCTO A FAVORITOS
 // ==========================================
 
-app.post(
-  "/api/productos/:id/favorito",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const productoId = Number(req.params.id);
-      const usuarioId = req.usuario.id;
+app.post("/api/productos/:id/favorito", verificarToken, async (req, res) => {
+  try {
+    const productoId = Number(req.params.id);
+    const usuarioId = req.usuario.id;
 
-      // Validar ID del producto
-      if (!Number.isInteger(productoId) || productoId <= 0) {
-        return res.status(400).json({
-          mensaje: "ID de producto inválido",
-        });
-      }
+    // Validar ID del producto
+    if (!Number.isInteger(productoId) || productoId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de producto inválido",
+      });
+    }
 
-      // Verificar que el producto exista
-      const [productos] = await pool.query(
-        `
+    // Verificar que el producto exista
+    const [productos] = await pool.query(
+      `
           SELECT id
           FROM producto
           WHERE id = ?
           LIMIT 1
         `,
-        [productoId],
-      );
+      [productoId],
+    );
 
-      if (productos.length === 0) {
-        return res.status(404).json({
-          mensaje: "Producto no encontrado",
-        });
-      }
+    if (productos.length === 0) {
+      return res.status(404).json({
+        mensaje: "Producto no encontrado",
+      });
+    }
 
-      // Verificar si ya está en favoritos
-      const [favoritos] = await pool.query(
-        `
+    // Verificar si ya está en favoritos
+    const [favoritos] = await pool.query(
+      `
           SELECT usuarioId, productoId
           FROM favoritoProducto
           WHERE usuarioId = ?
             AND productoId = ?
           LIMIT 1
         `,
-        [usuarioId, productoId],
-      );
+      [usuarioId, productoId],
+    );
 
-      if (favoritos.length > 0) {
-        return res.status(409).json({
-          mensaje: "El producto ya está en favoritos",
-        });
-      }
+    if (favoritos.length > 0) {
+      return res.status(409).json({
+        mensaje: "El producto ya está en favoritos",
+      });
+    }
 
-      // Agregar a favoritos
-      await pool.query(
-        `
+    // Agregar a favoritos
+    await pool.query(
+      `
           INSERT INTO favoritoProducto (
             usuarioId,
             productoId
           )
           VALUES (?, ?)
         `,
-        [usuarioId, productoId],
-      );
+      [usuarioId, productoId],
+    );
 
-      res.status(201).json({
-        mensaje: "Producto agregado a favoritos",
-      });
-    } catch (error) {
-      console.error(
-        "Error al agregar producto a favoritos:",
-        error,
-      );
+    res.status(201).json({
+      mensaje: "Producto agregado a favoritos",
+    });
+  } catch (error) {
+    console.error("Error al agregar producto a favoritos:", error);
 
-      res.status(500).json({
-        mensaje: "Error al agregar el producto a favoritos",
-      });
-    }
-  },
-);
+    res.status(500).json({
+      mensaje: "Error al agregar el producto a favoritos",
+    });
+  }
+});
 
 // ==========================================
 // QUITAR PRODUCTO DE FAVORITOS
 // ==========================================
 
-app.delete(
-  "/api/productos/:id/favorito",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const productoId = Number(req.params.id);
-      const usuarioId = req.usuario.id;
+app.delete("/api/productos/:id/favorito", verificarToken, async (req, res) => {
+  try {
+    const productoId = Number(req.params.id);
+    const usuarioId = req.usuario.id;
 
-      if (!Number.isInteger(productoId) || productoId <= 0) {
-        return res.status(400).json({
-          mensaje: "ID de producto inválido",
-        });
-      }
+    if (!Number.isInteger(productoId) || productoId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de producto inválido",
+      });
+    }
 
-      const [resultado] = await pool.query(
-        `
+    const [resultado] = await pool.query(
+      `
           DELETE FROM favoritoProducto
           WHERE usuarioId = ?
             AND productoId = ?
         `,
-        [usuarioId, productoId],
-      );
+      [usuarioId, productoId],
+    );
 
-      if (resultado.affectedRows === 0) {
-        return res.status(404).json({
-          mensaje: "El producto no estaba en favoritos",
-        });
-      }
-
-      res.json({
-        mensaje: "Producto eliminado de favoritos",
-      });
-    } catch (error) {
-      console.error(
-        "Error al quitar producto de favoritos:",
-        error,
-      );
-
-      res.status(500).json({
-        mensaje: "Error al quitar el producto de favoritos",
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        mensaje: "El producto no estaba en favoritos",
       });
     }
-  },
-);
+
+    res.json({
+      mensaje: "Producto eliminado de favoritos",
+    });
+  } catch (error) {
+    console.error("Error al quitar producto de favoritos:", error);
+
+    res.status(500).json({
+      mensaje: "Error al quitar el producto de favoritos",
+    });
+  }
+});
 
 // ==========================================
 // OBTENER PRODUCTOS FAVORITOS DEL USUARIO
 // ==========================================
 
-app.get(
-  "/api/productos/favoritos",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const usuarioId = req.usuario.id;
+app.get("/api/productos/favoritos", verificarToken, async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
 
-      const [favoritos] = await pool.query(
-        `
+    const [favoritos] = await pool.query(
+      `
           SELECT
             fp.productoId,
             fp.fechaAgregado
@@ -1022,22 +1007,18 @@ app.get(
           WHERE fp.usuarioId = ?
           ORDER BY fp.fechaAgregado DESC
         `,
-        [usuarioId],
-      );
+      [usuarioId],
+    );
 
-      res.json(favoritos);
-    } catch (error) {
-      console.error(
-        "Error al obtener productos favoritos:",
-        error,
-      );
+    res.json(favoritos);
+  } catch (error) {
+    console.error("Error al obtener productos favoritos:", error);
 
-      res.status(500).json({
-        mensaje: "Error al obtener los productos favoritos",
-      });
-    }
-  },
-);
+    res.status(500).json({
+      mensaje: "Error al obtener los productos favoritos",
+    });
+  }
+});
 
 // ==========================================
 // OBTENER COMENTARIOS APROBADOS DE UN PRODUCTO
@@ -1333,79 +1314,72 @@ app.get("/api/restaurantes", async (req, res) => {
 // AGREGAR RESTAURANTE A FAVORITOS
 // ==========================================
 
-app.post(
-  "/api/restaurantes/:id/favorito",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const restauranteId = Number(req.params.id);
-      const usuarioId = req.usuario.id;
+app.post("/api/restaurantes/:id/favorito", verificarToken, async (req, res) => {
+  try {
+    const restauranteId = Number(req.params.id);
+    const usuarioId = req.usuario.id;
 
-      if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
-        return res.status(400).json({
-          mensaje: "ID de restaurante inválido",
-        });
-      }
+    if (!Number.isInteger(restauranteId) || restauranteId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de restaurante inválido",
+      });
+    }
 
-      const [restaurantes] = await pool.query(
-        `
+    const [restaurantes] = await pool.query(
+      `
           SELECT id
           FROM restaurante
           WHERE id = ?
           LIMIT 1
         `,
-        [restauranteId],
-      );
+      [restauranteId],
+    );
 
-      if (restaurantes.length === 0) {
-        return res.status(404).json({
-          mensaje: "Restaurante no encontrado",
-        });
-      }
+    if (restaurantes.length === 0) {
+      return res.status(404).json({
+        mensaje: "Restaurante no encontrado",
+      });
+    }
 
-      const [favoritos] = await pool.query(
-        `
+    const [favoritos] = await pool.query(
+      `
           SELECT usuarioId, restauranteId
           FROM favoritoRestaurante
           WHERE usuarioId = ?
             AND restauranteId = ?
           LIMIT 1
         `,
-        [usuarioId, restauranteId],
-      );
+      [usuarioId, restauranteId],
+    );
 
-      if (favoritos.length > 0) {
-        return res.status(409).json({
-          mensaje: "El restaurante ya está en favoritos",
-        });
-      }
+    if (favoritos.length > 0) {
+      return res.status(409).json({
+        mensaje: "El restaurante ya está en favoritos",
+      });
+    }
 
-      await pool.query(
-        `
+    await pool.query(
+      `
           INSERT INTO favoritoRestaurante (
             usuarioId,
             restauranteId
           )
           VALUES (?, ?)
         `,
-        [usuarioId, restauranteId],
-      );
+      [usuarioId, restauranteId],
+    );
 
-      res.status(201).json({
-        mensaje: "Restaurante agregado a favoritos",
-      });
-    } catch (error) {
-      console.error(
-        "Error al agregar restaurante a favoritos:",
-        error,
-      );
+    res.status(201).json({
+      mensaje: "Restaurante agregado a favoritos",
+    });
+  } catch (error) {
+    console.error("Error al agregar restaurante a favoritos:", error);
 
-      res.status(500).json({
-        mensaje: "Error al agregar el restaurante a favoritos",
-      });
-    }
-  },
-);
+    res.status(500).json({
+      mensaje: "Error al agregar el restaurante a favoritos",
+    });
+  }
+});
 
 // ==========================================
 // QUITAR RESTAURANTE DE FAVORITOS
@@ -1444,10 +1418,7 @@ app.delete(
         mensaje: "Restaurante eliminado de favoritos",
       });
     } catch (error) {
-      console.error(
-        "Error al quitar restaurante de favoritos:",
-        error,
-      );
+      console.error("Error al quitar restaurante de favoritos:", error);
 
       res.status(500).json({
         mensaje: "Error al quitar el restaurante de favoritos",
@@ -1460,15 +1431,12 @@ app.delete(
 // OBTENER RESTAURANTES FAVORITOS DEL USUARIO
 // ==========================================
 
-app.get(
-  "/api/restaurantes/favoritos",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const usuarioId = req.usuario.id;
+app.get("/api/restaurantes/favoritos", verificarToken, async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
 
-      const [favoritos] = await pool.query(
-        `
+    const [favoritos] = await pool.query(
+      `
           SELECT
             fr.restauranteId,
             fr.fechaAgregado
@@ -1476,22 +1444,18 @@ app.get(
           WHERE fr.usuarioId = ?
           ORDER BY fr.fechaAgregado DESC
         `,
-        [usuarioId],
-      );
+      [usuarioId],
+    );
 
-      res.json(favoritos);
-    } catch (error) {
-      console.error(
-        "Error al obtener restaurantes favoritos:",
-        error,
-      );
+    res.json(favoritos);
+  } catch (error) {
+    console.error("Error al obtener restaurantes favoritos:", error);
 
-      res.status(500).json({
-        mensaje: "Error al obtener los restaurantes favoritos",
-      });
-    }
-  },
-);
+    res.status(500).json({
+      mensaje: "Error al obtener los restaurantes favoritos",
+    });
+  }
+});
 
 // ==========================================
 // OBTENER COMENTARIOS APROBADOS DE UN RESTAURANTE
@@ -2160,144 +2124,125 @@ app.get("/api/locales/:id/comentarios", async (req, res) => {
 // AGREGAR LOCAL A FAVORITOS
 // ==========================================
 
-app.post(
-  "/api/locales/:id/favorito",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const localId = Number(req.params.id);
-      const usuarioId = req.usuario.id;
+app.post("/api/locales/:id/favorito", verificarToken, async (req, res) => {
+  try {
+    const localId = Number(req.params.id);
+    const usuarioId = req.usuario.id;
 
-      if (!Number.isInteger(localId) || localId <= 0) {
-        return res.status(400).json({
-          mensaje: "ID de local inválido",
-        });
-      }
+    if (!Number.isInteger(localId) || localId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de local inválido",
+      });
+    }
 
-      const [locales] = await pool.query(
-        `
+    const [locales] = await pool.query(
+      `
           SELECT id
           FROM local
           WHERE id = ?
           LIMIT 1
         `,
-        [localId],
-      );
+      [localId],
+    );
 
-      if (locales.length === 0) {
-        return res.status(404).json({
-          mensaje: "Local no encontrado",
-        });
-      }
+    if (locales.length === 0) {
+      return res.status(404).json({
+        mensaje: "Local no encontrado",
+      });
+    }
 
-      const [favoritos] = await pool.query(
-        `
+    const [favoritos] = await pool.query(
+      `
           SELECT usuarioId, localId
           FROM favoritoLocal
           WHERE usuarioId = ?
             AND localId = ?
           LIMIT 1
         `,
-        [usuarioId, localId],
-      );
+      [usuarioId, localId],
+    );
 
-      if (favoritos.length > 0) {
-        return res.status(409).json({
-          mensaje: "El local ya está en favoritos",
-        });
-      }
+    if (favoritos.length > 0) {
+      return res.status(409).json({
+        mensaje: "El local ya está en favoritos",
+      });
+    }
 
-      await pool.query(
-        `
+    await pool.query(
+      `
           INSERT INTO favoritoLocal (
             usuarioId,
             localId
           )
           VALUES (?, ?)
         `,
-        [usuarioId, localId],
-      );
+      [usuarioId, localId],
+    );
 
-      res.status(201).json({
-        mensaje: "Local agregado a favoritos",
-      });
-    } catch (error) {
-      console.error(
-        "Error al agregar local a favoritos:",
-        error,
-      );
+    res.status(201).json({
+      mensaje: "Local agregado a favoritos",
+    });
+  } catch (error) {
+    console.error("Error al agregar local a favoritos:", error);
 
-      res.status(500).json({
-        mensaje: "Error al agregar el local a favoritos",
-      });
-    }
-  },
-);
-
+    res.status(500).json({
+      mensaje: "Error al agregar el local a favoritos",
+    });
+  }
+});
 
 // ==========================================
 // QUITAR LOCAL DE FAVORITOS
 // ==========================================
 
-app.delete(
-  "/api/locales/:id/favorito",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const localId = Number(req.params.id);
-      const usuarioId = req.usuario.id;
+app.delete("/api/locales/:id/favorito", verificarToken, async (req, res) => {
+  try {
+    const localId = Number(req.params.id);
+    const usuarioId = req.usuario.id;
 
-      if (!Number.isInteger(localId) || localId <= 0) {
-        return res.status(400).json({
-          mensaje: "ID de local inválido",
-        });
-      }
+    if (!Number.isInteger(localId) || localId <= 0) {
+      return res.status(400).json({
+        mensaje: "ID de local inválido",
+      });
+    }
 
-      const [resultado] = await pool.query(
-        `
+    const [resultado] = await pool.query(
+      `
           DELETE FROM favoritoLocal
           WHERE usuarioId = ?
             AND localId = ?
         `,
-        [usuarioId, localId],
-      );
+      [usuarioId, localId],
+    );
 
-      if (resultado.affectedRows === 0) {
-        return res.status(404).json({
-          mensaje: "El local no estaba en favoritos",
-        });
-      }
-
-      res.json({
-        mensaje: "Local eliminado de favoritos",
-      });
-    } catch (error) {
-      console.error(
-        "Error al quitar local de favoritos:",
-        error,
-      );
-
-      res.status(500).json({
-        mensaje: "Error al quitar el local de favoritos",
+    if (resultado.affectedRows === 0) {
+      return res.status(404).json({
+        mensaje: "El local no estaba en favoritos",
       });
     }
-  },
-);
 
+    res.json({
+      mensaje: "Local eliminado de favoritos",
+    });
+  } catch (error) {
+    console.error("Error al quitar local de favoritos:", error);
+
+    res.status(500).json({
+      mensaje: "Error al quitar el local de favoritos",
+    });
+  }
+});
 
 // ==========================================
 // OBTENER LOCALES FAVORITOS DEL USUARIO
 // ==========================================
 
-app.get(
-  "/api/locales/favoritos",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const usuarioId = req.usuario.id;
+app.get("/api/locales/favoritos", verificarToken, async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
 
-      const [favoritos] = await pool.query(
-        `
+    const [favoritos] = await pool.query(
+      `
           SELECT
             fl.localId,
             fl.fechaAgregado
@@ -2305,22 +2250,18 @@ app.get(
           WHERE fl.usuarioId = ?
           ORDER BY fl.fechaAgregado DESC
         `,
-        [usuarioId],
-      );
+      [usuarioId],
+    );
 
-      res.json(favoritos);
-    } catch (error) {
-      console.error(
-        "Error al obtener locales favoritos:",
-        error,
-      );
+    res.json(favoritos);
+  } catch (error) {
+    console.error("Error al obtener locales favoritos:", error);
 
-      res.status(500).json({
-        mensaje: "Error al obtener los locales favoritos",
-      });
-    }
-  },
-);
+    res.status(500).json({
+      mensaje: "Error al obtener los locales favoritos",
+    });
+  }
+});
 
 // ==========================================
 // OBTENER UN LOCAL POR ID
@@ -2451,10 +2392,7 @@ app.post(
       const nutricionistaId = Number(req.params.id);
       const usuarioId = req.usuario.id;
 
-      if (
-        !Number.isInteger(nutricionistaId) ||
-        nutricionistaId <= 0
-      ) {
+      if (!Number.isInteger(nutricionistaId) || nutricionistaId <= 0) {
         return res.status(400).json({
           mensaje: "ID de nutricionista inválido",
         });
@@ -2489,8 +2427,7 @@ app.post(
 
       if (favoritos.length > 0) {
         return res.status(409).json({
-          mensaje:
-            "El nutricionista ya está en favoritos",
+          mensaje: "El nutricionista ya está en favoritos",
         });
       }
 
@@ -2506,25 +2443,17 @@ app.post(
       );
 
       res.status(201).json({
-        mensaje:
-          "Nutricionista agregado a favoritos",
+        mensaje: "Nutricionista agregado a favoritos",
       });
-
     } catch (error) {
-
-      console.error(
-        "Error al agregar nutricionista a favoritos:",
-        error,
-      );
+      console.error("Error al agregar nutricionista a favoritos:", error);
 
       res.status(500).json({
-        mensaje:
-          "Error al agregar el nutricionista a favoritos",
+        mensaje: "Error al agregar el nutricionista a favoritos",
       });
     }
   },
 );
-
 
 // ==========================================
 // QUITAR NUTRICIONISTA DE FAVORITOS
@@ -2538,10 +2467,7 @@ app.delete(
       const nutricionistaId = Number(req.params.id);
       const usuarioId = req.usuario.id;
 
-      if (
-        !Number.isInteger(nutricionistaId) ||
-        nutricionistaId <= 0
-      ) {
+      if (!Number.isInteger(nutricionistaId) || nutricionistaId <= 0) {
         return res.status(400).json({
           mensaje: "ID de nutricionista inválido",
         });
@@ -2558,45 +2484,33 @@ app.delete(
 
       if (resultado.affectedRows === 0) {
         return res.status(404).json({
-          mensaje:
-            "El nutricionista no estaba en favoritos",
+          mensaje: "El nutricionista no estaba en favoritos",
         });
       }
 
       res.json({
-        mensaje:
-          "Nutricionista eliminado de favoritos",
+        mensaje: "Nutricionista eliminado de favoritos",
       });
-
     } catch (error) {
-
-      console.error(
-        "Error al quitar nutricionista de favoritos:",
-        error,
-      );
+      console.error("Error al quitar nutricionista de favoritos:", error);
 
       res.status(500).json({
-        mensaje:
-          "Error al quitar el nutricionista de favoritos",
+        mensaje: "Error al quitar el nutricionista de favoritos",
       });
     }
   },
 );
 
-
 // ==========================================
 // OBTENER NUTRICIONISTAS FAVORITOS DEL USUARIO
 // ==========================================
 
-app.get(
-  "/api/nutricionistas/favoritos",
-  verificarToken,
-  async (req, res) => {
-    try {
-      const usuarioId = req.usuario.id;
+app.get("/api/nutricionistas/favoritos", verificarToken, async (req, res) => {
+  try {
+    const usuarioId = req.usuario.id;
 
-      const [favoritos] = await pool.query(
-        `
+    const [favoritos] = await pool.query(
+      `
           SELECT
             fn.nutricionistaId,
             fn.fechaAgregado
@@ -2604,25 +2518,18 @@ app.get(
           WHERE fn.usuarioId = ?
           ORDER BY fn.fechaAgregado DESC
         `,
-        [usuarioId],
-      );
+      [usuarioId],
+    );
 
-      res.json(favoritos);
+    res.json(favoritos);
+  } catch (error) {
+    console.error("Error al obtener nutricionistas favoritos:", error);
 
-    } catch (error) {
-
-      console.error(
-        "Error al obtener nutricionistas favoritos:",
-        error,
-      );
-
-      res.status(500).json({
-        mensaje:
-          "Error al obtener los nutricionistas favoritos",
-      });
-    }
-  },
-);
+    res.status(500).json({
+      mensaje: "Error al obtener los nutricionistas favoritos",
+    });
+  }
+});
 
 // ==========================================
 // OBTENER UN NUTRICIONISTA POR ID
@@ -3783,6 +3690,7 @@ app.post(
         imagen,
         codigoBarras,
         certificadoSinTacc,
+        estadoVerificacion,
         marcaId,
         categoriaId,
       } = req.body;
@@ -3804,10 +3712,11 @@ app.post(
                         codigoBarras,
                         certificadoSinTacc,
                         fechaCreacion,
+                        estadoVerificacion,
                         marcaId,
                         categoriaId
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)
                 `,
         [
           nombre.trim(),
@@ -3817,6 +3726,9 @@ app.post(
           imagen || null,
           codigoBarras || null,
           Number(certificadoSinTacc) === 1 ? 1 : 0,
+          ["pendiente", "verificado", "rechazado"].includes(estadoVerificacion)
+            ? estadoVerificacion
+            : "pendiente",
           Number(marcaId),
           Number(categoriaId),
         ],
@@ -3863,6 +3775,7 @@ app.put(
         imagen,
         codigoBarras,
         certificadoSinTacc,
+        estadoVerificacion,
         marcaId,
         categoriaId,
       } = req.body;
@@ -3900,6 +3813,7 @@ app.put(
                     imagen = ?,
                     codigoBarras = ?,
                     certificadoSinTacc = ?,
+                    estadoVerificacion = ?,
                     marcaId = ?,
                     categoriaId = ?
                 WHERE id = ?
@@ -3912,6 +3826,9 @@ app.put(
           imagen || null,
           codigoBarras || null,
           Number(certificadoSinTacc) === 1 ? 1 : 0,
+          ["pendiente", "verificado", "rechazado"].includes(estadoVerificacion)
+            ? estadoVerificacion
+            : "pendiente",
           Number(marcaId),
           Number(categoriaId),
           productoId,

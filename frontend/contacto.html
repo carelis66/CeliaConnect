@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Contacto | CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/style.css">
+
+
+    <!-- Estilos exclusivos de Contacto -->
+    <style>
+
+        /* ================================
+           CONTACTO
+        ================================= */
+
+        .contacto-wrapper {
+            max-width: 1050px;
+            margin: 0 auto;
+        }
+
+
+        /* ================================
+           INFORMACIÓN
+        ================================= */
+
+        .contacto-info {
+            padding: 20px 10px;
+        }
+
+        .contacto-icono-principal {
+            width: 54px;
+            height: 54px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 20px;
+
+            border-radius: 16px;
+
+            background: var(--primary-light);
+            color: var(--primary);
+
+            font-size: 1.35rem;
+        }
+
+        .contacto-info-titulo {
+            margin-bottom: 12px;
+
+            color: var(--text);
+
+            font-size: 1.45rem;
+            font-weight: 750;
+        }
+
+        .contacto-info-texto {
+            max-width: 390px;
+            margin-bottom: 34px;
+
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .contacto-dato {
+            display: flex;
+            align-items: flex-start;
+
+            gap: 14px;
+
+            margin-bottom: 24px;
+        }
+
+        .contacto-dato:last-child {
+            margin-bottom: 0;
+        }
+
+        .contacto-dato-icono {
+            width: 42px;
+            height: 42px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .contacto-dato h3 {
+            margin: 0 0 4px;
+
+            color: var(--text);
+
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .contacto-dato p {
+            margin: 0;
+
+            color: var(--text-light);
+
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+
+        /* ================================
+           TARJETA DEL FORMULARIO
+        ================================= */
+
+        .contacto-card {
+            padding: 38px;
+
+            border: 1px solid var(--border);
+            border-radius: 22px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 8px 25px rgba(30, 20, 51, 0.06),
+                0 16px 40px rgba(108, 63, 217, 0.04);
+        }
+
+        .contacto-card-titulo {
+            margin-bottom: 6px;
+
+            color: var(--text);
+
+            font-size: 1.45rem;
+            font-weight: 750;
+        }
+
+        .contacto-card-subtitulo {
+            margin-bottom: 28px;
+
+            color: var(--text-light);
+
+            font-size: 0.92rem;
+        }
+
+
+        /* ================================
+           CAMPOS
+        ================================= */
+
+        .contacto-form-label {
+            margin-bottom: 8px;
+
+            color: var(--text);
+
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        .contacto-input-wrap {
+            position: relative;
+        }
+
+        .contacto-input-icono {
+            position: absolute;
+
+            top: 50%;
+            left: 18px;
+
+            transform: translateY(-50%);
+
+            color: var(--text-light);
+
+            font-size: 0.95rem;
+
+            pointer-events: none;
+        }
+
+        .contacto-form .form-control,
+        .contacto-form .form-select {
+            min-height: 52px;
+
+            padding: 12px 18px;
+
+            border: 1px solid var(--border);
+            border-radius: 18px;
+
+            background-color: #ffffff;
+
+            color: var(--text);
+
+            font-size: 0.92rem;
+
+            box-shadow: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .contacto-form .contacto-con-icono {
+            padding-left: 46px;
+        }
+
+        .contacto-form .form-control:focus,
+        .contacto-form .form-select:focus {
+            border-color: var(--primary);
+
+            box-shadow:
+                0 0 0 3px rgba(108, 63, 217, 0.10);
+        }
+
+        .contacto-form textarea.form-control {
+            min-height: 145px;
+
+            padding: 16px 18px;
+
+            border-radius: 18px;
+
+            resize: vertical;
+        }
+
+        .contacto-form .form-select {
+            cursor: pointer;
+        }
+
+
+        /* ================================
+           BOTÓN
+        ================================= */
+
+        .contacto-btn {
+            width: 100%;
+            min-height: 50px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 9px;
+
+            border: none;
+            border-radius: 16px;
+
+            background: var(--primary);
+            color: #ffffff;
+
+            font-size: 0.92rem;
+            font-weight: 700;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .contacto-btn:hover {
+            background: var(--primary-dark);
+            color: #ffffff;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 8px 20px rgba(108, 63, 217, 0.20);
+        }
+
+        .contacto-btn:active {
+            transform: translateY(0);
+        }
+
+
+        /* ================================
+           MENSAJE DE ÉXITO
+        ================================= */
+
+        .contacto-exito {
+            margin-bottom: 24px;
+            padding: 15px 17px;
+
+            border: 1px solid rgba(43, 143, 87, 0.18);
+            border-radius: 16px;
+
+            background: rgba(43, 143, 87, 0.08);
+
+            color: var(--text);
+        }
+
+        .contacto-exito-icono {
+            color: var(--success);
+            font-size: 1.15rem;
+        }
+
+
+        /* ================================
+           RESPONSIVE
+        ================================= */
+
+        @media (max-width: 991.98px) {
+
+            .contacto-wrapper {
+                max-width: 720px;
+            }
+
+            .contacto-info {
+                padding: 0;
+            }
+
+            .contacto-info-texto {
+                max-width: none;
+            }
+        }
+
+
+        @media (max-width: 575.98px) {
+
+            .contacto-card {
+                padding: 26px 20px;
+
+                border-radius: 18px;
+            }
+
+            .contacto-info-titulo,
+            .contacto-card-titulo {
+                font-size: 1.25rem;
+            }
+
+            .contacto-form .form-control,
+            .contacto-form .form-select {
+                min-height: 50px;
+
+                border-radius: 16px;
+            }
+
+            .contacto-form textarea.form-control {
+                border-radius: 16px;
+            }
+
+            .contacto-btn {
+                border-radius: 15px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <div id="header-placeholder"></div>
+
+
+    <!-- ================= MAIN ================= -->
+    <main>
+
+        <!-- ================= ENCABEZADO ================= -->
+
+        <section id="page-header">
+
+            <div class="container">
+
+                <nav aria-label="breadcrumb">
+
+                    <ol class="breadcrumb mb-3">
+
+                        <li class="breadcrumb-item">
+
+                            <a href="index.html">
+                                Inicio
+                            </a>
+
+                        </li>
+
+                        <li
+                            class="breadcrumb-item active"
+                            aria-current="page"
+                        >
+                            Contacto
+                        </li>
+
+                    </ol>
+
+                </nav>
+
+
+                <h1 class="fw-bold mb-2">
+                    Contactanos
+                </h1>
+
+                <p class="text-muted mb-0">
+                    ¿Tenés alguna consulta o sugerencia?
+                    Estamos para ayudarte.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= CONTACTO ================= -->
+
+        <section class="py-5">
+
+            <div class="container">
+
+                <div class="row g-5 contacto-wrapper">
+
+
+                    <!-- ================= INFORMACIÓN ================= -->
+
+                    <div class="col-lg-5">
+
+                        <div class="contacto-info">
+
+
+                            <div class="contacto-icono-principal">
+
+                                <i class="bi bi-chat-heart"></i>
+
+                            </div>
+
+
+                            <h2 class="contacto-info-titulo">
+                                ¿Necesitás ayuda?
+                            </h2>
+
+
+                            <p class="contacto-info-texto">
+
+                                Podés escribirnos si tenés dudas sobre
+                                CeliaConnect, encontraste información
+                                que debería actualizarse o simplemente
+                                querés enviarnos una sugerencia.
+
+                            </p>
+
+
+                            <!-- Ubicación -->
+
+                            <div class="contacto-dato">
+
+                                <div class="contacto-dato-icono">
+
+                                    <i class="bi bi-geo-alt"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <h3>
+                                        Ubicación
+                                    </h3>
+
+                                    <p>
+                                        CABA, Argentina
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Correo -->
+
+                            <div class="contacto-dato">
+
+                                <div class="contacto-dato-icono">
+
+                                    <i class="bi bi-envelope"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <h3>
+                                        Correo electrónico
+                                    </h3>
+
+                                    <p>
+                                        hola@celiaconnect.com
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Consultas -->
+
+                            <div class="contacto-dato">
+
+                                <div class="contacto-dato-icono">
+
+                                    <i class="bi bi-info-circle"></i>
+
+                                </div>
+
+                                <div>
+
+                                    <h3>
+                                        Sobre las consultas
+                                    </h3>
+
+                                    <p>
+                                        Podés contactarnos por consultas
+                                        generales, información publicada,
+                                        cuentas de usuario o privacidad.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ================= FORMULARIO ================= -->
+
+                    <div class="col-lg-7">
+
+                        <div class="contacto-card">
+
+
+                            <h2 class="contacto-card-titulo">
+                                Enviá tu consulta
+                            </h2>
+
+                            <p class="contacto-card-subtitulo">
+                                Completá el formulario y contanos
+                                en qué podemos ayudarte.
+                            </p>
+
+
+                            <!-- Mensaje de éxito -->
+
+                            <div
+                                id="contacto-exito"
+                                class="contacto-exito d-none"
+                                role="status"
+                            >
+
+                                <div class="d-flex gap-3">
+
+                                    <i
+                                        class="bi bi-check-circle-fill contacto-exito-icono"
+                                    ></i>
+
+                                    <div>
+
+                                        <strong>
+                                            Consulta registrada
+                                        </strong>
+
+                                        <div class="small mt-1">
+                                            Gracias por comunicarte
+                                            con CeliaConnect.
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Formulario -->
+
+                            <form
+                                id="contacto-form"
+                                class="contacto-form"
+                                novalidate
+                            >
+
+
+                                <!-- Nombre -->
+
+                                <div class="mb-4">
+
+                                    <label
+                                        for="contacto-nombre"
+                                        class="contacto-form-label"
+                                    >
+                                        Nombre
+                                    </label>
+
+
+                                    <div class="contacto-input-wrap">
+
+                                        <i
+                                            class="bi bi-person contacto-input-icono"
+                                        ></i>
+
+                                        <input
+                                            type="text"
+                                            class="form-control contacto-con-icono"
+                                            id="contacto-nombre"
+                                            name="nombre"
+                                            placeholder="Tu nombre"
+                                            autocomplete="name"
+                                            required
+                                        >
+
+                                        <div class="invalid-feedback">
+                                            Ingresá tu nombre.
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Email -->
+
+                                <div class="mb-4">
+
+                                    <label
+                                        for="contacto-email"
+                                        class="contacto-form-label"
+                                    >
+                                        Correo electrónico
+                                    </label>
+
+
+                                    <div class="contacto-input-wrap">
+
+                                        <i
+                                            class="bi bi-envelope contacto-input-icono"
+                                        ></i>
+
+                                        <input
+                                            type="email"
+                                            class="form-control contacto-con-icono"
+                                            id="contacto-email"
+                                            name="email"
+                                            placeholder="tu@email.com"
+                                            autocomplete="email"
+                                            required
+                                        >
+
+                                        <div class="invalid-feedback">
+                                            Ingresá un correo electrónico válido.
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Motivo -->
+
+                                <div class="mb-4">
+
+                                    <label
+                                        for="contacto-motivo"
+                                        class="contacto-form-label"
+                                    >
+                                        Motivo de la consulta
+                                    </label>
+
+                                    <select
+                                        class="form-select"
+                                        id="contacto-motivo"
+                                        name="motivo"
+                                        required
+                                    >
+
+                                        <option
+                                            value=""
+                                            selected
+                                            disabled
+                                        >
+                                            Seleccioná una opción
+                                        </option>
+
+                                        <option value="Consulta general">
+                                            Consulta general
+                                        </option>
+
+                                        <option value="Información incorrecta">
+                                            Información incorrecta
+                                        </option>
+
+                                        <option value="Producto o establecimiento">
+                                            Producto, restaurante o local
+                                        </option>
+
+                                        <option value="Cuenta de usuario">
+                                            Cuenta de usuario
+                                        </option>
+
+                                        <option value="Privacidad">
+                                            Privacidad
+                                        </option>
+
+                                        <option value="Sugerencia">
+                                            Sugerencia
+                                        </option>
+
+                                        <option value="Otro">
+                                            Otro
+                                        </option>
+
+                                    </select>
+
+                                    <div class="invalid-feedback">
+                                        Seleccioná un motivo.
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Mensaje -->
+
+                                <div class="mb-4">
+
+                                    <label
+                                        for="contacto-mensaje"
+                                        class="contacto-form-label"
+                                    >
+                                        Mensaje
+                                    </label>
+
+                                    <textarea
+                                        class="form-control"
+                                        id="contacto-mensaje"
+                                        name="mensaje"
+                                        rows="5"
+                                        placeholder="Escribí tu consulta..."
+                                        required
+                                    ></textarea>
+
+                                    <div class="invalid-feedback">
+                                        Escribí tu mensaje.
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Botón -->
+
+                                <button
+                                    type="submit"
+                                    class="contacto-btn"
+                                >
+
+                                    <i class="bi bi-send"></i>
+
+                                    <span>
+                                        Enviar mensaje
+                                    </span>
+
+                                    <i class="bi bi-arrow-right"></i>
+
+                                </button>
+
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+    <div id="footer-placeholder"></div>
+
+
+    <!-- Bootstrap JS -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- JavaScript general -->
+    <script src="js/app.js"></script>
+
+    <!-- JavaScript de contacto -->
+    <script src="js/contacto.js"></script>
+
+</body>
+
+</html>

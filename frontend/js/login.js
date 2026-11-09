@@ -15,6 +15,8 @@ document.addEventListener(
                 'login-form'
             );
 
+        if (!formulario) return;
+
         formulario.addEventListener(
             'submit',
             iniciarSesion
@@ -59,6 +61,82 @@ async function iniciarSesion(evento) {
 
     ocultarMensaje();
 
+
+    // ==========================================
+    // VALIDAR EMAIL
+    // ==========================================
+
+    if (!email) {
+
+        mostrarMensaje(
+            'Ingresá tu correo electrónico.',
+            'danger'
+        );
+
+        document
+            .getElementById('email')
+            .focus();
+
+        return;
+    }
+
+
+    const emailValido =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    if (!emailValido.test(email)) {
+
+        mostrarMensaje(
+            'Ingresá un correo electrónico válido.',
+            'danger'
+        );
+
+        document
+            .getElementById('email')
+            .focus();
+
+        return;
+    }
+
+
+    // ==========================================
+    // VALIDAR CONTRASEÑA
+    // ==========================================
+
+    if (!password) {
+
+        mostrarMensaje(
+            'Ingresá tu contraseña.',
+            'danger'
+        );
+
+        document
+            .getElementById('password')
+            .focus();
+
+        return;
+    }
+
+
+    if (password.length < 8) {
+
+        mostrarMensaje(
+            'La contraseña debe tener al menos 8 caracteres.',
+            'danger'
+        );
+
+        document
+            .getElementById('password')
+            .focus();
+
+        return;
+    }
+
+
+    // ==========================================
+    // ENVIAR LOGIN
+    // ==========================================
 
     boton.disabled = true;
 
@@ -108,59 +186,59 @@ async function iniciarSesion(evento) {
         }
 
 
-        // ==================================
-// GUARDAR USUARIO Y TOKEN
-// ==================================
+        // ==========================================
+        // GUARDAR USUARIO Y TOKEN
+        // ==========================================
 
-const usuarioJSON =
-    JSON.stringify(
-        datos.usuario
-    );
-
-
-if (recordarme) {
-
-    localStorage.setItem(
-        'celiaUsuario',
-        usuarioJSON
-    );
-
-    localStorage.setItem(
-        'celiaToken',
-        datos.token
-    );
+        const usuarioJSON =
+            JSON.stringify(
+                datos.usuario
+            );
 
 
-    sessionStorage.removeItem(
-        'celiaUsuario'
-    );
+        if (recordarme) {
 
-    sessionStorage.removeItem(
-        'celiaToken'
-    );
+            localStorage.setItem(
+                'celiaUsuario',
+                usuarioJSON
+            );
 
-} else {
-
-    sessionStorage.setItem(
-        'celiaUsuario',
-        usuarioJSON
-    );
-
-    sessionStorage.setItem(
-        'celiaToken',
-        datos.token
-    );
+            localStorage.setItem(
+                'celiaToken',
+                datos.token
+            );
 
 
-    localStorage.removeItem(
-        'celiaUsuario'
-    );
+            sessionStorage.removeItem(
+                'celiaUsuario'
+            );
 
-    localStorage.removeItem(
-        'celiaToken'
-    );
+            sessionStorage.removeItem(
+                'celiaToken'
+            );
 
-}
+        } else {
+
+            sessionStorage.setItem(
+                'celiaUsuario',
+                usuarioJSON
+            );
+
+            sessionStorage.setItem(
+                'celiaToken',
+                datos.token
+            );
+
+
+            localStorage.removeItem(
+                'celiaUsuario'
+            );
+
+            localStorage.removeItem(
+                'celiaToken'
+            );
+
+        }
 
 
         mostrarMensaje(
@@ -169,33 +247,32 @@ if (recordarme) {
         );
 
 
-        
-      // ==================================
-// REDIRECCIÓN SEGÚN ROL
-// ==================================
+        // ==========================================
+        // REDIRECCIÓN SEGÚN ROL
+        // ==========================================
 
-setTimeout(
-    () => {
+        setTimeout(
+            () => {
 
-        if (
-            Number(datos.usuario.rolId) === 1
-        ) {
+                if (
+                    Number(datos.usuario.rolId) === 1
+                ) {
 
-            // Administrador
-            window.location.href =
-                'admin/index.html';
+                    // Administrador
+                    window.location.href =
+                        'admin/index.html';
 
-        } else {
+                } else {
 
-            // Usuario común
-            window.location.href =
-                'index.html';
+                    // Usuario común / moderador
+                    window.location.href =
+                        'index.html';
 
-        }
+                }
 
-    },
-    2000
-);  
+            },
+            2000
+        );
 
 
     } catch (error) {

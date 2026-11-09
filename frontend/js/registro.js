@@ -13,6 +13,7 @@ document.addEventListener(
 
         if (!formulario) return;
 
+
         formulario.addEventListener(
             'submit',
             registrarUsuario
@@ -57,6 +58,11 @@ async function registrarUsuario(evento) {
             'password2'
         ).value;
 
+    const terminos =
+        document.getElementById(
+            'terminos'
+        ).checked;
+
     const boton =
         document.getElementById(
             'btn-registro'
@@ -67,8 +73,110 @@ async function registrarUsuario(evento) {
 
 
     // ==========================================
-    // VALIDAR CONTRASEÑAS
+    // VALIDAR CAMPOS OBLIGATORIOS
     // ==========================================
+
+    if (!nombre) {
+
+        mostrarMensaje(
+            'Ingresá tu nombre.',
+            'danger'
+        );
+
+        document
+            .getElementById('nombre')
+            .focus();
+
+        return;
+    }
+
+
+    if (!apellido) {
+
+        mostrarMensaje(
+            'Ingresá tu apellido.',
+            'danger'
+        );
+
+        document
+            .getElementById('apellido')
+            .focus();
+
+        return;
+    }
+
+
+    if (!documento) {
+
+        mostrarMensaje(
+            'Ingresá tu documento.',
+            'danger'
+        );
+
+        document
+            .getElementById('documento')
+            .focus();
+
+        return;
+    }
+
+
+    // ==========================================
+    // VALIDAR EMAIL
+    // ==========================================
+
+    if (!email) {
+
+        mostrarMensaje(
+            'Ingresá tu correo electrónico.',
+            'danger'
+        );
+
+        document
+            .getElementById('email')
+            .focus();
+
+        return;
+    }
+
+
+    const emailValido =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    if (!emailValido.test(email)) {
+
+        mostrarMensaje(
+            'Ingresá un correo electrónico válido.',
+            'danger'
+        );
+
+        document
+            .getElementById('email')
+            .focus();
+
+        return;
+    }
+
+
+    // ==========================================
+    // VALIDAR CONTRASEÑA
+    // ==========================================
+
+    if (!password) {
+
+        mostrarMensaje(
+            'Ingresá una contraseña.',
+            'danger'
+        );
+
+        document
+            .getElementById('password')
+            .focus();
+
+        return;
+    }
+
 
     if (password.length < 8) {
 
@@ -77,8 +185,30 @@ async function registrarUsuario(evento) {
             'danger'
         );
 
-        return;
+        document
+            .getElementById('password')
+            .focus();
 
+        return;
+    }
+
+
+    // ==========================================
+    // VALIDAR REPETIR CONTRASEÑA
+    // ==========================================
+
+    if (!password2) {
+
+        mostrarMensaje(
+            'Repetí tu contraseña.',
+            'danger'
+        );
+
+        document
+            .getElementById('password2')
+            .focus();
+
+        return;
     }
 
 
@@ -89,8 +219,30 @@ async function registrarUsuario(evento) {
             'danger'
         );
 
-        return;
+        document
+            .getElementById('password2')
+            .focus();
 
+        return;
+    }
+
+
+    // ==========================================
+    // VALIDAR TÉRMINOS
+    // ==========================================
+
+    if (!terminos) {
+
+        mostrarMensaje(
+            'Debés aceptar los Términos y condiciones y la Política de privacidad.',
+            'danger'
+        );
+
+        document
+            .getElementById('terminos')
+            .focus();
+
+        return;
     }
 
 
@@ -146,7 +298,6 @@ async function registrarUsuario(evento) {
             );
 
             return;
-
         }
 
 
@@ -198,7 +349,6 @@ async function registrarUsuario(evento) {
         `;
 
     }
-
 }
 
 

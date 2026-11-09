@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Preguntas frecuentes | CeliaConnect</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    >
+
+    <!-- Estilos propios -->
+    <link rel="stylesheet" href="css/style.css">
+
+
+    <!-- Estilos exclusivos de Preguntas frecuentes -->
+    <style>
+
+        /* ================================
+           PREGUNTAS FRECUENTES
+        ================================= */
+
+        .faq-wrapper {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+
+        /* ================================
+           INTRO
+        ================================= */
+
+        .faq-intro {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            margin-bottom: 26px;
+        }
+
+        .faq-intro-icono {
+            width: 52px;
+            height: 52px;
+
+            flex-shrink: 0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 16px;
+
+            background: var(--primary-light);
+            color: var(--primary);
+
+            font-size: 1.25rem;
+        }
+
+        .faq-intro h2 {
+            margin: 0 0 4px;
+
+            color: var(--text);
+
+            font-size: 1.15rem;
+            font-weight: 750;
+        }
+
+        .faq-intro p {
+            margin: 0;
+
+            color: var(--text-light);
+
+            font-size: 0.9rem;
+        }
+
+
+        /* ================================
+           TARJETA
+        ================================= */
+
+        .faq-card {
+            padding: 12px;
+
+            border: 1px solid var(--border);
+            border-radius: 22px;
+
+            background: #ffffff;
+
+            box-shadow:
+                0 8px 25px rgba(30, 20, 51, 0.06),
+                0 16px 40px rgba(108, 63, 217, 0.04);
+        }
+
+
+        /* ================================
+           ACCORDION
+        ================================= */
+
+        .faq-accordion .accordion-item {
+            overflow: hidden;
+
+            margin-bottom: 8px;
+
+            border: 1px solid transparent;
+            border-radius: 14px;
+
+            background: #ffffff;
+
+            transition:
+                border-color 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .faq-accordion .accordion-item:last-child {
+            margin-bottom: 0;
+        }
+
+
+        .faq-accordion .accordion-button {
+            min-height: 56px;
+
+            padding: 15px 18px;
+
+            border: none;
+            border-radius: 14px;
+
+            background: #ffffff;
+            color: var(--text);
+
+            font-size: 0.92rem;
+            font-weight: 650;
+
+            box-shadow: none;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease;
+        }
+
+
+        .faq-accordion .accordion-button:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+
+        .faq-accordion .accordion-button:not(.collapsed) {
+            background: var(--primary-light);
+            color: var(--primary);
+
+            box-shadow: none;
+        }
+
+
+        .faq-accordion .accordion-button:focus {
+            border-color: transparent;
+
+            box-shadow:
+                0 0 0 3px rgba(108, 63, 217, 0.10);
+        }
+
+
+        /* Flecha */
+
+        .faq-accordion .accordion-button::after {
+            width: 18px;
+            height: 18px;
+
+            background-size: 18px;
+        }
+
+
+        /* Contenido */
+
+        .faq-accordion .accordion-body {
+            padding: 18px 20px 20px;
+
+            color: var(--text-light);
+
+            font-size: 0.9rem;
+            line-height: 1.7;
+
+            background: #ffffff;
+        }
+
+
+        /* Línea sutil entre pregunta y respuesta */
+
+        .faq-accordion
+        .accordion-button:not(.collapsed)
+        + * {
+            border-top: 1px solid rgba(108, 63, 217, 0.08);
+        }
+
+
+        /* Links */
+
+        .faq-accordion a {
+            color: var(--primary);
+
+            text-decoration: none;
+            font-weight: 650;
+        }
+
+        .faq-accordion a:hover {
+            color: var(--primary-dark);
+
+            text-decoration: underline;
+        }
+
+
+        /* ================================
+           RESPONSIVE
+        ================================= */
+
+        @media (max-width: 575.98px) {
+
+            .faq-card {
+                padding: 8px;
+
+                border-radius: 18px;
+            }
+
+            .faq-intro {
+                align-items: flex-start;
+            }
+
+            .faq-intro-icono {
+                width: 46px;
+                height: 46px;
+
+                border-radius: 14px;
+            }
+
+            .faq-intro h2 {
+                font-size: 1.05rem;
+            }
+
+            .faq-accordion .accordion-button {
+                min-height: 54px;
+
+                padding: 14px 15px;
+
+                font-size: 0.88rem;
+            }
+
+            .faq-accordion .accordion-body {
+                padding: 16px;
+
+                font-size: 0.86rem;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <div id="header-placeholder"></div>
+
+
+    <!-- ================= MAIN ================= -->
+    <main>
+
+
+        <!-- ================= ENCABEZADO ================= -->
+
+        <section id="page-header">
+
+            <div class="container">
+
+                <nav aria-label="breadcrumb">
+
+                    <ol class="breadcrumb mb-3">
+
+                        <li class="breadcrumb-item">
+
+                            <a href="index.html">
+                                Inicio
+                            </a>
+
+                        </li>
+
+                        <li
+                            class="breadcrumb-item active"
+                            aria-current="page"
+                        >
+                            Preguntas frecuentes
+                        </li>
+
+                    </ol>
+
+                </nav>
+
+
+                <h1 class="fw-bold mb-2">
+                    Preguntas frecuentes
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Encontrá respuestas rápidas sobre CeliaConnect
+                    y sus principales funcionalidades.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PREGUNTAS ================= -->
+
+        <section class="py-5">
+
+            <div class="container">
+
+                <div class="faq-wrapper">
+
+
+                    <!-- Intro -->
+
+                    <div class="faq-intro">
+
+                        <div class="faq-intro-icono">
+
+                            <i class="bi bi-question-lg"></i>
+
+                        </div>
+
+
+                        <div>
+
+                            <h2>
+                                ¿Cómo podemos ayudarte?
+                            </h2>
+
+                            <p>
+                                Seleccioná una pregunta para ver
+                                más información.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Tarjeta -->
+
+                    <div class="faq-card">
+
+
+                        <div
+                            class="accordion faq-accordion"
+                            id="accordionPreguntas"
+                        >
+
+
+                            <!-- Pregunta 1 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta1"
+                                        aria-expanded="true"
+                                        aria-controls="pregunta1"
+                                    >
+                                        ¿Qué es CeliaConnect?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta1"
+                                    class="accordion-collapse collapse show"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        CeliaConnect es una plataforma
+                                        pensada para facilitar la búsqueda
+                                        de productos, restaurantes, locales
+                                        y profesionales relacionados con
+                                        la alimentación Sin TACC.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 2 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta2"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta2"
+                                    >
+                                        ¿Qué significa Sin TACC?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta2"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        Sin TACC significa “Sin Trigo,
+                                        Avena, Cebada y Centeno” y es la
+                                        denominación utilizada en Argentina
+                                        para identificar alimentos libres
+                                        de gluten.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 3 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta3"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta3"
+                                    >
+                                        ¿Necesito crear una cuenta para usar CeliaConnect?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta3"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        Podés explorar productos,
+                                        restaurantes, locales y
+                                        nutricionistas sin iniciar sesión.
+
+                                        Para utilizar funciones como
+                                        guardar favoritos o publicar
+                                        opiniones, necesitás una cuenta.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 4 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta4"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta4"
+                                    >
+                                        ¿Cómo guardo algo en favoritos?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta4"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        Cuando hayas iniciado sesión,
+                                        podés usar el ícono de corazón
+                                        para guardar productos,
+                                        restaurantes, locales y
+                                        nutricionistas.
+
+                                        Después vas a encontrarlos
+                                        reunidos en la sección
+                                        “Mis favoritos”.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 5 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta5"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta5"
+                                    >
+                                        ¿Cómo funcionan las opiniones y calificaciones?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta5"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        Los usuarios registrados pueden
+                                        compartir una opinión y asignar
+                                        una calificación.
+
+                                        Los comentarios pasan por un
+                                        proceso de moderación antes de
+                                        quedar publicados.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 6 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta6"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta6"
+                                    >
+                                        ¿CeliaConnect vende productos?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta6"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        No. CeliaConnect funciona como
+                                        una plataforma informativa para
+                                        descubrir productos, lugares y
+                                        profesionales.
+
+                                        No realiza directamente la venta
+                                        de productos ni la contratación
+                                        de servicios.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 7 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta7"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta7"
+                                    >
+                                        ¿La información publicada reemplaza una consulta médica?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta7"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        No. La información disponible
+                                        en CeliaConnect tiene carácter
+                                        informativo y no reemplaza el
+                                        diagnóstico, tratamiento ni
+                                        asesoramiento de un profesional
+                                        de la salud.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 8 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta8"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta8"
+                                    >
+                                        ¿En qué zona está disponible CeliaConnect?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta8"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        En esta primera etapa,
+                                        CeliaConnect está enfocado
+                                        principalmente en información
+                                        correspondiente a la Ciudad
+                                        Autónoma de Buenos Aires (CABA).
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Pregunta 9 -->
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header">
+
+                                    <button
+                                        class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#pregunta9"
+                                        aria-expanded="false"
+                                        aria-controls="pregunta9"
+                                    >
+                                        ¿Cómo puedo comunicarme con CeliaConnect?
+                                    </button>
+
+                                </h2>
+
+
+                                <div
+                                    id="pregunta9"
+                                    class="accordion-collapse collapse"
+                                    data-bs-parent="#accordionPreguntas"
+                                >
+
+                                    <div class="accordion-body">
+
+                                        Podés comunicarte con CeliaConnect
+                                        desde nuestra página de
+
+                                        <a href="contacto.html">
+                                            Contacto
+                                        </a>.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+    <div id="footer-placeholder"></div>
+
+
+    <!-- Bootstrap JS -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+    <!-- JavaScript general -->
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>

@@ -3,292 +3,207 @@
    Panel de administración
 ===================================================== */
 
-
 /* =====================================================
    DASHBOARD
 ===================================================== */
 
-const API_ADMIN_DASHBOARD =
-    'http://localhost:3000/api/admin/dashboard';
+const API_ADMIN_DASHBOARD = "http://localhost:3000/api/admin/dashboard";
 
-const API_ADMIN_ULTIMAS_ALTAS =
-    'http://localhost:3000/api/admin/ultimas-altas';
-
+const API_ADMIN_ULTIMAS_ALTAS = "http://localhost:3000/api/admin/ultimas-altas";
 
 /* =====================================================
    MODERACIÓN DE COMENTARIOS
 ===================================================== */
 
 const API_ADMIN_PRODUCTOS =
-    'http://localhost:3000/api/admin/comentarios/productos';
+  "http://localhost:3000/api/admin/comentarios/productos";
 
 const API_ADMIN_RESTAURANTES_COMENTARIOS =
-    'http://localhost:3000/api/admin/comentarios/restaurantes';
+  "http://localhost:3000/api/admin/comentarios/restaurantes";
 
-const API_ADMIN_LOCALES =
-    'http://localhost:3000/api/admin/comentarios/locales';
+const API_ADMIN_LOCALES = "http://localhost:3000/api/admin/comentarios/locales";
 
 const API_ADMIN_NUTRICIONISTAS =
-    'http://localhost:3000/api/admin/comentarios/nutricionistas';
-
+  "http://localhost:3000/api/admin/comentarios/nutricionistas";
 
 /* =====================================================
    PRODUCTOS
 ===================================================== */
 
-const API_PRODUCTOS =
-    'http://localhost:3000/api/productos';
+const API_PRODUCTOS = "http://localhost:3000/api/productos";
 
-const API_ADMIN_MARCAS =
-    'http://localhost:3000/api/admin/marcas';
+const API_ADMIN_MARCAS = "http://localhost:3000/api/admin/marcas";
 
-const API_ADMIN_CATEGORIAS =
-    'http://localhost:3000/api/admin/categorias';
-
+const API_ADMIN_CATEGORIAS = "http://localhost:3000/api/admin/categorias";
 
 /* =====================================================
    RESTAURANTES
 ===================================================== */
 
-const API_RESTAURANTES =
-    'http://localhost:3000/api/restaurantes';
+const API_RESTAURANTES = "http://localhost:3000/api/restaurantes";
 
-const API_ADMIN_RESTAURANTES =
-    'http://localhost:3000/api/admin/restaurantes';
+const API_ADMIN_RESTAURANTES = "http://localhost:3000/api/admin/restaurantes";
 
 const API_ADMIN_TIPOS_RESTAURANTE =
-    'http://localhost:3000/api/admin/tipos-restaurante';
+  "http://localhost:3000/api/admin/tipos-restaurante";
 
-const API_ADMIN_BARRIOS =
-    'http://localhost:3000/api/admin/barrios';
+const API_ADMIN_BARRIOS = "http://localhost:3000/api/admin/barrios";
 
 /* =====================================================
    LOCALES
 ===================================================== */
 
-const API_ADMIN_LOCALES_CRUD =
-    'http://localhost:3000/api/admin/locales';
+const API_ADMIN_LOCALES_CRUD = "http://localhost:3000/api/admin/locales";
 
-const API_ADMIN_TIPOS_LOCAL =
-    'http://localhost:3000/api/admin/tipos-local';
+const API_ADMIN_TIPOS_LOCAL = "http://localhost:3000/api/admin/tipos-local";
 
 /* NUTRICIONISTAS */
 const API_ADMIN_NUTRICIONISTAS_CRUD =
-    'http://localhost:3000/api/admin/nutricionistas';
+  "http://localhost:3000/api/admin/nutricionistas";
 let comentarioSeleccionado = null;
 let estadoSeleccionado = null;
 let tipoComentarioSeleccionado = null;
-
 
 // ==========================================
 // OBTENER TOKEN
 // ==========================================
 
 function obtenerTokenAdmin() {
-
-    return (
-        sessionStorage.getItem('celiaToken') ||
-        localStorage.getItem('celiaToken')
-    );
+  return (
+    sessionStorage.getItem("celiaToken") || localStorage.getItem("celiaToken")
+  );
 }
-
 
 // ==========================================
 // OBTENER USUARIO GUARDADO
 // ==========================================
 
 function obtenerUsuarioAdmin() {
+  const usuarioGuardado =
+    sessionStorage.getItem("celiaUsuario") ||
+    localStorage.getItem("celiaUsuario");
 
-    const usuarioGuardado =
-        sessionStorage.getItem('celiaUsuario') ||
-        localStorage.getItem('celiaUsuario');
+  if (!usuarioGuardado) {
+    return null;
+  }
 
-
-    if (!usuarioGuardado) {
-        return null;
-    }
-
-
-    try {
-
-        return JSON.parse(usuarioGuardado);
-
-    } catch (error) {
-
-        return null;
-
-    }
+  try {
+    return JSON.parse(usuarioGuardado);
+  } catch (error) {
+    return null;
+  }
 }
-
 
 // ==========================================
 // LIMPIAR SESIÓN
 // ==========================================
 
 function limpiarSesionAdmin() {
+  sessionStorage.removeItem("celiaToken");
+  sessionStorage.removeItem("celiaUsuario");
 
-    sessionStorage.removeItem('celiaToken');
-    sessionStorage.removeItem('celiaUsuario');
-
-    localStorage.removeItem('celiaToken');
-    localStorage.removeItem('celiaUsuario');
+  localStorage.removeItem("celiaToken");
+  localStorage.removeItem("celiaUsuario");
 }
-
 
 // ==========================================
 // VERIFICAR ACCESO AL ADMIN
 // ==========================================
 
 function verificarAccesoAdmin() {
+  const token = obtenerTokenAdmin();
 
-    const token =
-        obtenerTokenAdmin();
+  const usuario = obtenerUsuarioAdmin();
 
-    const usuario =
-        obtenerUsuarioAdmin();
+  // NO HAY SESIÓN
+  if (!token || !usuario) {
+    limpiarSesionAdmin();
 
+    window.location.replace("../login.html");
 
-    // NO HAY SESIÓN
-    if (
-        !token ||
-        !usuario
-    ) {
+    return false;
+  }
 
-        limpiarSesionAdmin();
+  // SOLO ADMINISTRADOR O MODERADOR
+  const rolId = Number(usuario.rolId);
 
-        window.location.replace(
-            '../login.html'
-        );
+  if (rolId !== 1 && rolId !== 3) {
+    window.location.replace("../index.html");
 
-        return false;
+    return false;
+  }
+
+  // MODERADOR:
+  // SOLO PUEDE ACCEDER AL DASHBOARD
+  if (rolId === 3) {
+    const paginaActual = window.location.pathname.split("/").pop();
+
+    if (paginaActual !== "index.html" && paginaActual !== "") {
+      window.location.replace("index.html");
+
+      return false;
     }
+  }
 
-
-    // SOLO ADMINISTRADOR O MODERADOR
-    const rolId =
-        Number(usuario.rolId);
-
-    if (
-        rolId !== 1 &&
-        rolId !== 3
-    ) {
-
-        window.location.replace(
-            '../index.html'
-        );
-
-        return false;
-    }
-
-
-    // MODERADOR:
-    // SOLO PUEDE ACCEDER AL DASHBOARD
-    if (rolId === 3) {
-
-        const paginaActual =
-            window.location.pathname
-                .split('/')
-                .pop();
-
-        if (
-            paginaActual !== 'index.html' &&
-            paginaActual !== ''
-        ) {
-
-            window.location.replace(
-                'index.html'
-            );
-
-            return false;
-        }
-    }
-
-
-    return true;
+  return true;
 }
-
-
 
 // ==========================================
 // CARGAR ESTADÍSTICAS DEL DASHBOARD
 // ==========================================
 
 async function cargarEstadisticasDashboard() {
+  try {
+    const token = obtenerTokenAdmin();
 
-    try {
-
-        const token = obtenerTokenAdmin();
-
-        if (!token) {
-            return;
-        }
-
-        const respuesta = await fetch(
-            API_ADMIN_DASHBOARD,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-        );
-
-        if (!respuesta.ok) {
-            throw new Error(
-                'No se pudieron cargar las estadísticas'
-            );
-        }
-
-        const datos = await respuesta.json();
-
-        const kpiProductos =
-            document.getElementById('kpiProductos');
-
-        const kpiRestaurantes =
-            document.getElementById('kpiRestaurantes');
-
-        const kpiLocales =
-            document.getElementById('kpiLocales');
-
-        const kpiNutricionistas =
-            document.getElementById('kpiNutricionistas');
-
-        const kpiUsuarios =
-            document.getElementById('kpiUsuarios');
-
-
-        if (kpiProductos) {
-            kpiProductos.textContent =
-                datos.productos ?? 0;
-        }
-
-        if (kpiRestaurantes) {
-            kpiRestaurantes.textContent =
-                datos.restaurantes ?? 0;
-        }
-
-        if (kpiLocales) {
-            kpiLocales.textContent =
-                datos.locales ?? 0;
-        }
-
-        if (kpiNutricionistas) {
-            kpiNutricionistas.textContent =
-                datos.nutricionistas ?? 0;
-        }
-
-        if (kpiUsuarios) {
-            kpiUsuarios.textContent =
-                datos.usuarios ?? 0;
-        }
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar estadísticas del dashboard:',
-            error
-        );
-
+    if (!token) {
+      return;
     }
+
+    const respuesta = await fetch(API_ADMIN_DASHBOARD, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar las estadísticas");
+    }
+
+    const datos = await respuesta.json();
+
+    const kpiProductos = document.getElementById("kpiProductos");
+
+    const kpiRestaurantes = document.getElementById("kpiRestaurantes");
+
+    const kpiLocales = document.getElementById("kpiLocales");
+
+    const kpiNutricionistas = document.getElementById("kpiNutricionistas");
+
+    const kpiUsuarios = document.getElementById("kpiUsuarios");
+
+    if (kpiProductos) {
+      kpiProductos.textContent = datos.productos ?? 0;
+    }
+
+    if (kpiRestaurantes) {
+      kpiRestaurantes.textContent = datos.restaurantes ?? 0;
+    }
+
+    if (kpiLocales) {
+      kpiLocales.textContent = datos.locales ?? 0;
+    }
+
+    if (kpiNutricionistas) {
+      kpiNutricionistas.textContent = datos.nutricionistas ?? 0;
+    }
+
+    if (kpiUsuarios) {
+      kpiUsuarios.textContent = datos.usuarios ?? 0;
+    }
+  } catch (error) {
+    console.error("Error al cargar estadísticas del dashboard:", error);
+  }
 }
 
 // ==========================================
@@ -296,78 +211,71 @@ async function cargarEstadisticasDashboard() {
 // ==========================================
 
 async function cargarUltimasAltas() {
-    try {
-        const token = obtenerTokenAdmin();
+  try {
+    const token = obtenerTokenAdmin();
 
-        const respuesta = await fetch(API_ADMIN_ULTIMAS_ALTAS, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+    const respuesta = await fetch(API_ADMIN_ULTIMAS_ALTAS, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        if (!respuesta.ok) {
-            throw new Error(
-                'No se pudieron cargar las últimas altas'
-            );
-        }
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar las últimas altas");
+    }
 
-        const altas = await respuesta.json();
+    const altas = await respuesta.json();
 
-        const tabla = document.getElementById('tablaUltimasAltas');
+    const tabla = document.getElementById("tablaUltimasAltas");
 
-        if (!tabla) {
-            return;
-        }
+    if (!tabla) {
+      return;
+    }
 
-        tabla.innerHTML = '';
+    tabla.innerHTML = "";
 
-        altas.forEach((alta) => {
+    altas.forEach((alta) => {
+      let icono = "bi-circle-fill";
 
-            let icono = 'bi-circle-fill';
+      if (alta.tipo === "Producto") {
+        icono = "bi-basket2-fill";
+      }
 
-            if (alta.tipo === 'Producto') {
-                icono = 'bi-basket2-fill';
-            }
+      if (alta.tipo === "Restaurante") {
+        icono = "bi-shop";
+      }
 
-            if (alta.tipo === 'Restaurante') {
-                icono = 'bi-shop';
-            }
+      if (alta.tipo === "Local") {
+        icono = "bi-geo-alt-fill";
+      }
 
-            if (alta.tipo === 'Local') {
-                icono = 'bi-geo-alt-fill';
-            }
+      if (alta.tipo === "Nutricionista") {
+        icono = "bi-heart-pulse-fill";
+      }
 
-            if (alta.tipo === 'Nutricionista') {
-                icono = 'bi-heart-pulse-fill';
-            }
+      let claseEstado = "status-pending";
+      let iconoEstado = "bi-hourglass-split";
 
+      const estado = alta.estado.toLowerCase();
 
-            let claseEstado = 'status-pending';
-            let iconoEstado = 'bi-hourglass-split';
+      if (estado === "verificado") {
+        claseEstado = "status-ok";
+        iconoEstado = "bi-patch-check-fill";
+      }
 
-            const estado = alta.estado.toLowerCase();
+      if (estado === "rechazado") {
+        claseEstado = "status-rejected";
+        iconoEstado = "bi-x-circle-fill";
+      }
 
-            if (estado === 'verificado') {
-                claseEstado = 'status-ok';
-                iconoEstado = 'bi-patch-check-fill';
-            }
+      const fecha = new Date(alta.fechaCreacion);
 
-            if (estado === 'rechazado') {
-                claseEstado = 'status-rejected';
-                iconoEstado = 'bi-x-circle-fill';
-            }
+      const fechaFormateada = fecha.toLocaleDateString("es-AR", {
+        day: "2-digit",
+        month: "short",
+      });
 
-
-            const fecha = new Date(alta.fechaCreacion);
-
-            const fechaFormateada =
-                fecha.toLocaleDateString('es-AR', {
-                    day: '2-digit',
-                    month: 'short'
-                });
-
-
-            tabla.innerHTML += `
+      tabla.innerHTML += `
                 <tr>
                     <td>
                         <div class="admin-item">
@@ -401,62 +309,54 @@ async function cargarUltimasAltas() {
                     </td>
                 </tr>
             `;
-        });
-
-    } catch (error) {
-        console.error(
-            'Error al cargar últimas altas:',
-            error
-        );
-    }
+    });
+  } catch (error) {
+    console.error("Error al cargar últimas altas:", error);
+  }
 }
 
 async function cargarProductosAdmin() {
+  const tabla = document.getElementById("tablaProductosAdmin");
 
-    const tabla =
-        document.getElementById('tablaProductosAdmin');
+  if (!tabla) {
+    return;
+  }
 
-    if (!tabla) {
-        return;
+  try {
+    const respuesta = await fetch(API_PRODUCTOS);
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar los productos");
     }
 
-    try {
+    const productos = await respuesta.json();
 
-        const respuesta =
-            await fetch(API_PRODUCTOS);
+    tabla.innerHTML = "";
 
-        if (!respuesta.ok) {
-            throw new Error(
-                'No se pudieron cargar los productos'
-            );
-        }
+    productos.forEach((producto) => {
+      const estado = producto.estadoVerificacion || "pendiente";
 
-        const productos =
-            await respuesta.json();
+      let claseEstado = "status-pending";
 
-        tabla.innerHTML = '';
+      let iconoEstado = "bi-hourglass-split";
 
-        productos.forEach((producto) => {
+      let textoEstado = "Pendiente";
 
-            const certificado =
-                Number(producto.certificadoSinTacc) === 1;
+      if (estado === "verificado") {
+        claseEstado = "status-ok";
 
-            const claseEstado =
-                certificado
-                    ? 'status-ok'
-                    : 'status-pending';
+        iconoEstado = "bi-patch-check-fill";
 
-            const iconoEstado =
-                certificado
-                    ? 'bi-patch-check-fill'
-                    : 'bi-hourglass-split';
+        textoEstado = "Verificado";
+      } else if (estado === "rechazado") {
+        claseEstado = "status-rejected";
 
-            const textoEstado =
-                certificado
-                    ? 'Certificado'
-                    : 'Pendiente';
+        iconoEstado = "bi-x-circle-fill";
 
-            tabla.innerHTML += `
+        textoEstado = "Rechazado";
+      }
+
+      tabla.innerHTML += `
                 <tr>
 
                     <td>
@@ -472,7 +372,7 @@ async function cargarProductosAdmin() {
                                 </span>
 
                                 <span class="admin-item-sub">
-                                    ${producto.codigoBarras || 'Sin código'}
+                                    ${producto.codigoBarras || "Sin código"}
                                 </span>
                             </div>
 
@@ -518,17 +418,11 @@ async function cargarProductosAdmin() {
 
                 </tr>
             `;
+    });
+  } catch (error) {
+    console.error("Error al cargar productos:", error);
 
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar productos:',
-            error
-        );
-
-        tabla.innerHTML = `
+    tabla.innerHTML = `
             <tr>
                 <td
                     colspan="5"
@@ -538,9 +432,7 @@ async function cargarProductosAdmin() {
                 </td>
             </tr>
         `;
-
-    }
-
+  }
 }
 
 // ==========================================
@@ -548,83 +440,53 @@ async function cargarProductosAdmin() {
 // ==========================================
 
 async function cargarRestaurantesAdmin() {
+  const tabla = document.getElementById("tablaRestaurantesAdmin");
 
-    const tabla =
-        document.getElementById(
-            'tablaRestaurantesAdmin'
-        );
+  if (!tabla) {
+    return;
+  }
 
-    if (!tabla) {
-        return;
+  try {
+    const token = obtenerTokenAdmin();
+
+    const respuesta = await fetch(API_ADMIN_RESTAURANTES, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar los restaurantes");
     }
 
-    try {
+    const restaurantes = await respuesta.json();
 
-        const token =
-            obtenerTokenAdmin();
+    tabla.innerHTML = "";
 
-        const respuesta =
-            await fetch(
-                API_ADMIN_RESTAURANTES,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            );
+    restaurantes.forEach((restaurante) => {
+      const estado = restaurante.estadoVerificacion;
 
-        if (!respuesta.ok) {
-            throw new Error(
-                'No se pudieron cargar los restaurantes'
-            );
-        }
+      let claseEstado = "status-pending";
 
-        const restaurantes =
-            await respuesta.json();
+      let iconoEstado = "bi-hourglass-split";
 
-        tabla.innerHTML = '';
+      let textoEstado = "Pendiente";
 
-        restaurantes.forEach((restaurante) => {
+      if (estado === "verificado") {
+        claseEstado = "status-ok";
 
-            const estado =
-                restaurante.estadoVerificacion;
+        iconoEstado = "bi-patch-check-fill";
 
-            let claseEstado =
-                'status-pending';
+        textoEstado = "Verificado";
+      } else if (estado === "rechazado") {
+        claseEstado = "status-rejected";
 
-            let iconoEstado =
-                'bi-hourglass-split';
+        iconoEstado = "bi-x-circle-fill";
 
-            let textoEstado =
-                'Pendiente';
+        textoEstado = "Rechazado";
+      }
 
-
-            if (estado === 'verificado') {
-
-                claseEstado =
-                    'status-ok';
-
-                iconoEstado =
-                    'bi-patch-check-fill';
-
-                textoEstado =
-                    'Verificado';
-
-            } else if (estado === 'rechazado') {
-
-                claseEstado =
-                    'status-rejected';
-
-                iconoEstado =
-                    'bi-x-circle-fill';
-
-                textoEstado =
-                    'Rechazado';
-            }
-
-
-            tabla.innerHTML += `
+      tabla.innerHTML += `
                 <tr>
 
                     <td>
@@ -640,7 +502,7 @@ async function cargarRestaurantesAdmin() {
                                 </span>
 
                                 <span class="admin-item-sub">
-                                    ${restaurante.direccion || 'Sin dirección'}
+                                    ${restaurante.direccion || "Sin dirección"}
                                 </span>
                             </div>
 
@@ -648,11 +510,11 @@ async function cargarRestaurantesAdmin() {
                     </td>
 
                     <td>
-                        ${restaurante.tipo || restaurante.tipoRestaurante || '-'}
+                        ${restaurante.tipo || restaurante.tipoRestaurante || "-"}
                     </td>
 
                     <td>
-                        ${restaurante.barrio || '-'}
+                        ${restaurante.barrio || "-"}
                     </td>
 
                     <td>
@@ -686,17 +548,11 @@ async function cargarRestaurantesAdmin() {
 
                 </tr>
             `;
-        });
+    });
+  } catch (error) {
+    console.error("Error al cargar restaurantes:", error);
 
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar restaurantes:',
-            error
-        );
-
-        tabla.innerHTML = `
+    tabla.innerHTML = `
             <tr>
                 <td
                     colspan="5"
@@ -706,7 +562,7 @@ async function cargarRestaurantesAdmin() {
                 </td>
             </tr>
         `;
-    }
+  }
 }
 
 // ==========================================
@@ -714,317 +570,170 @@ async function cargarRestaurantesAdmin() {
 // ==========================================
 
 async function cargarOpcionesRestaurante() {
+  const selectTipo = document.getElementById("restauranteTipo");
 
-    const selectTipo =
-        document.getElementById('restauranteTipo');
+  const selectBarrio = document.getElementById("restauranteBarrio");
 
-    const selectBarrio =
-        document.getElementById('restauranteBarrio');
+  if (!selectTipo || !selectBarrio) {
+    return;
+  }
 
-    if (!selectTipo || !selectBarrio) {
-        return;
+  try {
+    const token = obtenerTokenAdmin();
+
+    const [respuestaTipos, respuestaBarrios] = await Promise.all([
+      fetch(API_ADMIN_TIPOS_RESTAURANTE, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+
+      fetch(API_ADMIN_BARRIOS, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    ]);
+
+    if (!respuestaTipos.ok || !respuestaBarrios.ok) {
+      throw new Error("No se pudieron cargar tipos y barrios");
     }
 
-    try {
+    const tipos = await respuestaTipos.json();
 
-        const token =
-            obtenerTokenAdmin();
+    const barrios = await respuestaBarrios.json();
 
-        const [respuestaTipos, respuestaBarrios] =
-            await Promise.all([
+    selectTipo.innerHTML = '<option value="">Seleccionar tipo</option>';
 
-                fetch(
-                    API_ADMIN_TIPOS_RESTAURANTE,
-                    {
-                        headers: {
-                            Authorization:
-                                `Bearer ${token}`
-                        }
-                    }
-                ),
-
-                fetch(
-                    API_ADMIN_BARRIOS,
-                    {
-                        headers: {
-                            Authorization:
-                                `Bearer ${token}`
-                        }
-                    }
-                )
-
-            ]);
-
-
-        if (
-            !respuestaTipos.ok ||
-            !respuestaBarrios.ok
-        ) {
-            throw new Error(
-                'No se pudieron cargar tipos y barrios'
-            );
-        }
-
-
-        const tipos =
-            await respuestaTipos.json();
-
-        const barrios =
-            await respuestaBarrios.json();
-
-
-        selectTipo.innerHTML =
-            '<option value="">Seleccionar tipo</option>';
-
-        tipos.forEach((tipo) => {
-
-            selectTipo.innerHTML += `
+    tipos.forEach((tipo) => {
+      selectTipo.innerHTML += `
                 <option value="${tipo.id}">
                     ${tipo.nombre}
                 </option>
             `;
+    });
 
-        });
+    selectBarrio.innerHTML = '<option value="">Seleccionar barrio</option>';
 
-
-        selectBarrio.innerHTML =
-            '<option value="">Seleccionar barrio</option>';
-
-        barrios.forEach((barrio) => {
-
-            selectBarrio.innerHTML += `
+    barrios.forEach((barrio) => {
+      selectBarrio.innerHTML += `
                 <option value="${barrio.id}">
                     ${barrio.nombre}
                 </option>
             `;
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar opciones de restaurante:',
-            error
-        );
-
-    }
-
+    });
+  } catch (error) {
+    console.error("Error al cargar opciones de restaurante:", error);
+  }
 }
-
 
 // ==========================================
 // EDITAR RESTAURANTE - ADMIN
 // ==========================================
 
 function inicializarEdicionRestaurantes() {
+  const tabla = document.getElementById("tablaRestaurantesAdmin");
 
-    const tabla =
-        document.getElementById(
-            'tablaRestaurantesAdmin'
-        );
+  const modalElemento = document.getElementById("modalRestaurante");
 
-    const modalElemento =
-        document.getElementById(
-            'modalRestaurante'
-        );
+  if (!tabla || !modalElemento) {
+    return;
+  }
 
-    if (!tabla || !modalElemento) {
-        return;
+  tabla.addEventListener("click", async (event) => {
+    const boton = event.target.closest('button[title="Editar restaurante"]');
+
+    if (!boton) {
+      return;
     }
 
+    const restauranteId = Number(boton.dataset.id);
 
-    tabla.addEventListener(
-        'click',
-        async (event) => {
+    try {
+      const token = obtenerTokenAdmin();
 
-            const boton =
-                event.target.closest(
-                    'button[title="Editar restaurante"]'
-                );
+      const respuesta = await fetch(API_ADMIN_RESTAURANTES, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-            if (!boton) {
-                return;
-            }
+      if (!respuesta.ok) {
+        throw new Error("No se pudo obtener el restaurante");
+      }
 
+      const restaurantes = await respuesta.json();
 
-            const restauranteId =
-                Number(boton.dataset.id);
+      const restaurante = restaurantes.find(
+        (item) => Number(item.id) === restauranteId,
+      );
 
+      if (!restaurante) {
+        throw new Error("Restaurante no encontrado");
+      }
 
-            try {
+      document.getElementById("restauranteId").value = restaurante.id;
 
-                const token =
-                    obtenerTokenAdmin();
+      document.getElementById("restauranteNombre").value =
+        restaurante.nombre || "";
 
+      document.getElementById("restauranteTipo").value =
+        restaurante.tipoRestauranteId || "";
 
-                const respuesta =
-                    await fetch(
-                        API_ADMIN_RESTAURANTES,
-                        {
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
+      document.getElementById("restauranteBarrio").value =
+        restaurante.barrioId || "";
 
+      document.getElementById("restauranteEstado").value =
+        restaurante.estadoVerificacion || "pendiente";
 
-                if (!respuesta.ok) {
-                    throw new Error(
-                        'No se pudo obtener el restaurante'
-                    );
-                }
+      document.getElementById("restauranteDescripcion").value =
+        restaurante.descripcion || "";
 
+      document.getElementById("restauranteDireccion").value =
+        restaurante.direccion || "";
 
-                const restaurantes =
-                    await respuesta.json();
+      document.getElementById("restauranteTelefono").value =
+        restaurante.telefono || "";
 
+      document.getElementById("restauranteEmail").value =
+        restaurante.email || "";
 
-                const restaurante =
-                    restaurantes.find(
-                        (item) =>
-                            Number(item.id) === restauranteId
-                    );
+      document.getElementById("restauranteHorario").value =
+        restaurante.horario || "";
 
+      document.getElementById("restauranteSitioWeb").value =
+        restaurante.sitioWeb || "";
 
-                if (!restaurante) {
-                    throw new Error(
-                        'Restaurante no encontrado'
-                    );
-                }
+      document.getElementById("restauranteInstagram").value =
+        restaurante.instagram || "";
 
+      document.getElementById("restauranteLatitud").value =
+        restaurante.latitud || "";
 
-                document.getElementById(
-                    'restauranteId'
-                ).value =
-                    restaurante.id;
+      document.getElementById("restauranteLongitud").value =
+        restaurante.longitud || "";
 
+      document.getElementById("restauranteImagenExterior").value =
+        restaurante.imagenExterior || "";
 
-                document.getElementById(
-                    'restauranteNombre'
-                ).value =
-                    restaurante.nombre || '';
+      document.getElementById("restauranteImagenInterior").value =
+        restaurante.imagenInterior || "";
 
+      document.getElementById("modalRestauranteTitulo").textContent =
+        "Editar restaurante";
 
-                document.getElementById(
-                    'restauranteTipo'
-                ).value =
-                    restaurante.tipoRestauranteId || '';
-
-
-                document.getElementById(
-                    'restauranteBarrio'
-                ).value =
-                    restaurante.barrioId || '';
-
-
-                document.getElementById(
-                    'restauranteEstado'
-                ).value =
-                    restaurante.estadoVerificacion || 'pendiente';
-
-
-                document.getElementById(
-                    'restauranteDescripcion'
-                ).value =
-                    restaurante.descripcion || '';
-
-
-                document.getElementById(
-                    'restauranteDireccion'
-                ).value =
-                    restaurante.direccion || '';
-
-
-                document.getElementById(
-                    'restauranteTelefono'
-                ).value =
-                    restaurante.telefono || '';
-
-
-                document.getElementById(
-                    'restauranteEmail'
-                ).value =
-                    restaurante.email || '';
-
-
-                document.getElementById(
-                    'restauranteHorario'
-                ).value =
-                    restaurante.horario || '';
-
-
-                document.getElementById(
-                    'restauranteSitioWeb'
-                ).value =
-                    restaurante.sitioWeb || '';
-
-
-                document.getElementById(
-                    'restauranteInstagram'
-                ).value =
-                    restaurante.instagram || '';
-
-
-                document.getElementById(
-                    'restauranteLatitud'
-                ).value =
-                    restaurante.latitud || '';
-
-
-                document.getElementById(
-                    'restauranteLongitud'
-                ).value =
-                    restaurante.longitud || '';
-
-
-                document.getElementById(
-                    'restauranteImagenExterior'
-                ).value =
-                    restaurante.imagenExterior || '';
-
-
-                document.getElementById(
-                    'restauranteImagenInterior'
-                ).value =
-                    restaurante.imagenInterior || '';
-
-
-                document.getElementById(
-                    'modalRestauranteTitulo'
-                ).textContent =
-                    'Editar restaurante';
-
-
-                document.getElementById(
-                    'btnGuardarRestaurante'
-                ).innerHTML = `
+      document.getElementById("btnGuardarRestaurante").innerHTML = `
                     <i class="bi bi-check-lg"></i>
                     Guardar restaurante
                 `;
 
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-                const modal =
-                    bootstrap.Modal.getOrCreateInstance(
-                        modalElemento
-                    );
-
-                modal.show();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al cargar restaurante para editar:',
-                    error
-                );
-
-            }
-
-        }
-    );
-
+      modal.show();
+    } catch (error) {
+      console.error("Error al cargar restaurante para editar:", error);
+    }
+  });
 }
 
 // ==========================================
@@ -1032,72 +741,40 @@ function inicializarEdicionRestaurantes() {
 // ==========================================
 
 function inicializarNuevoRestaurante() {
+  const botonNuevo = document.getElementById("btnNuevoRestaurante");
 
-    const botonNuevo =
-        document.getElementById(
-            'btnNuevoRestaurante'
-        );
+  const form = document.getElementById("formRestaurante");
 
-    const form =
-        document.getElementById(
-            'formRestaurante'
-        );
+  const modalElemento = document.getElementById("modalRestaurante");
 
-    const modalElemento =
-        document.getElementById(
-            'modalRestaurante'
-        );
+  if (!botonNuevo || !form || !modalElemento) {
+    return;
+  }
 
-    if (!botonNuevo || !form || !modalElemento) {
-        return;
-    }
+  botonNuevo.addEventListener("click", () => {
+    // Limpiar formulario
+    form.reset();
 
+    // Vaciar ID para indicar que es un restaurante nuevo
+    document.getElementById("restauranteId").value = "";
 
-    botonNuevo.addEventListener(
-        'click',
-        () => {
+    // Estado inicial
+    document.getElementById("restauranteEstado").value = "pendiente";
 
-            // Limpiar formulario
-            form.reset();
+    // Cambiar título
+    document.getElementById("modalRestauranteTitulo").textContent =
+      "Nuevo restaurante";
 
-            // Vaciar ID para indicar que es un restaurante nuevo
-            document.getElementById(
-                'restauranteId'
-            ).value = '';
-
-
-            // Estado inicial
-            document.getElementById(
-                'restauranteEstado'
-            ).value = 'pendiente';
-
-
-            // Cambiar título
-            document.getElementById(
-                'modalRestauranteTitulo'
-            ).textContent =
-                'Nuevo restaurante';
-
-
-            // Botón
-            document.getElementById(
-                'btnGuardarRestaurante'
-            ).innerHTML = `
+    // Botón
+    document.getElementById("btnGuardarRestaurante").innerHTML = `
                 <i class="bi bi-check-lg"></i>
                 Guardar restaurante
             `;
 
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-            const modal =
-                bootstrap.Modal.getOrCreateInstance(
-                    modalElemento
-                );
-
-            modal.show();
-
-        }
-    );
-
+    modal.show();
+  });
 }
 
 // ==========================================
@@ -1105,257 +782,135 @@ function inicializarNuevoRestaurante() {
 // ==========================================
 
 function inicializarGuardarRestaurante() {
+  const form = document.getElementById("formRestaurante");
 
-    const form =
-        document.getElementById('formRestaurante');
+  if (!form) {
+    return;
+  }
 
-    if (!form) {
-        return;
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const restauranteId = document.getElementById("restauranteId").value;
+
+    const datosRestaurante = {
+      nombre: document.getElementById("restauranteNombre").value.trim(),
+
+      tipoRestauranteId: Number(
+        document.getElementById("restauranteTipo").value,
+      ),
+
+      barrioId: Number(document.getElementById("restauranteBarrio").value),
+
+      estadoVerificacion: document.getElementById("restauranteEstado").value,
+
+      descripcion: document
+        .getElementById("restauranteDescripcion")
+        .value.trim(),
+
+      direccion: document.getElementById("restauranteDireccion").value.trim(),
+
+      telefono: document.getElementById("restauranteTelefono").value.trim(),
+
+      email: document.getElementById("restauranteEmail").value.trim(),
+
+      horario: document.getElementById("restauranteHorario").value.trim(),
+
+      sitioWeb: document.getElementById("restauranteSitioWeb").value.trim(),
+
+      instagram: document.getElementById("restauranteInstagram").value.trim(),
+
+      latitud: document.getElementById("restauranteLatitud").value || null,
+
+      longitud: document.getElementById("restauranteLongitud").value || null,
+
+      imagenExterior: document
+        .getElementById("restauranteImagenExterior")
+        .value.trim(),
+
+      imagenInterior: document
+        .getElementById("restauranteImagenInterior")
+        .value.trim(),
+    };
+
+    try {
+      const token = obtenerTokenAdmin();
+
+      // Si no hay ID, estamos creando.
+      // Si hay ID, estamos editando.
+      const esNuevo = !restauranteId;
+
+      const url = esNuevo
+        ? API_ADMIN_RESTAURANTES
+        : `${API_ADMIN_RESTAURANTES}/${restauranteId}`;
+
+      const metodo = esNuevo ? "POST" : "PUT";
+
+      const respuesta = await fetch(url, {
+        method: metodo,
+
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify(datosRestaurante),
+      });
+
+      if (!respuesta.ok) {
+        const error = await respuesta.json();
+
+        throw new Error(
+          error.mensaje ||
+            (esNuevo
+              ? "No se pudo crear el restaurante"
+              : "No se pudo actualizar el restaurante"),
+        );
+      }
+
+      // Preparar mensaje de confirmación
+      const tituloExito = document.querySelector("#modalRestauranteExito h5");
+
+      const textoExito = document.querySelector("#modalRestauranteExito p");
+
+      if (tituloExito && textoExito) {
+        tituloExito.textContent = esNuevo
+          ? "Restaurante creado"
+          : "Restaurante actualizado";
+
+        textoExito.textContent = esNuevo
+          ? "El restaurante se creó correctamente."
+          : "Los cambios del restaurante se guardaron correctamente.";
+      }
+
+      // Actualizar tabla
+      await cargarRestaurantesAdmin();
+
+      // Cerrar modal
+      const modalElemento = document.getElementById("modalRestaurante");
+
+      const modal = bootstrap.Modal.getInstance(modalElemento);
+
+      if (modal) {
+        modalElemento.addEventListener(
+          "hidden.bs.modal",
+          () => {
+            const modalExito = bootstrap.Modal.getOrCreateInstance(
+              document.getElementById("modalRestauranteExito"),
+            );
+
+            modalExito.show();
+          },
+          { once: true },
+        );
+
+        modal.hide();
+      }
+    } catch (error) {
+      console.error("Error al guardar restaurante:", error);
     }
-
-
-    form.addEventListener(
-        'submit',
-        async (event) => {
-
-            event.preventDefault();
-
-
-            const restauranteId =
-                document.getElementById(
-                    'restauranteId'
-                ).value;
-
-
-            const datosRestaurante = {
-
-                nombre:
-                    document.getElementById(
-                        'restauranteNombre'
-                    ).value.trim(),
-
-                tipoRestauranteId:
-                    Number(
-                        document.getElementById(
-                            'restauranteTipo'
-                        ).value
-                    ),
-
-                barrioId:
-                    Number(
-                        document.getElementById(
-                            'restauranteBarrio'
-                        ).value
-                    ),
-
-                estadoVerificacion:
-                    document.getElementById(
-                        'restauranteEstado'
-                    ).value,
-
-                descripcion:
-                    document.getElementById(
-                        'restauranteDescripcion'
-                    ).value.trim(),
-
-                direccion:
-                    document.getElementById(
-                        'restauranteDireccion'
-                    ).value.trim(),
-
-                telefono:
-                    document.getElementById(
-                        'restauranteTelefono'
-                    ).value.trim(),
-
-                email:
-                    document.getElementById(
-                        'restauranteEmail'
-                    ).value.trim(),
-
-                horario:
-                    document.getElementById(
-                        'restauranteHorario'
-                    ).value.trim(),
-
-                sitioWeb:
-                    document.getElementById(
-                        'restauranteSitioWeb'
-                    ).value.trim(),
-
-                instagram:
-                    document.getElementById(
-                        'restauranteInstagram'
-                    ).value.trim(),
-
-                latitud:
-                    document.getElementById(
-                        'restauranteLatitud'
-                    ).value || null,
-
-                longitud:
-                    document.getElementById(
-                        'restauranteLongitud'
-                    ).value || null,
-
-                imagenExterior:
-                    document.getElementById(
-                        'restauranteImagenExterior'
-                    ).value.trim(),
-
-                imagenInterior:
-                    document.getElementById(
-                        'restauranteImagenInterior'
-                    ).value.trim()
-
-            };
-
-
-            try {
-
-                const token =
-                    obtenerTokenAdmin();
-
-
-                // Si no hay ID, estamos creando.
-                // Si hay ID, estamos editando.
-                const esNuevo =
-                    !restauranteId;
-
-
-                const url =
-                    esNuevo
-                        ? API_ADMIN_RESTAURANTES
-                        : `${API_ADMIN_RESTAURANTES}/${restauranteId}`;
-
-
-                const metodo =
-                    esNuevo
-                        ? 'POST'
-                        : 'PUT';
-
-
-                const respuesta =
-                    await fetch(
-                        url,
-                        {
-                            method: metodo,
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json',
-
-                                Authorization:
-                                    `Bearer ${token}`
-                            },
-
-                            body:
-                                JSON.stringify(
-                                    datosRestaurante
-                                )
-                        }
-                    );
-
-
-                if (!respuesta.ok) {
-
-                    const error =
-                        await respuesta.json();
-
-                    throw new Error(
-                        error.mensaje ||
-                        (
-                            esNuevo
-                                ? 'No se pudo crear el restaurante'
-                                : 'No se pudo actualizar el restaurante'
-                        )
-                    );
-
-                }
-
-
-                // Preparar mensaje de confirmación
-                const tituloExito =
-                    document.querySelector(
-                        '#modalRestauranteExito h5'
-                    );
-
-                const textoExito =
-                    document.querySelector(
-                        '#modalRestauranteExito p'
-                    );
-
-
-                if (tituloExito && textoExito) {
-
-                    tituloExito.textContent =
-                        esNuevo
-                            ? 'Restaurante creado'
-                            : 'Restaurante actualizado';
-
-
-                    textoExito.textContent =
-                        esNuevo
-                            ? 'El restaurante se creó correctamente.'
-                            : 'Los cambios del restaurante se guardaron correctamente.';
-
-                }
-
-
-                // Actualizar tabla
-                await cargarRestaurantesAdmin();
-
-
-                // Cerrar modal
-                const modalElemento =
-                    document.getElementById(
-                        'modalRestaurante'
-                    );
-
-                const modal =
-                    bootstrap.Modal.getInstance(
-                        modalElemento
-                    );
-
-
-                if (modal) {
-
-                    modalElemento.addEventListener(
-                        'hidden.bs.modal',
-                        () => {
-
-                            const modalExito =
-                                bootstrap.Modal
-                                    .getOrCreateInstance(
-                                        document.getElementById(
-                                            'modalRestauranteExito'
-                                        )
-                                    );
-
-                            modalExito.show();
-
-                        },
-                        { once: true }
-                    );
-
-
-                    modal.hide();
-
-                }
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al guardar restaurante:',
-                    error
-                );
-
-            }
-
-        }
-    );
-
+  });
 }
 
 // ==========================================
@@ -1363,180 +918,105 @@ function inicializarGuardarRestaurante() {
 // ==========================================
 
 function inicializarEliminarRestaurante() {
+  const tabla = document.getElementById("tablaRestaurantesAdmin");
 
-    const tabla =
-        document.getElementById(
-            'tablaRestaurantesAdmin'
-        );
+  const modalElemento = document.getElementById("modalEliminarRestaurante");
 
-    const modalElemento =
-        document.getElementById(
-            'modalEliminarRestaurante'
-        );
+  if (!tabla || !modalElemento) {
+    return;
+  }
 
-    if (!tabla || !modalElemento) {
-        return;
+  tabla.addEventListener("click", (event) => {
+    const boton = event.target.closest('button[title="Eliminar restaurante"]');
+
+    if (!boton) {
+      return;
     }
 
+    const restauranteId = boton.dataset.id;
 
-    tabla.addEventListener(
-        'click',
-        (event) => {
+    const fila = boton.closest("tr");
 
-            const boton =
-                event.target.closest(
-                    'button[title="Eliminar restaurante"]'
-                );
+    const nombre =
+      fila.querySelector(".admin-item-name")?.textContent.trim() ||
+      "este restaurante";
 
-            if (!boton) {
-                return;
-            }
-
-
-            const restauranteId =
-                boton.dataset.id;
-
-
-            const fila =
-                boton.closest('tr');
-
-
-            const nombre =
-                fila.querySelector(
-                    '.admin-item-name'
-                )?.textContent.trim() ||
-                'este restaurante';
-
-
-            // Guardamos el ID en el botón de confirmación
-            const botonConfirmar =
-                document.getElementById(
-                    'btnConfirmarEliminarRestaurante'
-                );
-
-            botonConfirmar.dataset.id =
-                restauranteId;
-
-
-            // Mostrar nombre en el modal
-            document.getElementById(
-                'nombreRestauranteEliminar'
-            ).textContent =
-                nombre;
-
-
-            const modal =
-                bootstrap.Modal.getOrCreateInstance(
-                    modalElemento
-                );
-
-            modal.show();
-
-        }
+    // Guardamos el ID en el botón de confirmación
+    const botonConfirmar = document.getElementById(
+      "btnConfirmarEliminarRestaurante",
     );
 
-}
+    botonConfirmar.dataset.id = restauranteId;
 
+    // Mostrar nombre en el modal
+    document.getElementById("nombreRestauranteEliminar").textContent = nombre;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
+
+    modal.show();
+  });
+}
 
 // ==========================================
 // CONFIRMAR ELIMINAR RESTAURANTE
 // ==========================================
 
 function inicializarConfirmarEliminarRestaurante() {
+  const botonConfirmar = document.getElementById(
+    "btnConfirmarEliminarRestaurante",
+  );
 
-    const botonConfirmar =
-        document.getElementById(
-            'btnConfirmarEliminarRestaurante'
-        );
+  if (!botonConfirmar) {
+    return;
+  }
 
-    if (!botonConfirmar) {
-        return;
+  botonConfirmar.addEventListener("click", async () => {
+    const restauranteId = botonConfirmar.dataset.id;
+
+    if (!restauranteId) {
+      return;
     }
 
+    try {
+      const token = obtenerTokenAdmin();
 
-    botonConfirmar.addEventListener(
-        'click',
-        async () => {
+      const respuesta = await fetch(
+        `${API_ADMIN_RESTAURANTES}/${restauranteId}`,
+        {
+          method: "DELETE",
 
-            const restauranteId =
-                botonConfirmar.dataset.id;
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
+      if (!respuesta.ok) {
+        const error = await respuesta.json();
 
-            if (!restauranteId) {
-                return;
-            }
+        throw new Error(error.mensaje || "No se pudo eliminar el restaurante");
+      }
 
+      // Cerrar modal de eliminación
+      const modalEliminarElemento = document.getElementById(
+        "modalEliminarRestaurante",
+      );
 
-            try {
+      const modalEliminar = bootstrap.Modal.getInstance(modalEliminarElemento);
 
-                const token =
-                    obtenerTokenAdmin();
+      if (modalEliminar) {
+        modalEliminar.hide();
+      }
 
+      // Limpiar ID guardado
+      delete botonConfirmar.dataset.id;
 
-                const respuesta =
-                    await fetch(
-                        `${API_ADMIN_RESTAURANTES}/${restauranteId}`,
-                        {
-                            method: 'DELETE',
-
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
-
-
-                if (!respuesta.ok) {
-
-                    const error =
-                        await respuesta.json();
-
-                    throw new Error(
-                        error.mensaje ||
-                        'No se pudo eliminar el restaurante'
-                    );
-
-                }
-
-
-                // Cerrar modal de eliminación
-                const modalEliminarElemento =
-                    document.getElementById(
-                        'modalEliminarRestaurante'
-                    );
-
-                const modalEliminar =
-                    bootstrap.Modal.getInstance(
-                        modalEliminarElemento
-                    );
-
-
-                if (modalEliminar) {
-                    modalEliminar.hide();
-                }
-
-
-                // Limpiar ID guardado
-                delete botonConfirmar.dataset.id;
-
-
-                // Recargar tabla
-                await cargarRestaurantesAdmin();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al eliminar restaurante:',
-                    error
-                );
-
-            }
-
-        }
-    );
-
+      // Recargar tabla
+      await cargarRestaurantesAdmin();
+    } catch (error) {
+      console.error("Error al eliminar restaurante:", error);
+    }
+  });
 }
 
 // ==========================================
@@ -1544,210 +1024,134 @@ function inicializarConfirmarEliminarRestaurante() {
 // ==========================================
 
 async function cargarOpcionesProducto() {
+  const selectMarca = document.getElementById("productoMarca");
 
-    const selectMarca =
-        document.getElementById('productoMarca');
+  const selectCategoria = document.getElementById("productoCategoria");
 
-    const selectCategoria =
-        document.getElementById('productoCategoria');
+  if (!selectMarca || !selectCategoria) {
+    return;
+  }
 
-    if (!selectMarca || !selectCategoria) {
-        return;
+  try {
+    const token = obtenerTokenAdmin();
+
+    const [respuestaMarcas, respuestaCategorias] = await Promise.all([
+      fetch(API_ADMIN_MARCAS, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+
+      fetch(API_ADMIN_CATEGORIAS, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    ]);
+
+    if (!respuestaMarcas.ok || !respuestaCategorias.ok) {
+      throw new Error("No se pudieron cargar marcas y categorías");
     }
 
-    try {
+    const marcas = await respuestaMarcas.json();
 
-        const token = obtenerTokenAdmin();
+    const categorias = await respuestaCategorias.json();
 
-        const [respuestaMarcas, respuestaCategorias] =
-            await Promise.all([
-                fetch(API_ADMIN_MARCAS, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }),
+    selectMarca.innerHTML = '<option value="">Seleccionar marca</option>';
 
-                fetch(API_ADMIN_CATEGORIAS, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                })
-            ]);
-
-
-        if (
-            !respuestaMarcas.ok ||
-            !respuestaCategorias.ok
-        ) {
-            throw new Error(
-                'No se pudieron cargar marcas y categorías'
-            );
-        }
-
-
-        const marcas =
-            await respuestaMarcas.json();
-
-        const categorias =
-            await respuestaCategorias.json();
-
-
-        selectMarca.innerHTML =
-            '<option value="">Seleccionar marca</option>';
-
-        marcas.forEach((marca) => {
-
-            selectMarca.innerHTML += `
+    marcas.forEach((marca) => {
+      selectMarca.innerHTML += `
                 <option value="${marca.id}">
                     ${marca.nombre}
                 </option>
             `;
+    });
 
-        });
+    selectCategoria.innerHTML =
+      '<option value="">Seleccionar categoría</option>';
 
-
-        selectCategoria.innerHTML =
-            '<option value="">Seleccionar categoría</option>';
-
-        categorias.forEach((categoria) => {
-
-            selectCategoria.innerHTML += `
+    categorias.forEach((categoria) => {
+      selectCategoria.innerHTML += `
                 <option value="${categoria.id}">
                     ${categoria.nombre}
                 </option>
             `;
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar opciones de producto:',
-            error
-        );
-
-    }
-
+    });
+  } catch (error) {
+    console.error("Error al cargar opciones de producto:", error);
+  }
 }
 
 function inicializarEdicionProductos() {
+  const tabla = document.getElementById("tablaProductosAdmin");
 
-    const tabla =
-        document.getElementById('tablaProductosAdmin');
+  const modalElemento = document.getElementById("modalProducto");
 
-    const modalElemento =
-        document.getElementById('modalProducto');
+  if (!tabla || !modalElemento) {
+    return;
+  }
 
-    if (!tabla || !modalElemento) {
-        return;
+  tabla.addEventListener("click", async (event) => {
+    const boton = event.target.closest('button[title="Editar"]');
+
+    if (!boton) {
+      return;
     }
 
-    tabla.addEventListener('click', async (event) => {
+    const productoId = Number(boton.dataset.id);
 
-        const boton =
-            event.target.closest(
-                'button[title="Editar"]'
-            );
+    try {
+      const respuesta = await fetch(`${API_PRODUCTOS}/${productoId}`);
 
-        if (!boton) {
-            return;
-        }
+      if (!respuesta.ok) {
+        throw new Error("No se pudo obtener el producto");
+      }
 
-        const productoId =
-            Number(boton.dataset.id);
+      const producto = await respuesta.json();
 
-        try {
+      document.getElementById("productoId").value = producto.id;
 
-            const respuesta =
-                await fetch(
-                    `${API_PRODUCTOS}/${productoId}`
-                );
+      document.getElementById("productoNombre").value = producto.nombre || "";
 
-            if (!respuesta.ok) {
-                throw new Error(
-                    'No se pudo obtener el producto'
-                );
-            }
+      document.getElementById("productoCodigoBarras").value =
+        producto.codigoBarras || "";
 
-            const producto =
-                await respuesta.json();
+      document.getElementById("productoDescripcion").value =
+        producto.descripcion || "";
 
+      document.getElementById("productoIngredientes").value =
+        producto.ingredientes || "";
 
-            document.getElementById(
-                'productoId'
-            ).value = producto.id;
+      document.getElementById("productoInfoNutricional").value =
+        producto.informacionNutricional || "";
 
-            document.getElementById(
-                'productoNombre'
-            ).value = producto.nombre || '';
+      document.getElementById("productoImagen").value = producto.imagen || "";
 
-            document.getElementById(
-                'productoCodigoBarras'
-            ).value = producto.codigoBarras || '';
+      document.getElementById("productoMarca").value = producto.marcaId;
 
-            document.getElementById(
-                'productoDescripcion'
-            ).value = producto.descripcion || '';
+      document.getElementById("productoCategoria").value = producto.categoriaId;
 
-            document.getElementById(
-                'productoIngredientes'
-            ).value = producto.ingredientes || '';
+      document.getElementById("productoCertificado").checked =
+        Number(producto.certificadoSinTacc) === 1;
 
-            document.getElementById(
-                'productoInfoNutricional'
-            ).value =
-                producto.informacionNutricional || '';
+      document.getElementById("productoEstado").value =
+        producto.estadoVerificacion || "pendiente";
 
-            document.getElementById(
-                'productoImagen'
-            ).value = producto.imagen || '';
+      document.getElementById("modalProductoTitulo").textContent =
+        "Editar producto";
 
-            document.getElementById(
-    'productoMarca'
-).value = producto.marcaId;
-
-document.getElementById(
-    'productoCategoria'
-).value = producto.categoriaId;
-
-            document.getElementById(
-                'productoCertificado'
-            ).checked =
-                Number(producto.certificadoSinTacc) === 1;
-
-
-            document.getElementById(
-                'modalProductoTitulo'
-            ).textContent = 'Editar producto';
-
-            document.getElementById(
-    'btnGuardarProducto'
-).innerHTML = `
+      document.getElementById("btnGuardarProducto").innerHTML = `
     <i class="bi bi-check-lg"></i>
     Guardar producto
 `;
 
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-            const modal =
-                bootstrap.Modal.getOrCreateInstance(
-                    modalElemento
-                );
-
-            modal.show();
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al cargar producto para editar:',
-                error
-            );
-
-        }
-
-    });
-
+      modal.show();
+    } catch (error) {
+      console.error("Error al cargar producto para editar:", error);
+    }
+  });
 }
 
 // ==========================================
@@ -1755,63 +1159,42 @@ document.getElementById(
 // ==========================================
 
 function inicializarEliminarProducto() {
+  const tabla = document.getElementById("tablaProductosAdmin");
 
-    const tabla =
-        document.getElementById('tablaProductosAdmin');
+  const modalElemento = document.getElementById("modalEliminarProducto");
 
-    const modalElemento =
-        document.getElementById('modalEliminarProducto');
+  if (!tabla || !modalElemento) {
+    return;
+  }
 
-    if (!tabla || !modalElemento) {
-        return;
+  tabla.addEventListener("click", (event) => {
+    const boton = event.target.closest('button[title="Eliminar"]');
+
+    if (!boton) {
+      return;
     }
 
-    tabla.addEventListener('click', (event) => {
+    const productoId = Number(boton.dataset.id);
 
-        const boton =
-            event.target.closest(
-                'button[title="Eliminar"]'
-            );
+    const fila = boton.closest("tr");
 
-        if (!boton) {
-            return;
-        }
+    const nombreProducto = fila
+      .querySelector(".admin-item-name")
+      .textContent.trim();
 
-        const productoId =
-            Number(boton.dataset.id);
+    document.getElementById("nombreProductoEliminar").textContent =
+      nombreProducto;
 
-        const fila =
-            boton.closest('tr');
+    const botonConfirmar = document.getElementById(
+      "btnConfirmarEliminarProducto",
+    );
 
-        const nombreProducto =
-            fila.querySelector(
-                '.admin-item-name'
-            ).textContent.trim();
+    botonConfirmar.dataset.id = productoId;
 
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-        document.getElementById(
-            'nombreProductoEliminar'
-        ).textContent = nombreProducto;
-
-
-        const botonConfirmar =
-            document.getElementById(
-                'btnConfirmarEliminarProducto'
-            );
-
-        botonConfirmar.dataset.id =
-            productoId;
-
-
-        const modal =
-            bootstrap.Modal.getOrCreateInstance(
-                modalElemento
-            );
-
-        modal.show();
-
-    });
-
+    modal.show();
+  });
 }
 
 // ==========================================
@@ -1819,97 +1202,56 @@ function inicializarEliminarProducto() {
 // ==========================================
 
 function inicializarConfirmarEliminarProducto() {
+  const botonConfirmar = document.getElementById(
+    "btnConfirmarEliminarProducto",
+  );
 
-    const botonConfirmar =
-        document.getElementById(
-            'btnConfirmarEliminarProducto'
-        );
+  const modalElemento = document.getElementById("modalEliminarProducto");
 
-    const modalElemento =
-        document.getElementById(
-            'modalEliminarProducto'
-        );
+  if (!botonConfirmar || !modalElemento) {
+    return;
+  }
 
-    if (!botonConfirmar || !modalElemento) {
-        return;
+  botonConfirmar.addEventListener("click", async () => {
+    const productoId = Number(botonConfirmar.dataset.id);
+
+    if (!productoId) {
+      return;
     }
 
+    try {
+      const token = obtenerTokenAdmin();
 
-    botonConfirmar.addEventListener(
-        'click',
-        async () => {
+      botonConfirmar.disabled = true;
 
-            const productoId =
-                Number(
-                    botonConfirmar.dataset.id
-                );
+      const respuesta = await fetch(
+        `http://localhost:3000/api/admin/productos/${productoId}`,
+        {
+          method: "DELETE",
 
-            if (!productoId) {
-                return;
-            }
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
+      const resultado = await respuesta.json();
 
-            try {
+      if (!respuesta.ok) {
+        throw new Error(resultado.mensaje || "No se pudo eliminar el producto");
+      }
 
-                const token =
-                    obtenerTokenAdmin();
+      const modal = bootstrap.Modal.getInstance(modalElemento);
 
-                botonConfirmar.disabled = true;
+      modal.hide();
 
-
-                const respuesta =
-                    await fetch(
-                        `http://localhost:3000/api/admin/productos/${productoId}`,
-                        {
-                            method: 'DELETE',
-
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
-
-
-                const resultado =
-                    await respuesta.json();
-
-
-                if (!respuesta.ok) {
-                    throw new Error(
-                        resultado.mensaje ||
-                        'No se pudo eliminar el producto'
-                    );
-                }
-
-
-                const modal =
-                    bootstrap.Modal.getInstance(
-                        modalElemento
-                    );
-
-                modal.hide();
-
-
-                await cargarProductosAdmin();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al eliminar producto:',
-                    error
-                );
-
-            } finally {
-
-                botonConfirmar.disabled = false;
-
-            }
-
-        }
-    );
-
+      await cargarProductosAdmin();
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
+    } finally {
+      botonConfirmar.disabled = false;
+    }
+  });
 }
 
 // ==========================================
@@ -1917,288 +1259,173 @@ function inicializarConfirmarEliminarProducto() {
 // ==========================================
 
 function inicializarGuardarProducto() {
+  const formulario = document.getElementById("formProducto");
 
-    const formulario =
-        document.getElementById('formProducto');
+  const modalElemento = document.getElementById("modalProducto");
 
-    const modalElemento =
-        document.getElementById('modalProducto');
+  if (!formulario || !modalElemento) {
+    return;
+  }
 
-    if (!formulario || !modalElemento) {
-        return;
-    }
+  formulario.addEventListener("submit", async (event) => {
+    event.preventDefault();
 
-    formulario.addEventListener('submit', async (event) => {
+    const productoId = Number(document.getElementById("productoId").value);
 
-        event.preventDefault();
+    const token = obtenerTokenAdmin();
 
-        const productoId =
-            Number(
-                document.getElementById('productoId').value
-            );
+    const datosProducto = {
+      nombre: document.getElementById("productoNombre").value.trim(),
 
+      codigoBarras: document
+        .getElementById("productoCodigoBarras")
+        .value.trim(),
 
-        const token =
-            obtenerTokenAdmin();
+      marcaId: Number(document.getElementById("productoMarca").value),
 
-        const datosProducto = {
+      categoriaId: Number(document.getElementById("productoCategoria").value),
 
-            nombre:
-                document.getElementById(
-                    'productoNombre'
-                ).value.trim(),
+      descripcion: document.getElementById("productoDescripcion").value.trim(),
 
-            codigoBarras:
-                document.getElementById(
-                    'productoCodigoBarras'
-                ).value.trim(),
+      ingredientes: document
+        .getElementById("productoIngredientes")
+        .value.trim(),
 
-            marcaId:
-                Number(
-                    document.getElementById(
-                        'productoMarca'
-                    ).value
-                ),
+      informacionNutricional: document
+        .getElementById("productoInfoNutricional")
+        .value.trim(),
 
-            categoriaId:
-                Number(
-                    document.getElementById(
-                        'productoCategoria'
-                    ).value
-                ),
+      imagen: document.getElementById("productoImagen").value.trim(),
 
-            descripcion:
-                document.getElementById(
-                    'productoDescripcion'
-                ).value.trim(),
+      certificadoSinTacc: document.getElementById("productoCertificado").checked
+        ? 1
+        : 0,
 
-            ingredientes:
-                document.getElementById(
-                    'productoIngredientes'
-                ).value.trim(),
+      estadoVerificacion: document.getElementById("productoEstado").value,
+    };
 
-            informacionNutricional:
-                document.getElementById(
-                    'productoInfoNutricional'
-                ).value.trim(),
+    try {
+      const botonGuardar = document.getElementById("btnGuardarProducto");
 
-            imagen:
-                document.getElementById(
-                    'productoImagen'
-                ).value.trim(),
+      botonGuardar.disabled = true;
 
-            certificadoSinTacc:
-                document.getElementById(
-                    'productoCertificado'
-                ).checked
-                    ? 1
-                    : 0
-        };
+      const esNuevo = !productoId;
 
-
-        try {
-
-            const botonGuardar =
-                document.getElementById(
-                    'btnGuardarProducto'
-                );
-
-            botonGuardar.disabled = true;
-
-            const esNuevo =
-    !productoId;
-
-const url =
-    esNuevo
-        ? 'http://localhost:3000/api/admin/productos'
+      const url = esNuevo
+        ? "http://localhost:3000/api/admin/productos"
         : `http://localhost:3000/api/admin/productos/${productoId}`;
 
-const metodo =
-    esNuevo
-        ? 'POST'
-        : 'PUT';
+      const metodo = esNuevo ? "POST" : "PUT";
 
-const respuesta =
-    await fetch(
-        url,
-        {
-            method: metodo,
+      const respuesta = await fetch(url, {
+        method: metodo,
 
-            headers: {
-                'Content-Type':
-                    'application/json',
+        headers: {
+          "Content-Type": "application/json",
 
-                Authorization:
-                    `Bearer ${token}`
-            },
+          Authorization: `Bearer ${token}`,
+        },
 
-            body:
-                JSON.stringify(datosProducto)
-        }
-    );
+        body: JSON.stringify(datosProducto),
+      });
 
+      const resultado = await respuesta.json();
 
-            const resultado =
-                await respuesta.json();
+      if (!respuesta.ok) {
+        throw new Error(
+          resultado.mensaje || "No se pudo actualizar el producto",
+        );
+      }
 
+      const tituloExito = document.querySelector("#modalProductoExito h5");
 
-            if (!respuesta.ok) {
-                throw new Error(
-                    resultado.mensaje ||
-                    'No se pudo actualizar el producto'
-                );
-            }
+      const textoExito = document.querySelector("#modalProductoExito p");
 
-            const tituloExito =
-    document.querySelector(
-        '#modalProductoExito h5'
-    );
+      if (tituloExito && textoExito) {
+        tituloExito.textContent = esNuevo
+          ? "Producto creado"
+          : "Producto actualizado";
 
-const textoExito =
-    document.querySelector(
-        '#modalProductoExito p'
-    );
+        textoExito.textContent = esNuevo
+          ? "El producto se creó correctamente."
+          : "Los cambios se guardaron correctamente.";
+      }
 
-if (tituloExito && textoExito) {
+      const modal = bootstrap.Modal.getInstance(modalElemento);
 
-    tituloExito.textContent =
-        esNuevo
-            ? 'Producto creado'
-            : 'Producto actualizado';
+      modalElemento.addEventListener(
+        "hidden.bs.modal",
+        () => {
+          const modalExitoElemento =
+            document.getElementById("modalProductoExito");
 
-    textoExito.textContent =
-        esNuevo
-            ? 'El producto se creó correctamente.'
-            : 'Los cambios se guardaron correctamente.';
-}
+          const modalExito =
+            bootstrap.Modal.getOrCreateInstance(modalExitoElemento);
 
+          modalExito.show();
+        },
+        { once: true },
+      );
 
-            const modal =
-    bootstrap.Modal.getInstance(
-        modalElemento
-    );
+      modal.hide();
 
-modalElemento.addEventListener(
-    'hidden.bs.modal',
-    () => {
+      await cargarProductosAdmin();
+    } catch (error) {
+      console.error("Error al guardar producto:", error);
+    } finally {
+      const botonGuardar = document.getElementById("btnGuardarProducto");
 
-        const modalExitoElemento =
-            document.getElementById(
-                'modalProductoExito'
-            );
-
-        const modalExito =
-            bootstrap.Modal.getOrCreateInstance(
-                modalExitoElemento
-            );
-
-        modalExito.show();
-
-    },
-    { once: true }
-);
-
-modal.hide();
-
-
-            await cargarProductosAdmin();
-
-
-        } catch (error) {
-
-            console.error(
-                'Error al guardar producto:',
-                error
-            );
-
-        } finally {
-
-            const botonGuardar =
-                document.getElementById(
-                    'btnGuardarProducto'
-                );
-
-            botonGuardar.disabled = false;
-
-        }
-
-    });
-
+      botonGuardar.disabled = false;
+    }
+  });
 }
 
 async function cargarNutricionistasAdmin() {
+  const tabla = document.getElementById("tablaNutricionistasAdmin");
 
-    const tabla =
-        document.getElementById('tablaNutricionistasAdmin');
+  if (!tabla) return;
 
-    if (!tabla) return;
+  try {
+    const token = obtenerTokenAdmin();
 
-    try {
+    const respuesta = await fetch(API_ADMIN_NUTRICIONISTAS_CRUD, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        const token = obtenerTokenAdmin();
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar los nutricionistas");
+    }
 
-        const respuesta =
-            await fetch(
-                API_ADMIN_NUTRICIONISTAS_CRUD,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            );
+    const nutricionistas = await respuesta.json();
 
-        if (!respuesta.ok) {
-            throw new Error(
-                'No se pudieron cargar los nutricionistas'
-            );
-        }
+    tabla.innerHTML = "";
 
-        const nutricionistas =
-            await respuesta.json();
+    nutricionistas.forEach((nutricionista) => {
+      const estado = nutricionista.estadoVerificacion;
 
-        tabla.innerHTML = '';
+      let claseEstado = "status-pending";
 
-        nutricionistas.forEach((nutricionista) => {
+      let iconoEstado = "bi-hourglass-split";
 
-            const estado =
-                nutricionista.estadoVerificacion;
+      let textoEstado = "Pendiente";
 
-            let claseEstado =
-                'status-pending';
+      if (estado === "verificado") {
+        claseEstado = "status-ok";
 
-            let iconoEstado =
-                'bi-hourglass-split';
+        iconoEstado = "bi-patch-check-fill";
 
-            let textoEstado =
-                'Pendiente';
+        textoEstado = "Verificado";
+      } else if (estado === "rechazado") {
+        claseEstado = "status-rejected";
 
+        iconoEstado = "bi-x-circle-fill";
 
-            if (estado === 'verificado') {
+        textoEstado = "Rechazado";
+      }
 
-                claseEstado =
-                    'status-ok';
-
-                iconoEstado =
-                    'bi-patch-check-fill';
-
-                textoEstado =
-                    'Verificado';
-
-            } else if (estado === 'rechazado') {
-
-                claseEstado =
-                    'status-rejected';
-
-                iconoEstado =
-                    'bi-x-circle-fill';
-
-                textoEstado =
-                    'Rechazado';
-            }
-
-
-            tabla.innerHTML += `
+      tabla.innerHTML += `
                 <tr>
 
                     <td>
@@ -2215,7 +1442,7 @@ async function cargarNutricionistasAdmin() {
                                 </span>
 
                                 <span class="admin-item-sub">
-                                    ${nutricionista.email || 'Sin email'}
+                                    ${nutricionista.email || "Sin email"}
                                 </span>
                             </div>
 
@@ -2223,11 +1450,11 @@ async function cargarNutricionistasAdmin() {
                     </td>
 
                     <td>
-                        ${nutricionista.matricula || '-'}
+                        ${nutricionista.matricula || "-"}
                     </td>
 
                     <td>
-                        ${nutricionista.barrio || '-'}
+                        ${nutricionista.barrio || "-"}
                     </td>
 
                     <td>
@@ -2261,16 +1488,11 @@ async function cargarNutricionistasAdmin() {
 
                 </tr>
             `;
-        });
+    });
+  } catch (error) {
+    console.error("Error al cargar nutricionistas:", error);
 
-    } catch (error) {
-
-        console.error(
-            'Error al cargar nutricionistas:',
-            error
-        );
-
-        tabla.innerHTML = `
+    tabla.innerHTML = `
             <tr>
                 <td
                     colspan="5"
@@ -2280,849 +1502,439 @@ async function cargarNutricionistasAdmin() {
                 </td>
             </tr>
         `;
-    }
+  }
 }
 
 async function cargarOpcionesLocal() {
+  const selectTipo = document.getElementById("localTipo");
 
-    const selectTipo =
-        document.getElementById('localTipo');
+  const selectBarrio = document.getElementById("localBarrio");
 
-    const selectBarrio =
-        document.getElementById('localBarrio');
+  if (!selectTipo || !selectBarrio) {
+    return;
+  }
 
-    if (!selectTipo || !selectBarrio) {
-        return;
+  try {
+    const token = obtenerTokenAdmin();
+
+    const [respuestaTipos, respuestaBarrios] = await Promise.all([
+      fetch(API_ADMIN_TIPOS_LOCAL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+
+      fetch(API_ADMIN_BARRIOS, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    ]);
+
+    if (!respuestaTipos.ok || !respuestaBarrios.ok) {
+      throw new Error("No se pudieron cargar las opciones del local");
     }
 
-    try {
+    const tipos = await respuestaTipos.json();
 
-        const token =
-            obtenerTokenAdmin();
+    const barrios = await respuestaBarrios.json();
 
-        const [
-            respuestaTipos,
-            respuestaBarrios
-        ] = await Promise.all([
-
-            fetch(
-                API_ADMIN_TIPOS_LOCAL,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            ),
-
-            fetch(
-                API_ADMIN_BARRIOS,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            )
-
-        ]);
-
-
-        if (
-            !respuestaTipos.ok ||
-            !respuestaBarrios.ok
-        ) {
-            throw new Error(
-                'No se pudieron cargar las opciones del local'
-            );
-        }
-
-
-        const tipos =
-            await respuestaTipos.json();
-
-        const barrios =
-            await respuestaBarrios.json();
-
-
-        selectTipo.innerHTML = `
+    selectTipo.innerHTML = `
             <option value="">
                 Seleccionar tipo
             </option>
         `;
 
-        tipos.forEach((tipo) => {
-
-            selectTipo.innerHTML += `
+    tipos.forEach((tipo) => {
+      selectTipo.innerHTML += `
                 <option value="${tipo.id}">
                     ${tipo.nombre}
                 </option>
             `;
+    });
 
-        });
-
-
-        selectBarrio.innerHTML = `
+    selectBarrio.innerHTML = `
             <option value="">
                 Seleccionar barrio
             </option>
         `;
 
-        barrios.forEach((barrio) => {
-
-            selectBarrio.innerHTML += `
+    barrios.forEach((barrio) => {
+      selectBarrio.innerHTML += `
                 <option value="${barrio.id}">
                     ${barrio.nombre}
                 </option>
             `;
-
-        });
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar opciones del local:',
-            error
-        );
-
-    }
+    });
+  } catch (error) {
+    console.error("Error al cargar opciones del local:", error);
+  }
 }
 
 function inicializarNuevoLocal() {
+  const boton = document.getElementById("btnNuevoLocal");
 
-    const boton =
-        document.getElementById('btnNuevoLocal');
+  const formulario = document.getElementById("formLocal");
 
-    const formulario =
-        document.getElementById('formLocal');
+  const modalElemento = document.getElementById("modalLocal");
 
-    const modalElemento =
-        document.getElementById('modalLocal');
+  if (!boton || !formulario || !modalElemento) {
+    return;
+  }
 
-    if (!boton || !formulario || !modalElemento) {
-        return;
-    }
+  boton.addEventListener("click", () => {
+    formulario.reset();
 
+    document.getElementById("localId").value = "";
 
-    boton.addEventListener('click', () => {
+    document.getElementById("localEstado").value = "pendiente";
 
-        formulario.reset();
+    document.getElementById("modalLocalTitulo").textContent = "Nuevo local";
 
-        document.getElementById(
-            'localId'
-        ).value = '';
-
-        document.getElementById(
-            'localEstado'
-        ).value = 'pendiente';
-
-        document.getElementById(
-            'modalLocalTitulo'
-        ).textContent = 'Nuevo local';
-
-        document.getElementById(
-            'btnGuardarLocal'
-        ).innerHTML = `
+    document.getElementById("btnGuardarLocal").innerHTML = `
             <i class="bi bi-check-lg"></i>
             Guardar local
         `;
 
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-        const modal =
-            bootstrap.Modal.getOrCreateInstance(
-                modalElemento
-            );
-
-        modal.show();
-
-    });
-
+    modal.show();
+  });
 }
 
 function inicializarGuardarLocal() {
+  const formulario = document.getElementById("formLocal");
 
-    const formulario =
-        document.getElementById('formLocal');
+  const modalElemento = document.getElementById("modalLocal");
 
-    const modalElemento =
-        document.getElementById('modalLocal');
+  const modalExitoElemento = document.getElementById("modalLocalExito");
 
-    const modalExitoElemento =
-        document.getElementById('modalLocalExito');
+  if (!formulario || !modalElemento || !modalExitoElemento) {
+    return;
+  }
 
-    if (
-        !formulario ||
-        !modalElemento ||
-        !modalExitoElemento
-    ) {
-        return;
+  formulario.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const localId = document.getElementById("localId").value;
+
+    const datosLocal = {
+      nombre: document.getElementById("localNombre").value.trim(),
+
+      tipoLocalId: document.getElementById("localTipo").value,
+
+      barrioId: document.getElementById("localBarrio").value,
+
+      estadoVerificacion: document.getElementById("localEstado").value,
+
+      descripcion: document.getElementById("localDescripcion").value.trim(),
+
+      direccion: document.getElementById("localDireccion").value.trim(),
+
+      telefono: document.getElementById("localTelefono").value.trim(),
+
+      email: document.getElementById("localEmail").value.trim(),
+
+      horario: document.getElementById("localHorario").value.trim(),
+
+      sitioWeb: document.getElementById("localSitioWeb").value.trim(),
+
+      instagram: document.getElementById("localInstagram").value.trim(),
+
+      imagen: document.getElementById("localImagen").value.trim(),
+
+      latitud: document.getElementById("localLatitud").value || null,
+
+      longitud: document.getElementById("localLongitud").value || null,
+    };
+
+    const esNuevo = !localId;
+
+    const url = esNuevo
+      ? API_ADMIN_LOCALES_CRUD
+      : `${API_ADMIN_LOCALES_CRUD}/${localId}`;
+
+    const metodo = esNuevo ? "POST" : "PUT";
+
+    try {
+      const token = obtenerTokenAdmin();
+
+      const respuesta = await fetch(url, {
+        method: metodo,
+
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify(datosLocal),
+      });
+
+      const resultado = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(resultado.mensaje || "No se pudo guardar el local");
+      }
+
+      await cargarLocalesAdmin();
+
+      const modal = bootstrap.Modal.getInstance(modalElemento);
+
+      const tituloExito = modalExitoElemento.querySelector("h5");
+
+      const textoExito = modalExitoElemento.querySelector("p");
+
+      if (esNuevo) {
+        tituloExito.textContent = "Local creado";
+
+        textoExito.textContent = "El local se creó correctamente.";
+      } else {
+        tituloExito.textContent = "Local actualizado";
+
+        textoExito.textContent =
+          "Los cambios del local se guardaron correctamente.";
+      }
+
+      modalElemento.addEventListener(
+        "hidden.bs.modal",
+        () => {
+          const modalExito =
+            bootstrap.Modal.getOrCreateInstance(modalExitoElemento);
+
+          modalExito.show();
+        },
+        {
+          once: true,
+        },
+      );
+
+      modal.hide();
+    } catch (error) {
+      console.error("Error al guardar local:", error);
     }
-
-
-    formulario.addEventListener(
-        'submit',
-        async (event) => {
-
-            event.preventDefault();
-
-
-            const localId =
-                document.getElementById(
-                    'localId'
-                ).value;
-
-
-            const datosLocal = {
-
-                nombre:
-                    document.getElementById(
-                        'localNombre'
-                    ).value.trim(),
-
-                tipoLocalId:
-                    document.getElementById(
-                        'localTipo'
-                    ).value,
-
-                barrioId:
-                    document.getElementById(
-                        'localBarrio'
-                    ).value,
-
-                estadoVerificacion:
-                    document.getElementById(
-                        'localEstado'
-                    ).value,
-
-                descripcion:
-                    document.getElementById(
-                        'localDescripcion'
-                    ).value.trim(),
-
-                direccion:
-                    document.getElementById(
-                        'localDireccion'
-                    ).value.trim(),
-
-                telefono:
-                    document.getElementById(
-                        'localTelefono'
-                    ).value.trim(),
-
-                email:
-                    document.getElementById(
-                        'localEmail'
-                    ).value.trim(),
-
-                horario:
-                    document.getElementById(
-                        'localHorario'
-                    ).value.trim(),
-
-                sitioWeb:
-                    document.getElementById(
-                        'localSitioWeb'
-                    ).value.trim(),
-
-                instagram:
-                    document.getElementById(
-                        'localInstagram'
-                    ).value.trim(),
-
-                imagen:
-                    document.getElementById(
-                        'localImagen'
-                    ).value.trim(),
-
-                latitud:
-                    document.getElementById(
-                        'localLatitud'
-                    ).value || null,
-
-                longitud:
-                    document.getElementById(
-                        'localLongitud'
-                    ).value || null
-            };
-
-
-            const esNuevo =
-                !localId;
-
-
-            const url =
-                esNuevo
-                    ? API_ADMIN_LOCALES_CRUD
-                    : `${API_ADMIN_LOCALES_CRUD}/${localId}`;
-
-
-            const metodo =
-                esNuevo
-                    ? 'POST'
-                    : 'PUT';
-
-
-            try {
-
-                const token =
-                    obtenerTokenAdmin();
-
-
-                const respuesta =
-                    await fetch(
-                        url,
-                        {
-                            method: metodo,
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json',
-
-                                Authorization:
-                                    `Bearer ${token}`
-                            },
-
-                            body:
-                                JSON.stringify(
-                                    datosLocal
-                                )
-                        }
-                    );
-
-
-                const resultado =
-                    await respuesta.json();
-
-
-                if (!respuesta.ok) {
-
-                    throw new Error(
-                        resultado.mensaje ||
-                        'No se pudo guardar el local'
-                    );
-
-                }
-
-
-                await cargarLocalesAdmin();
-
-
-                const modal =
-                    bootstrap.Modal.getInstance(
-                        modalElemento
-                    );
-
-
-                const tituloExito =
-                    modalExitoElemento.querySelector(
-                        'h5'
-                    );
-
-                const textoExito =
-                    modalExitoElemento.querySelector(
-                        'p'
-                    );
-
-
-                if (esNuevo) {
-
-                    tituloExito.textContent =
-                        'Local creado';
-
-                    textoExito.textContent =
-                        'El local se creó correctamente.';
-
-                } else {
-
-                    tituloExito.textContent =
-                        'Local actualizado';
-
-                    textoExito.textContent =
-                        'Los cambios del local se guardaron correctamente.';
-
-                }
-
-
-                modalElemento.addEventListener(
-                    'hidden.bs.modal',
-                    () => {
-
-                        const modalExito =
-                            bootstrap.Modal.getOrCreateInstance(
-                                modalExitoElemento
-                            );
-
-                        modalExito.show();
-
-                    },
-                    {
-                        once: true
-                    }
-                );
-
-
-                modal.hide();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al guardar local:',
-                    error
-                );
-
-            }
-
-        }
-    );
-
+  });
 }
 
 function inicializarEdicionLocales() {
+  const tabla = document.getElementById("tablaLocalesAdmin");
 
-    const tabla =
-        document.getElementById('tablaLocalesAdmin');
+  const modalElemento = document.getElementById("modalLocal");
 
-    const modalElemento =
-        document.getElementById('modalLocal');
+  if (!tabla || !modalElemento) {
+    return;
+  }
 
-    if (!tabla || !modalElemento) {
-        return;
+  tabla.addEventListener("click", async (event) => {
+    const botonEditar = event.target.closest('button[title="Editar local"]');
+
+    if (!botonEditar) {
+      return;
     }
 
+    const localId = Number(botonEditar.dataset.id);
 
-    tabla.addEventListener(
-        'click',
-        async (event) => {
+    try {
+      const token = obtenerTokenAdmin();
 
-            const botonEditar =
-                event.target.closest(
-                    'button[title="Editar local"]'
-                );
+      const respuesta = await fetch(API_ADMIN_LOCALES_CRUD, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-            if (!botonEditar) {
-                return;
-            }
+      if (!respuesta.ok) {
+        throw new Error("No se pudo obtener el local");
+      }
 
+      const locales = await respuesta.json();
 
-            const localId =
-                Number(
-                    botonEditar.dataset.id
-                );
+      const local = locales.find((item) => Number(item.id) === localId);
 
+      if (!local) {
+        throw new Error("Local no encontrado");
+      }
 
-            try {
+      document.getElementById("localId").value = local.id;
 
-                const token =
-                    obtenerTokenAdmin();
+      document.getElementById("localNombre").value = local.nombre || "";
 
+      document.getElementById("localTipo").value = local.tipoLocalId || "";
 
-                const respuesta =
-                    await fetch(
-                        API_ADMIN_LOCALES_CRUD,
-                        {
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
+      document.getElementById("localBarrio").value = local.barrioId || "";
 
+      document.getElementById("localEstado").value =
+        local.estadoVerificacion || "pendiente";
 
-                if (!respuesta.ok) {
-                    throw new Error(
-                        'No se pudo obtener el local'
-                    );
-                }
+      document.getElementById("localDescripcion").value =
+        local.descripcion || "";
 
+      document.getElementById("localDireccion").value = local.direccion || "";
 
-                const locales =
-                    await respuesta.json();
+      document.getElementById("localTelefono").value = local.telefono || "";
 
+      document.getElementById("localEmail").value = local.email || "";
 
-                const local =
-                    locales.find(
-                        (item) =>
-                            Number(item.id) === localId
-                    );
+      document.getElementById("localHorario").value = local.horario || "";
 
+      document.getElementById("localSitioWeb").value = local.sitioWeb || "";
 
-                if (!local) {
-                    throw new Error(
-                        'Local no encontrado'
-                    );
-                }
+      document.getElementById("localInstagram").value = local.instagram || "";
 
+      document.getElementById("localImagen").value = local.imagen || "";
 
-                document.getElementById(
-                    'localId'
-                ).value =
-                    local.id;
+      document.getElementById("localLatitud").value = local.latitud || "";
 
+      document.getElementById("localLongitud").value = local.longitud || "";
 
-                document.getElementById(
-                    'localNombre'
-                ).value =
-                    local.nombre || '';
+      document.getElementById("modalLocalTitulo").textContent = "Editar local";
 
-
-                document.getElementById(
-                    'localTipo'
-                ).value =
-                    local.tipoLocalId || '';
-
-
-                document.getElementById(
-                    'localBarrio'
-                ).value =
-                    local.barrioId || '';
-
-
-                document.getElementById(
-                    'localEstado'
-                ).value =
-                    local.estadoVerificacion || 'pendiente';
-
-
-                document.getElementById(
-                    'localDescripcion'
-                ).value =
-                    local.descripcion || '';
-
-
-                document.getElementById(
-                    'localDireccion'
-                ).value =
-                    local.direccion || '';
-
-
-                document.getElementById(
-                    'localTelefono'
-                ).value =
-                    local.telefono || '';
-
-
-                document.getElementById(
-                    'localEmail'
-                ).value =
-                    local.email || '';
-
-
-                document.getElementById(
-                    'localHorario'
-                ).value =
-                    local.horario || '';
-
-
-                document.getElementById(
-                    'localSitioWeb'
-                ).value =
-                    local.sitioWeb || '';
-
-
-                document.getElementById(
-                    'localInstagram'
-                ).value =
-                    local.instagram || '';
-
-
-                document.getElementById(
-                    'localImagen'
-                ).value =
-                    local.imagen || '';
-
-
-                document.getElementById(
-                    'localLatitud'
-                ).value =
-                    local.latitud || '';
-
-
-                document.getElementById(
-                    'localLongitud'
-                ).value =
-                    local.longitud || '';
-
-
-                document.getElementById(
-                    'modalLocalTitulo'
-                ).textContent =
-                    'Editar local';
-
-
-                document.getElementById(
-                    'btnGuardarLocal'
-                ).innerHTML = `
+      document.getElementById("btnGuardarLocal").innerHTML = `
                     <i class="bi bi-check-lg"></i>
                     Guardar local
                 `;
 
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-                const modal =
-                    bootstrap.Modal.getOrCreateInstance(
-                        modalElemento
-                    );
-
-                modal.show();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al cargar local para editar:',
-                    error
-                );
-
-            }
-
-        }
-    );
-
+      modal.show();
+    } catch (error) {
+      console.error("Error al cargar local para editar:", error);
+    }
+  });
 }
 
 function inicializarEliminarLocal() {
+  const tabla = document.getElementById("tablaLocalesAdmin");
 
-    const tabla =
-        document.getElementById('tablaLocalesAdmin');
+  const modalElemento = document.getElementById("modalEliminarLocal");
 
-    const modalElemento =
-        document.getElementById('modalEliminarLocal');
+  const nombreLocal = document.getElementById("nombreLocalEliminar");
 
-    const nombreLocal =
-        document.getElementById('nombreLocalEliminar');
+  const botonConfirmar = document.getElementById("btnConfirmarEliminarLocal");
 
-    const botonConfirmar =
-        document.getElementById('btnConfirmarEliminarLocal');
+  if (!tabla || !modalElemento || !nombreLocal || !botonConfirmar) {
+    return;
+  }
 
-
-    if (
-        !tabla ||
-        !modalElemento ||
-        !nombreLocal ||
-        !botonConfirmar
-    ) {
-        return;
-    }
-
-
-    tabla.addEventListener(
-        'click',
-        (event) => {
-
-            const botonEliminar =
-                event.target.closest(
-                    'button[title="Eliminar local"]'
-                );
-
-
-            if (!botonEliminar) {
-                return;
-            }
-
-
-            const localId =
-                botonEliminar.dataset.id;
-
-
-            const fila =
-                botonEliminar.closest('tr');
-
-
-            const nombre =
-                fila.querySelector(
-                    '.admin-item-name'
-                )?.textContent.trim() || 'este local';
-
-
-            botonConfirmar.dataset.id =
-                localId;
-
-
-            nombreLocal.textContent =
-                nombre;
-
-
-            const modal =
-                bootstrap.Modal.getOrCreateInstance(
-                    modalElemento
-                );
-
-            modal.show();
-
-        }
+  tabla.addEventListener("click", (event) => {
+    const botonEliminar = event.target.closest(
+      'button[title="Eliminar local"]',
     );
 
+    if (!botonEliminar) {
+      return;
+    }
+
+    const localId = botonEliminar.dataset.id;
+
+    const fila = botonEliminar.closest("tr");
+
+    const nombre =
+      fila.querySelector(".admin-item-name")?.textContent.trim() ||
+      "este local";
+
+    botonConfirmar.dataset.id = localId;
+
+    nombreLocal.textContent = nombre;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
+
+    modal.show();
+  });
 }
 
-
 function inicializarConfirmarEliminarLocal() {
+  const botonConfirmar = document.getElementById("btnConfirmarEliminarLocal");
 
-    const botonConfirmar =
-        document.getElementById(
-            'btnConfirmarEliminarLocal'
-        );
+  const modalElemento = document.getElementById("modalEliminarLocal");
 
-    const modalElemento =
-        document.getElementById(
-            'modalEliminarLocal'
-        );
+  if (!botonConfirmar || !modalElemento) {
+    return;
+  }
 
+  botonConfirmar.addEventListener("click", async () => {
+    const localId = botonConfirmar.dataset.id;
 
-    if (!botonConfirmar || !modalElemento) {
-        return;
+    if (!localId) {
+      return;
     }
 
+    try {
+      const token = obtenerTokenAdmin();
 
-    botonConfirmar.addEventListener(
-        'click',
-        async () => {
+      const respuesta = await fetch(`${API_ADMIN_LOCALES_CRUD}/${localId}`, {
+        method: "DELETE",
 
-            const localId =
-                botonConfirmar.dataset.id;
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
+      const resultado = await respuesta.json();
 
-            if (!localId) {
-                return;
-            }
+      if (!respuesta.ok) {
+        throw new Error(resultado.mensaje || "No se pudo eliminar el local");
+      }
 
+      const modal = bootstrap.Modal.getInstance(modalElemento);
 
-            try {
+      modal.hide();
 
-                const token =
-                    obtenerTokenAdmin();
+      delete botonConfirmar.dataset.id;
 
-
-                const respuesta =
-                    await fetch(
-                        `${API_ADMIN_LOCALES_CRUD}/${localId}`,
-                        {
-                            method: 'DELETE',
-
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
-
-
-                const resultado =
-                    await respuesta.json();
-
-
-                if (!respuesta.ok) {
-
-                    throw new Error(
-                        resultado.mensaje ||
-                        'No se pudo eliminar el local'
-                    );
-
-                }
-
-
-                const modal =
-                    bootstrap.Modal.getInstance(
-                        modalElemento
-                    );
-
-
-                modal.hide();
-
-
-                delete botonConfirmar.dataset.id;
-
-
-                await cargarLocalesAdmin();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al eliminar local:',
-                    error
-                );
-
-            }
-
-        }
-    );
-
+      await cargarLocalesAdmin();
+    } catch (error) {
+      console.error("Error al eliminar local:", error);
+    }
+  });
 }
 
 async function cargarLocalesAdmin() {
+  const tabla = document.getElementById("tablaLocalesAdmin");
 
-    const tabla =
-        document.getElementById('tablaLocalesAdmin');
+  if (!tabla) return;
 
-    if (!tabla) return;
+  try {
+    const token = obtenerTokenAdmin();
 
-    try {
+    const respuesta = await fetch(API_ADMIN_LOCALES_CRUD, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        const token = obtenerTokenAdmin();
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar los locales");
+    }
 
-        const respuesta =
-            await fetch(
-                API_ADMIN_LOCALES_CRUD,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            );
+    const locales = await respuesta.json();
 
-        if (!respuesta.ok) {
-            throw new Error(
-                'No se pudieron cargar los locales'
-            );
-        }
+    tabla.innerHTML = "";
 
-        const locales =
-            await respuesta.json();
+    locales.forEach((local) => {
+      const estado = local.estadoVerificacion;
 
-        tabla.innerHTML = '';
+      let claseEstado = "status-pending";
 
-        locales.forEach((local) => {
+      let iconoEstado = "bi-hourglass-split";
 
-            const estado =
-                local.estadoVerificacion;
+      let textoEstado = "Pendiente";
 
-            let claseEstado =
-                'status-pending';
+      if (estado === "verificado") {
+        claseEstado = "status-ok";
 
-            let iconoEstado =
-                'bi-hourglass-split';
+        iconoEstado = "bi-patch-check-fill";
 
-            let textoEstado =
-                'Pendiente';
+        textoEstado = "Verificado";
+      } else if (estado === "rechazado") {
+        claseEstado = "status-rejected";
 
+        iconoEstado = "bi-x-circle-fill";
 
-            if (estado === 'verificado') {
+        textoEstado = "Rechazado";
+      }
 
-                claseEstado =
-                    'status-ok';
-
-                iconoEstado =
-                    'bi-patch-check-fill';
-
-                textoEstado =
-                    'Verificado';
-
-            } else if (estado === 'rechazado') {
-
-                claseEstado =
-                    'status-rejected';
-
-                iconoEstado =
-                    'bi-x-circle-fill';
-
-                textoEstado =
-                    'Rechazado';
-            }
-
-
-            tabla.innerHTML += `
+      tabla.innerHTML += `
                 <tr>
 
                     <td>
@@ -3138,7 +1950,7 @@ async function cargarLocalesAdmin() {
                                 </span>
 
                                 <span class="admin-item-sub">
-                                    ${local.direccion || 'Sin dirección'}
+                                    ${local.direccion || "Sin dirección"}
                                 </span>
                             </div>
 
@@ -3146,11 +1958,11 @@ async function cargarLocalesAdmin() {
                     </td>
 
                     <td>
-                        ${local.tipo || '-'}
+                        ${local.tipo || "-"}
                     </td>
 
                     <td>
-                        ${local.barrio || '-'}
+                        ${local.barrio || "-"}
                     </td>
 
                     <td>
@@ -3184,16 +1996,11 @@ async function cargarLocalesAdmin() {
 
                 </tr>
             `;
-        });
+    });
+  } catch (error) {
+    console.error("Error al cargar locales:", error);
 
-    } catch (error) {
-
-        console.error(
-            'Error al cargar locales:',
-            error
-        );
-
-        tabla.innerHTML = `
+    tabla.innerHTML = `
             <tr>
                 <td
                     colspan="5"
@@ -3203,916 +2010,542 @@ async function cargarLocalesAdmin() {
                 </td>
             </tr>
         `;
-    }
+  }
 }
 
 async function cargarOpcionesNutricionista() {
+  const selectBarrio = document.getElementById("nutricionistaBarrio");
 
-    const selectBarrio =
-        document.getElementById('nutricionistaBarrio');
+  if (!selectBarrio) return;
 
-    if (!selectBarrio) return;
+  try {
+    const token = obtenerTokenAdmin();
 
-    try {
+    const respuesta = await fetch(API_ADMIN_BARRIOS, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-        const token =
-            obtenerTokenAdmin();
+    if (!respuesta.ok) {
+      throw new Error("No se pudieron cargar los barrios");
+    }
 
-        const respuesta =
-            await fetch(
-                API_ADMIN_BARRIOS,
-                {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`
-                    }
-                }
-            );
+    const barrios = await respuesta.json();
 
-        if (!respuesta.ok) {
-            throw new Error(
-                'No se pudieron cargar los barrios'
-            );
-        }
-
-        const barrios =
-            await respuesta.json();
-
-        selectBarrio.innerHTML = `
+    selectBarrio.innerHTML = `
             <option value="">
                 Seleccionar barrio
             </option>
         `;
 
-        barrios.forEach((barrio) => {
-
-            selectBarrio.innerHTML += `
+    barrios.forEach((barrio) => {
+      selectBarrio.innerHTML += `
                 <option value="${barrio.id}">
                     ${barrio.nombre}
                 </option>
             `;
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar barrios para nutricionistas:',
-            error
-        );
-
-    }
-
+    });
+  } catch (error) {
+    console.error("Error al cargar barrios para nutricionistas:", error);
+  }
 }
 
 function inicializarNuevoNutricionista() {
+  const boton = document.getElementById("btnNuevoNutricionista");
 
-    const boton =
-        document.getElementById(
-            'btnNuevoNutricionista'
-        );
+  const modalElemento = document.getElementById("modalNutricionista");
 
-    const modalElemento =
-        document.getElementById(
-            'modalNutricionista'
-        );
+  const formulario = document.getElementById("formNutricionista");
 
-    const formulario =
-        document.getElementById(
-            'formNutricionista'
-        );
+  if (!boton || !modalElemento || !formulario) {
+    return;
+  }
 
-    if (!boton || !modalElemento || !formulario) {
-        return;
-    }
+  boton.addEventListener("click", () => {
+    formulario.reset();
 
-    boton.addEventListener(
-        'click',
-        () => {
+    document.getElementById("nutricionistaId").value = "";
 
-            formulario.reset();
+    document.getElementById("nutricionistaEstado").value = "pendiente";
 
-            document.getElementById(
-                'nutricionistaId'
-            ).value = '';
+    document.getElementById("modalNutricionistaTitulo").textContent =
+      "Nuevo nutricionista";
 
-            document.getElementById(
-                'nutricionistaEstado'
-            ).value = 'pendiente';
-
-            document.getElementById(
-                'modalNutricionistaTitulo'
-            ).textContent =
-                'Nuevo nutricionista';
-
-            document.getElementById(
-                'btnGuardarNutricionista'
-            ).innerHTML = `
+    document.getElementById("btnGuardarNutricionista").innerHTML = `
                 <i class="bi bi-check-lg"></i>
                 Guardar nutricionista
             `;
 
-            const modal =
-                bootstrap.Modal.getOrCreateInstance(
-                    modalElemento
-                );
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-            modal.show();
-
-        }
-    );
+    modal.show();
+  });
 }
 
 function inicializarGuardarNutricionista() {
+  const formulario = document.getElementById("formNutricionista");
 
-    const formulario =
-        document.getElementById('formNutricionista');
+  const modalElemento = document.getElementById("modalNutricionista");
 
-    const modalElemento =
-        document.getElementById('modalNutricionista');
+  if (!formulario || !modalElemento) {
+    return;
+  }
 
-    if (!formulario || !modalElemento) {
-        return;
+  formulario.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const nutricionistaId = document.getElementById("nutricionistaId").value;
+
+    const datos = {
+      nombre: document.getElementById("nutricionistaNombre").value.trim(),
+
+      apellido: document.getElementById("nutricionistaApellido").value.trim(),
+
+      matricula: document.getElementById("nutricionistaMatricula").value.trim(),
+
+      barrioId: document.getElementById("nutricionistaBarrio").value,
+
+      estadoVerificacion: document.getElementById("nutricionistaEstado").value,
+
+      descripcion: document
+        .getElementById("nutricionistaDescripcion")
+        .value.trim(),
+
+      fotoPerfil: document.getElementById("nutricionistaFoto").value.trim(),
+
+      direccion: document.getElementById("nutricionistaDireccion").value.trim(),
+
+      telefono: document.getElementById("nutricionistaTelefono").value.trim(),
+
+      tieneWhatsapp: document.getElementById("nutricionistaWhatsapp").checked,
+
+      email: document.getElementById("nutricionistaEmail").value.trim(),
+
+      instagram: document.getElementById("nutricionistaInstagram").value.trim(),
+
+      sitioWeb: document.getElementById("nutricionistaSitioWeb").value.trim(),
+
+      horario: document.getElementById("nutricionistaHorario").value.trim(),
+
+      latitud: document.getElementById("nutricionistaLatitud").value || null,
+
+      longitud: document.getElementById("nutricionistaLongitud").value || null,
+    };
+
+    const esNuevo = !nutricionistaId;
+
+    const url = esNuevo
+      ? API_ADMIN_NUTRICIONISTAS_CRUD
+      : `${API_ADMIN_NUTRICIONISTAS_CRUD}/${nutricionistaId}`;
+
+    const metodo = esNuevo ? "POST" : "PUT";
+
+    try {
+      const token = obtenerTokenAdmin();
+
+      const respuesta = await fetch(url, {
+        method: metodo,
+
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization: `Bearer ${token}`,
+        },
+
+        body: JSON.stringify(datos),
+      });
+
+      const resultado = await respuesta.json();
+
+      if (!respuesta.ok) {
+        throw new Error(
+          resultado.mensaje || "No se pudo guardar el nutricionista",
+        );
+      }
+
+      const modal = bootstrap.Modal.getInstance(modalElemento);
+
+      modal.hide();
+
+      await cargarNutricionistasAdmin();
+
+      const titulo = document.getElementById("modalNutricionistaExitoTitulo");
+
+      const mensaje = document.getElementById("modalNutricionistaExitoMensaje");
+
+      if (esNuevo) {
+        titulo.textContent = "Nutricionista creado";
+
+        mensaje.textContent = "El nutricionista se creó correctamente.";
+      } else {
+        titulo.textContent = "Nutricionista actualizado";
+
+        mensaje.textContent =
+          "Los cambios del nutricionista se guardaron correctamente.";
+      }
+
+      const modalExito = bootstrap.Modal.getOrCreateInstance(
+        document.getElementById("modalNutricionistaExito"),
+      );
+
+      modalExito.show();
+    } catch (error) {
+      console.error("Error al guardar nutricionista:", error);
     }
-
-
-    formulario.addEventListener(
-        'submit',
-        async (event) => {
-
-            event.preventDefault();
-
-
-            const nutricionistaId =
-                document.getElementById(
-                    'nutricionistaId'
-                ).value;
-
-
-            const datos = {
-
-                nombre:
-                    document.getElementById(
-                        'nutricionistaNombre'
-                    ).value.trim(),
-
-                apellido:
-                    document.getElementById(
-                        'nutricionistaApellido'
-                    ).value.trim(),
-
-                matricula:
-                    document.getElementById(
-                        'nutricionistaMatricula'
-                    ).value.trim(),
-
-                barrioId:
-                    document.getElementById(
-                        'nutricionistaBarrio'
-                    ).value,
-
-                estadoVerificacion:
-                    document.getElementById(
-                        'nutricionistaEstado'
-                    ).value,
-
-                descripcion:
-                    document.getElementById(
-                        'nutricionistaDescripcion'
-                    ).value.trim(),
-
-                fotoPerfil:
-                    document.getElementById(
-                        'nutricionistaFoto'
-                    ).value.trim(),
-
-                direccion:
-                    document.getElementById(
-                        'nutricionistaDireccion'
-                    ).value.trim(),
-
-                telefono:
-                    document.getElementById(
-                        'nutricionistaTelefono'
-                    ).value.trim(),
-
-                tieneWhatsapp:
-                    document.getElementById(
-                        'nutricionistaWhatsapp'
-                    ).checked,
-
-                email:
-                    document.getElementById(
-                        'nutricionistaEmail'
-                    ).value.trim(),
-
-                instagram:
-                    document.getElementById(
-                        'nutricionistaInstagram'
-                    ).value.trim(),
-
-                sitioWeb:
-                    document.getElementById(
-                        'nutricionistaSitioWeb'
-                    ).value.trim(),
-
-                horario:
-                    document.getElementById(
-                        'nutricionistaHorario'
-                    ).value.trim(),
-
-                latitud:
-                    document.getElementById(
-                        'nutricionistaLatitud'
-                    ).value || null,
-
-                longitud:
-                    document.getElementById(
-                        'nutricionistaLongitud'
-                    ).value || null
-            };
-
-
-            const esNuevo =
-                !nutricionistaId;
-
-
-            const url =
-                esNuevo
-                    ? API_ADMIN_NUTRICIONISTAS_CRUD
-                    : `${API_ADMIN_NUTRICIONISTAS_CRUD}/${nutricionistaId}`;
-
-
-            const metodo =
-                esNuevo ? 'POST' : 'PUT';
-
-
-            try {
-
-                const token =
-                    obtenerTokenAdmin();
-
-
-                const respuesta =
-                    await fetch(
-                        url,
-                        {
-                            method: metodo,
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json',
-
-                                Authorization:
-                                    `Bearer ${token}`
-                            },
-
-                            body:
-                                JSON.stringify(datos)
-                        }
-                    );
-
-
-                const resultado =
-                    await respuesta.json();
-
-
-                if (!respuesta.ok) {
-
-                    throw new Error(
-                        resultado.mensaje ||
-                        'No se pudo guardar el nutricionista'
-                    );
-
-                }
-
-
-                const modal =
-                    bootstrap.Modal.getInstance(
-                        modalElemento
-                    );
-
-                modal.hide();
-
-
-                await cargarNutricionistasAdmin();
-
-
-                const titulo =
-                    document.getElementById(
-                        'modalNutricionistaExitoTitulo'
-                    );
-
-                const mensaje =
-                    document.getElementById(
-                        'modalNutricionistaExitoMensaje'
-                    );
-
-
-                if (esNuevo) {
-
-                    titulo.textContent =
-                        'Nutricionista creado';
-
-                    mensaje.textContent =
-                        'El nutricionista se creó correctamente.';
-
-                } else {
-
-                    titulo.textContent =
-                        'Nutricionista actualizado';
-
-                    mensaje.textContent =
-                        'Los cambios del nutricionista se guardaron correctamente.';
-
-                }
-
-
-                const modalExito =
-                    bootstrap.Modal.getOrCreateInstance(
-                        document.getElementById(
-                            'modalNutricionistaExito'
-                        )
-                    );
-
-                modalExito.show();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al guardar nutricionista:',
-                    error
-                );
-
-            }
-
-        }
-    );
-
+  });
 }
 
 function inicializarEdicionNutricionistas() {
+  const tabla = document.getElementById("tablaNutricionistasAdmin");
 
-    const tabla =
-        document.getElementById('tablaNutricionistasAdmin');
+  const modalElemento = document.getElementById("modalNutricionista");
 
-    const modalElemento =
-        document.getElementById('modalNutricionista');
+  if (!tabla || !modalElemento) {
+    return;
+  }
 
-    if (!tabla || !modalElemento) {
-        return;
+  tabla.addEventListener("click", async (event) => {
+    const botonEditar = event.target.closest(
+      'button[title="Editar nutricionista"]',
+    );
+
+    if (!botonEditar) {
+      return;
     }
 
+    const nutricionistaId = Number(botonEditar.dataset.id);
 
-    tabla.addEventListener(
-        'click',
-        async (event) => {
+    try {
+      const token = obtenerTokenAdmin();
 
-            const botonEditar =
-                event.target.closest(
-                    'button[title="Editar nutricionista"]'
-                );
+      const respuesta = await fetch(API_ADMIN_NUTRICIONISTAS_CRUD, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-            if (!botonEditar) {
-                return;
-            }
+      if (!respuesta.ok) {
+        throw new Error("No se pudo obtener el nutricionista");
+      }
 
+      const nutricionistas = await respuesta.json();
 
-            const nutricionistaId =
-                Number(botonEditar.dataset.id);
+      const nutricionista = nutricionistas.find(
+        (item) => Number(item.id) === nutricionistaId,
+      );
 
+      if (!nutricionista) {
+        throw new Error("Nutricionista no encontrado");
+      }
 
-            try {
+      document.getElementById("nutricionistaId").value = nutricionista.id;
 
-                const token =
-                    obtenerTokenAdmin();
+      document.getElementById("nutricionistaNombre").value =
+        nutricionista.nombre || "";
 
+      document.getElementById("nutricionistaApellido").value =
+        nutricionista.apellido || "";
 
-                const respuesta =
-                    await fetch(
-                        API_ADMIN_NUTRICIONISTAS_CRUD,
-                        {
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
+      document.getElementById("nutricionistaMatricula").value =
+        nutricionista.matricula || "";
 
+      document.getElementById("nutricionistaBarrio").value =
+        nutricionista.barrioId || "";
 
-                if (!respuesta.ok) {
-                    throw new Error(
-                        'No se pudo obtener el nutricionista'
-                    );
-                }
+      document.getElementById("nutricionistaEstado").value =
+        nutricionista.estadoVerificacion || "pendiente";
 
+      document.getElementById("nutricionistaDescripcion").value =
+        nutricionista.descripcion || "";
 
-                const nutricionistas =
-                    await respuesta.json();
+      document.getElementById("nutricionistaFoto").value =
+        nutricionista.fotoPerfil || "";
 
+      document.getElementById("nutricionistaDireccion").value =
+        nutricionista.direccion || "";
 
-                const nutricionista =
-                    nutricionistas.find(
-                        (item) =>
-                            Number(item.id) ===
-                            nutricionistaId
-                    );
+      document.getElementById("nutricionistaTelefono").value =
+        nutricionista.telefono || "";
 
+      document.getElementById("nutricionistaWhatsapp").checked = Boolean(
+        Number(nutricionista.tieneWhatsapp),
+      );
 
-                if (!nutricionista) {
-                    throw new Error(
-                        'Nutricionista no encontrado'
-                    );
-                }
+      document.getElementById("nutricionistaEmail").value =
+        nutricionista.email || "";
 
+      document.getElementById("nutricionistaInstagram").value =
+        nutricionista.instagram || "";
 
-                document.getElementById(
-                    'nutricionistaId'
-                ).value =
-                    nutricionista.id;
+      document.getElementById("nutricionistaSitioWeb").value =
+        nutricionista.sitioWeb || "";
 
+      document.getElementById("nutricionistaHorario").value =
+        nutricionista.horario || "";
 
-                document.getElementById(
-                    'nutricionistaNombre'
-                ).value =
-                    nutricionista.nombre || '';
+      document.getElementById("nutricionistaLatitud").value =
+        nutricionista.latitud || "";
 
+      document.getElementById("nutricionistaLongitud").value =
+        nutricionista.longitud || "";
 
-                document.getElementById(
-                    'nutricionistaApellido'
-                ).value =
-                    nutricionista.apellido || '';
+      document.getElementById("modalNutricionistaTitulo").textContent =
+        "Editar nutricionista";
 
-
-                document.getElementById(
-                    'nutricionistaMatricula'
-                ).value =
-                    nutricionista.matricula || '';
-
-
-                document.getElementById(
-                    'nutricionistaBarrio'
-                ).value =
-                    nutricionista.barrioId || '';
-
-
-                document.getElementById(
-                    'nutricionistaEstado'
-                ).value =
-                    nutricionista.estadoVerificacion ||
-                    'pendiente';
-
-
-                document.getElementById(
-                    'nutricionistaDescripcion'
-                ).value =
-                    nutricionista.descripcion || '';
-
-
-                document.getElementById(
-                    'nutricionistaFoto'
-                ).value =
-                    nutricionista.fotoPerfil || '';
-
-
-                document.getElementById(
-                    'nutricionistaDireccion'
-                ).value =
-                    nutricionista.direccion || '';
-
-
-                document.getElementById(
-                    'nutricionistaTelefono'
-                ).value =
-                    nutricionista.telefono || '';
-
-
-                document.getElementById(
-                    'nutricionistaWhatsapp'
-                ).checked =
-                    Boolean(
-                        Number(
-                            nutricionista.tieneWhatsapp
-                        )
-                    );
-
-
-                document.getElementById(
-                    'nutricionistaEmail'
-                ).value =
-                    nutricionista.email || '';
-
-
-                document.getElementById(
-                    'nutricionistaInstagram'
-                ).value =
-                    nutricionista.instagram || '';
-
-
-                document.getElementById(
-                    'nutricionistaSitioWeb'
-                ).value =
-                    nutricionista.sitioWeb || '';
-
-
-                document.getElementById(
-                    'nutricionistaHorario'
-                ).value =
-                    nutricionista.horario || '';
-
-
-                document.getElementById(
-                    'nutricionistaLatitud'
-                ).value =
-                    nutricionista.latitud || '';
-
-
-                document.getElementById(
-                    'nutricionistaLongitud'
-                ).value =
-                    nutricionista.longitud || '';
-
-
-                document.getElementById(
-                    'modalNutricionistaTitulo'
-                ).textContent =
-                    'Editar nutricionista';
-
-
-                document.getElementById(
-                    'btnGuardarNutricionista'
-                ).innerHTML = `
+      document.getElementById("btnGuardarNutricionista").innerHTML = `
                     <i class="bi bi-check-lg"></i>
                     Guardar nutricionista
                 `;
 
+      const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-                const modal =
-                    bootstrap.Modal.getOrCreateInstance(
-                        modalElemento
-                    );
-
-                modal.show();
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al cargar nutricionista para editar:',
-                    error
-                );
-
-            }
-
-        }
-    );
+      modal.show();
+    } catch (error) {
+      console.error("Error al cargar nutricionista para editar:", error);
+    }
+  });
 }
 
 function inicializarEliminarNutricionista() {
+  const tabla = document.getElementById("tablaNutricionistasAdmin");
 
-    const tabla =
-        document.getElementById('tablaNutricionistasAdmin');
+  const modalElemento = document.getElementById("modalEliminarNutricionista");
 
-    const modalElemento =
-        document.getElementById('modalEliminarNutricionista');
+  if (!tabla || !modalElemento) {
+    return;
+  }
 
-    if (!tabla || !modalElemento) {
-        return;
+  tabla.addEventListener("click", (event) => {
+    const botonEliminar = event.target.closest(
+      'button[title="Eliminar nutricionista"]',
+    );
+
+    if (!botonEliminar) {
+      return;
     }
 
+    const nutricionistaId = botonEliminar.dataset.id;
 
-    tabla.addEventListener(
-        'click',
-        (event) => {
+    const fila = botonEliminar.closest("tr");
 
-            const botonEliminar =
-                event.target.closest(
-                    'button[title="Eliminar nutricionista"]'
-                );
+    const nombre =
+      fila.querySelector(".admin-item-name")?.textContent.trim() ||
+      "este nutricionista";
 
-            if (!botonEliminar) {
-                return;
-            }
+    document.getElementById("nombreNutricionistaEliminar").textContent = nombre;
 
-
-            const nutricionistaId =
-                botonEliminar.dataset.id;
-
-            const fila =
-                botonEliminar.closest('tr');
-
-            const nombre =
-                fila.querySelector(
-                    '.admin-item-name'
-                )?.textContent.trim() ||
-                'este nutricionista';
-
-
-            document.getElementById(
-                'nombreNutricionistaEliminar'
-            ).textContent =
-                nombre;
-
-
-            const botonConfirmar =
-                document.getElementById(
-                    'btnConfirmarEliminarNutricionista'
-                );
-
-            botonConfirmar.dataset.id =
-                nutricionistaId;
-
-
-            const modal =
-                bootstrap.Modal.getOrCreateInstance(
-                    modalElemento
-                );
-
-            modal.show();
-
-        }
+    const botonConfirmar = document.getElementById(
+      "btnConfirmarEliminarNutricionista",
     );
+
+    botonConfirmar.dataset.id = nutricionistaId;
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
+
+    modal.show();
+  });
 }
 
 function inicializarConfirmarEliminarNutricionista() {
+  const botonConfirmar = document.getElementById(
+    "btnConfirmarEliminarNutricionista",
+  );
 
-    const botonConfirmar =
-        document.getElementById(
-            'btnConfirmarEliminarNutricionista'
-        );
+  const modalElemento = document.getElementById("modalEliminarNutricionista");
 
-    const modalElemento =
-        document.getElementById(
-            'modalEliminarNutricionista'
-        );
+  if (!botonConfirmar || !modalElemento) {
+    return;
+  }
 
-    if (!botonConfirmar || !modalElemento) {
-        return;
+  botonConfirmar.addEventListener("click", async () => {
+    const nutricionistaId = botonConfirmar.dataset.id;
+
+    if (!nutricionistaId) {
+      return;
     }
 
+    try {
+      const token = obtenerTokenAdmin();
 
-    botonConfirmar.addEventListener(
-        'click',
-        async () => {
+      const respuesta = await fetch(
+        `${API_ADMIN_NUTRICIONISTAS_CRUD}/${nutricionistaId}`,
+        {
+          method: "DELETE",
 
-            const nutricionistaId =
-                botonConfirmar.dataset.id;
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-            if (!nutricionistaId) {
-                return;
-            }
+      const resultado = await respuesta.json();
 
+      if (!respuesta.ok) {
+        throw new Error(
+          resultado.mensaje || "No se pudo eliminar el nutricionista",
+        );
+      }
 
-            try {
+      const modalEliminar = bootstrap.Modal.getInstance(modalElemento);
 
-                const token =
-                    obtenerTokenAdmin();
+      modalEliminar.hide();
 
+      await cargarNutricionistasAdmin();
 
-                const respuesta =
-                    await fetch(
-                        `${API_ADMIN_NUTRICIONISTAS_CRUD}/${nutricionistaId}`,
-                        {
-                            method: 'DELETE',
+      document.getElementById("modalNutricionistaExitoTitulo").textContent =
+        "Nutricionista eliminado";
 
-                            headers: {
-                                Authorization:
-                                    `Bearer ${token}`
-                            }
-                        }
-                    );
+      document.getElementById("modalNutricionistaExitoMensaje").textContent =
+        "El nutricionista se eliminó correctamente.";
 
+      const modalExito = bootstrap.Modal.getOrCreateInstance(
+        document.getElementById("modalNutricionistaExito"),
+      );
 
-                const resultado =
-                    await respuesta.json();
+      modalExito.show();
 
-
-                if (!respuesta.ok) {
-
-                    throw new Error(
-                        resultado.mensaje ||
-                        'No se pudo eliminar el nutricionista'
-                    );
-
-                }
-
-
-                const modalEliminar =
-                    bootstrap.Modal.getInstance(
-                        modalElemento
-                    );
-
-                modalEliminar.hide();
-
-
-                await cargarNutricionistasAdmin();
-
-
-                document.getElementById(
-                    'modalNutricionistaExitoTitulo'
-                ).textContent =
-                    'Nutricionista eliminado';
-
-
-                document.getElementById(
-                    'modalNutricionistaExitoMensaje'
-                ).textContent =
-                    'El nutricionista se eliminó correctamente.';
-
-
-                const modalExito =
-                    bootstrap.Modal.getOrCreateInstance(
-                        document.getElementById(
-                            'modalNutricionistaExito'
-                        )
-                    );
-
-                modalExito.show();
-
-
-                botonConfirmar.dataset.id = '';
-
-
-            } catch (error) {
-
-                console.error(
-                    'Error al eliminar nutricionista:',
-                    error
-                );
-
-            }
-
-        }
-    );
+      botonConfirmar.dataset.id = "";
+    } catch (error) {
+      console.error("Error al eliminar nutricionista:", error);
+    }
+  });
 }
 
 // ==========================================
 // INICIAR ADMIN
 // ==========================================
 
-document.addEventListener(
-    'DOMContentLoaded',
+document.addEventListener("DOMContentLoaded", () => {
+  if (!verificarAccesoAdmin()) {
+    return;
+  }
+
+  mostrarUsuarioPanel();
+  configurarDashboardSegunRol();
+
+  cargarComponente(
+    "#admin-sidebar-placeholder",
+    "../components/admin-sidebar.html",
     () => {
+      configurarSidebarSegunRol();
 
-        if (!verificarAccesoAdmin()) {
-            return;
-        }
+      marcarLinkActivoAdmin();
 
-        mostrarUsuarioPanel();
-        configurarDashboardSegunRol();
+      inicializarCerrarSesionAdmin();
+    },
+  );
 
+  inicializarMenuMobileAdmin();
 
-        cargarComponente(
-    '#admin-sidebar-placeholder',
-    '../components/admin-sidebar.html',
-    () => {
+  inicializarModalModeracion();
 
-        configurarSidebarSegunRol();
+  const usuarioActualAdmin = obtenerUsuarioAdmin();
+  const rolActualAdmin = Number(usuarioActualAdmin?.rolId);
 
-        marcarLinkActivoAdmin();
-
-        inicializarCerrarSesionAdmin();
-
-    }
-);
-
-
-        inicializarMenuMobileAdmin();
-
-        inicializarModalModeracion();
-
-      const usuarioActualAdmin = obtenerUsuarioAdmin();
-const rolActualAdmin = Number(usuarioActualAdmin?.rolId);
-
-// Solo el ADMIN carga estadísticas y últimas altas
-if (rolActualAdmin === 1) {
-
-    if (typeof cargarEstadisticasDashboard === 'function') {
-        cargarEstadisticasDashboard();
+  // Solo el ADMIN carga estadísticas y últimas altas
+  if (rolActualAdmin === 1) {
+    if (typeof cargarEstadisticasDashboard === "function") {
+      cargarEstadisticasDashboard();
     }
 
-    if (typeof cargarUltimasAltas === 'function') {
-        cargarUltimasAltas();
+    if (typeof cargarUltimasAltas === "function") {
+      cargarUltimasAltas();
     }
-}
+  }
 
-// Admin y Moderador pueden cargar comentarios pendientes
-cargarComentariosPendientes();
+  // Admin y Moderador pueden cargar comentarios pendientes
+  cargarComentariosPendientes();
 
+  // ==========================================
+  // RESTAURANTES
+  // ==========================================
 
-        // ==========================================
-        // RESTAURANTES
-        // ==========================================
+  cargarRestaurantesAdmin();
 
-        cargarRestaurantesAdmin();
+  cargarOpcionesRestaurante().then(() => {
+    inicializarEdicionRestaurantes();
 
-        cargarOpcionesRestaurante()
-            .then(() => {
+    inicializarNuevoRestaurante();
+  });
 
-                inicializarEdicionRestaurantes();
+  inicializarGuardarRestaurante();
 
-                inicializarNuevoRestaurante();
+  inicializarEliminarRestaurante();
 
-            });
+  inicializarConfirmarEliminarRestaurante();
 
-        inicializarGuardarRestaurante();
+  // LOCALES
+  cargarLocalesAdmin();
+  cargarOpcionesLocal();
+  inicializarNuevoLocal();
+  inicializarGuardarLocal();
+  inicializarEdicionLocales();
+  inicializarEliminarLocal();
+  inicializarConfirmarEliminarLocal();
 
-        inicializarEliminarRestaurante();
+  // NUTRICIONISTAS
+  cargarNutricionistasAdmin();
+  cargarOpcionesNutricionista();
+  inicializarNuevoNutricionista();
+  inicializarGuardarNutricionista();
+  inicializarEdicionNutricionistas();
+  inicializarEliminarNutricionista();
+  inicializarConfirmarEliminarNutricionista();
 
-        inicializarConfirmarEliminarRestaurante();
+  // ==========================================
+  // PRODUCTOS
+  // ==========================================
 
-        // LOCALES
-        cargarLocalesAdmin();
-        cargarOpcionesLocal();
-        inicializarNuevoLocal();
-        inicializarGuardarLocal();
-        inicializarEdicionLocales();
-        inicializarEliminarLocal();
-        inicializarConfirmarEliminarLocal();
+  cargarProductosAdmin();
 
-        // NUTRICIONISTAS
-        cargarNutricionistasAdmin();
-        cargarOpcionesNutricionista();
-        inicializarNuevoNutricionista();
-        inicializarGuardarNutricionista();
-        inicializarEdicionNutricionistas();
-        inicializarEliminarNutricionista();
-        inicializarConfirmarEliminarNutricionista();
+  cargarOpcionesProducto().then(() => {
+    inicializarEdicionProductos();
 
+    inicializarNuevoProducto();
+  });
 
+  inicializarGuardarProducto();
 
-        // ==========================================
-        // PRODUCTOS
-        // ==========================================
+  inicializarEliminarProducto();
 
-        cargarProductosAdmin();
-
-        cargarOpcionesProducto()
-            .then(() => {
-
-                inicializarEdicionProductos();
-
-                inicializarNuevoProducto();
-
-            });
-
-        inicializarGuardarProducto();
-
-        inicializarEliminarProducto();
-
-        inicializarConfirmarEliminarProducto();
-
-    }
-);
+  inicializarConfirmarEliminarProducto();
+});
 
 // ==========================================
 // NUEVO PRODUCTO - ADMIN
 // ==========================================
 
 function inicializarNuevoProducto() {
+  const botonNuevo = document.getElementById("btnNuevoProducto");
 
-    const botonNuevo =
-        document.getElementById('btnNuevoProducto');
+  const formulario = document.getElementById("formProducto");
 
-    const formulario =
-        document.getElementById('formProducto');
+  const modalElemento = document.getElementById("modalProducto");
 
-    const modalElemento =
-        document.getElementById('modalProducto');
+  if (!botonNuevo || !formulario || !modalElemento) {
+    return;
+  }
 
-    if (!botonNuevo || !formulario || !modalElemento) {
-        return;
-    }
+  botonNuevo.addEventListener("click", () => {
+    formulario.reset();
 
-    botonNuevo.addEventListener('click', () => {
+    document.getElementById("productoId").value = "";
 
-        formulario.reset();
+    document.getElementById("productoEstado").value = "pendiente";
 
-        document.getElementById(
-            'productoId'
-        ).value = '';
+    document.getElementById("modalProductoTitulo").textContent =
+      "Nuevo producto";
 
-        document.getElementById(
-            'modalProductoTitulo'
-        ).textContent = 'Nuevo producto';
-
-        document.getElementById(
-            'btnGuardarProducto'
-        ).innerHTML = `
+    document.getElementById("btnGuardarProducto").innerHTML = `
             <i class="bi bi-check-lg"></i>
             Crear producto
         `;
 
-        const modal =
-            bootstrap.Modal.getOrCreateInstance(
-                modalElemento
-            );
+    const modal = bootstrap.Modal.getOrCreateInstance(modalElemento);
 
-        modal.show();
-
-    });
-
+    modal.show();
+  });
 }
 
 // ==========================================
@@ -4120,48 +2553,31 @@ function inicializarNuevoProducto() {
 // ==========================================
 
 function mostrarUsuarioPanel() {
+  const usuario = obtenerUsuarioAdmin();
 
-    const usuario =
-        obtenerUsuarioAdmin();
+  if (!usuario) {
+    return;
+  }
 
-    if (!usuario) {
-        return;
-    }
+  const nombre = document.getElementById("adminUsuarioNombre");
 
-    const nombre =
-        document.getElementById(
-            'adminUsuarioNombre'
-        );
+  const rol = document.getElementById("adminUsuarioRol");
 
-    const rol =
-        document.getElementById(
-            'adminUsuarioRol'
-        );
+  if (!nombre || !rol) {
+    return;
+  }
 
-    if (!nombre || !rol) {
-        return;
-    }
+  const rolId = Number(usuario.rolId);
 
-    const rolId =
-        Number(usuario.rolId);
+  if (rolId === 1) {
+    nombre.textContent = "Administrador";
 
-    if (rolId === 1) {
+    rol.textContent = "Rol: admin";
+  } else if (rolId === 3) {
+    nombre.textContent = "Moderador";
 
-        nombre.textContent =
-            'Administrador';
-
-        rol.textContent =
-            'Rol: admin';
-
-    } else if (rolId === 3) {
-
-        nombre.textContent =
-            'Moderador';
-
-        rol.textContent =
-            'Rol: moderador';
-
-    }
+    rol.textContent = "Rol: moderador";
+  }
 }
 
 // ==========================================
@@ -4169,86 +2585,56 @@ function mostrarUsuarioPanel() {
 // ==========================================
 
 function configurarDashboardSegunRol() {
+  const usuario = obtenerUsuarioAdmin();
 
-    const usuario =
-        obtenerUsuarioAdmin();
+  if (!usuario) {
+    return;
+  }
 
-    if (!usuario) {
-        return;
+  const rolId = Number(usuario.rolId);
+
+  // ADMINISTRADOR
+  // Conserva el dashboard completo
+  if (rolId === 1) {
+    return;
+  }
+
+  // MODERADOR
+  if (rolId === 3) {
+    const encabezadoAdmin = document.getElementById("dashboardAdminHead");
+
+    const metricasAdmin = document.getElementById("dashboardAdminMetricas");
+
+    const altasAdmin = document.getElementById("dashboardAdminAltas");
+
+    const encabezadoModerador = document.getElementById(
+      "dashboardModeradorHead",
+    );
+
+    const panelModeracion = document.getElementById("dashboardModeracion");
+
+    if (encabezadoAdmin) {
+      encabezadoAdmin.classList.add("d-none");
     }
 
-    const rolId =
-        Number(usuario.rolId);
-
-    // ADMINISTRADOR
-    // Conserva el dashboard completo
-    if (rolId === 1) {
-        return;
+    if (metricasAdmin) {
+      metricasAdmin.classList.add("d-none");
     }
 
-    // MODERADOR
-    if (rolId === 3) {
-
-        const encabezadoAdmin =
-            document.getElementById(
-                'dashboardAdminHead'
-            );
-
-        const metricasAdmin =
-            document.getElementById(
-                'dashboardAdminMetricas'
-            );
-
-        const altasAdmin =
-            document.getElementById(
-                'dashboardAdminAltas'
-            );
-
-        const encabezadoModerador =
-    document.getElementById(
-        'dashboardModeradorHead'
-    );
-
-    const panelModeracion =
-    document.getElementById(
-        'dashboardModeracion'
-    );
-
-        if (encabezadoAdmin) {
-            encabezadoAdmin.classList.add(
-                'd-none'
-            );
-        }
-
-        if (metricasAdmin) {
-            metricasAdmin.classList.add(
-                'd-none'
-            );
-        }
-
-        if (altasAdmin) {
-            altasAdmin.classList.add(
-                'd-none'
-            );
-        }
-
-        if (encabezadoModerador) {
-    encabezadoModerador.classList.remove(
-        'd-none'
-    );
-
-    if (panelModeracion) {
-    panelModeracion.classList.remove(
-        'col-xl-4'
-    );
-
-    panelModeracion.classList.add(
-        'col-xl-12'
-    );
-}
-}
+    if (altasAdmin) {
+      altasAdmin.classList.add("d-none");
     }
 
+    if (encabezadoModerador) {
+      encabezadoModerador.classList.remove("d-none");
+
+      if (panelModeracion) {
+        panelModeracion.classList.remove("col-xl-4");
+
+        panelModeracion.classList.add("col-xl-12");
+      }
+    }
+  }
 }
 
 // ==========================================
@@ -4256,64 +2642,39 @@ function configurarDashboardSegunRol() {
 // ==========================================
 
 function configurarSidebarSegunRol() {
+  const usuario = obtenerUsuarioAdmin();
 
-    const usuario =
-        obtenerUsuarioAdmin();
+  if (!usuario) {
+    return;
+  }
 
-    if (!usuario) {
-        return;
-    }
+  const rolId = Number(usuario.rolId);
 
-    const rolId =
-        Number(usuario.rolId);
+  // ADMINISTRADOR
+  if (rolId === 1) {
+    return;
+  }
 
-    // ADMINISTRADOR
-    if (rolId === 1) {
-        return;
-    }
+  // MODERADOR
+  if (rolId === 3) {
+    const enlacesPermitidos = ["index.html"];
 
-    // MODERADOR
-    if (rolId === 3) {
+    document.querySelectorAll(".admin-nav-link[data-page]").forEach((link) => {
+      if (!enlacesPermitidos.includes(link.dataset.page)) {
+        link.classList.add("d-none");
+      }
+    });
 
-        const enlacesPermitidos = [
-            'index.html'
-        ];
-
-        document
-            .querySelectorAll(
-                '.admin-nav-link[data-page]'
-            )
-            .forEach(link => {
-
-                if (
-                    !enlacesPermitidos.includes(
-                        link.dataset.page
-                    )
-                ) {
-                    link.classList.add('d-none');
-                }
-
-            });
-
-
-        // Ocultar títulos de secciones
-        document
-            .querySelectorAll(
-                '.admin-nav-label'
-            )
-            .forEach(label => {
-
-                if (
-                    label.textContent.trim() ===
-                        'Catálogo' ||
-                    label.textContent.trim() ===
-                        'Administración'
-                ) {
-                    label.classList.add('d-none');
-                }
-
-            });
-    }
+    // Ocultar títulos de secciones
+    document.querySelectorAll(".admin-nav-label").forEach((label) => {
+      if (
+        label.textContent.trim() === "Catálogo" ||
+        label.textContent.trim() === "Administración"
+      ) {
+        label.classList.add("d-none");
+      }
+    });
+  }
 }
 
 // ==========================================
@@ -4321,250 +2682,119 @@ function configurarSidebarSegunRol() {
 // ==========================================
 
 function marcarLinkActivoAdmin() {
+  const paginaActual =
+    window.location.pathname.split("/").pop() || "index.html";
 
-    const paginaActual =
-        window.location.pathname
-            .split('/')
-            .pop() ||
-        'index.html';
-
-
-    document
-        .querySelectorAll(
-            '.admin-nav-link[data-page]'
-        )
-        .forEach(link => {
-
-            link.classList.toggle(
-                'active',
-                link.dataset.page ===
-                    paginaActual
-            );
-
-        });
+  document.querySelectorAll(".admin-nav-link[data-page]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.page === paginaActual);
+  });
 }
-
 
 // ==========================================
 // MENÚ MOBILE
 // ==========================================
 
 function inicializarMenuMobileAdmin() {
+  const body = document.body;
 
-    const body =
-        document.body;
+  const botonMenu = document.getElementById("adminMenuToggle");
 
-    const botonMenu =
-        document.getElementById(
-            'adminMenuToggle'
-        );
+  const overlay = document.getElementById("adminOverlay");
 
-    const overlay =
-        document.getElementById(
-            'adminOverlay'
-        );
+  const sidebar = document.getElementById("admin-sidebar-placeholder");
 
-    const sidebar =
-        document.getElementById(
-            'admin-sidebar-placeholder'
-        );
+  const cerrarMenu = () => body.classList.remove("admin-menu-open");
 
+  if (botonMenu) {
+    botonMenu.addEventListener("click", () => {
+      body.classList.toggle("admin-menu-open");
+    });
+  }
 
-    const cerrarMenu =
-        () =>
-            body.classList.remove(
-                'admin-menu-open'
-            );
+  if (overlay) {
+    overlay.addEventListener("click", cerrarMenu);
+  }
 
+  if (sidebar) {
+    sidebar.addEventListener("click", (evento) => {
+      if (evento.target.closest(".admin-nav-link, .admin-close")) {
+        cerrarMenu();
+      }
+    });
+  }
 
-    if (botonMenu) {
-
-        botonMenu.addEventListener(
-            'click',
-            () => {
-
-                body.classList.toggle(
-                    'admin-menu-open'
-                );
-
-            }
-        );
+  document.addEventListener("keydown", (evento) => {
+    if (evento.key === "Escape") {
+      cerrarMenu();
     }
-
-
-    if (overlay) {
-
-        overlay.addEventListener(
-            'click',
-            cerrarMenu
-        );
-    }
-
-
-    if (sidebar) {
-
-        sidebar.addEventListener(
-            'click',
-            evento => {
-
-                if (
-                    evento.target.closest(
-                        '.admin-nav-link, .admin-close'
-                    )
-                ) {
-
-                    cerrarMenu();
-
-                }
-
-            }
-        );
-    }
-
-
-    document.addEventListener(
-        'keydown',
-        evento => {
-
-            if (
-                evento.key ===
-                'Escape'
-            ) {
-
-                cerrarMenu();
-
-            }
-
-        }
-    );
+  });
 }
-
 
 // ==========================================
 // CERRAR SESIÓN ADMIN
 // ==========================================
 
 function inicializarCerrarSesionAdmin() {
+  const botonCerrarSesion = document.getElementById("adminCerrarSesion");
 
-    const botonCerrarSesion =
-        document.getElementById(
-            'adminCerrarSesion'
-        );
+  if (!botonCerrarSesion) {
+    return;
+  }
 
+  botonCerrarSesion.addEventListener("click", (evento) => {
+    evento.preventDefault();
 
-    if (!botonCerrarSesion) {
-        return;
-    }
+    limpiarSesionAdmin();
 
-
-    botonCerrarSesion.addEventListener(
-        'click',
-        evento => {
-
-            evento.preventDefault();
-
-            limpiarSesionAdmin();
-
-            window.location.replace(
-                '../login.html'
-            );
-
-        }
-    );
+    window.location.replace("../login.html");
+  });
 }
-
 
 // ==========================================
 // GENERAR INICIALES
 // ==========================================
 
-function generarIniciales(
-    nombre,
-    apellido
-) {
+function generarIniciales(nombre, apellido) {
+  const inicialNombre = nombre ? nombre.charAt(0) : "";
 
-    const inicialNombre =
-        nombre
-            ? nombre.charAt(0)
-            : '';
+  const inicialApellido = apellido ? apellido.charAt(0) : "";
 
-    const inicialApellido =
-        apellido
-            ? apellido.charAt(0)
-            : '';
-
-
-    return (
-        inicialNombre +
-        inicialApellido
-    ).toUpperCase();
+  return (inicialNombre + inicialApellido).toUpperCase();
 }
-
 
 // ==========================================
 // PETICIÓN ADMIN
 // ==========================================
 
-async function obtenerComentariosAPI(
-    url,
-    token
-) {
+async function obtenerComentariosAPI(url, token) {
+  const respuesta = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    const respuesta =
-        await fetch(
-            url,
-            {
-                headers: {
-                    Authorization:
-                        `Bearer ${token}`
-                }
-            }
-        );
+  // SESIÓN VENCIDA
+  if (respuesta.status === 401) {
+    limpiarSesionAdmin();
 
+    window.location.replace("../login.html");
 
-    // SESIÓN VENCIDA
-    if (
-        respuesta.status === 401
-    ) {
+    throw new Error("Sesión vencida");
+  }
 
-        limpiarSesionAdmin();
+  // SIN PERMISOS
+  if (respuesta.status === 403) {
+    window.location.replace("../index.html");
 
-        window.location.replace(
-            '../login.html'
-        );
+    throw new Error("Sin permisos");
+  }
 
-        throw new Error(
-            'Sesión vencida'
-        );
-    }
+  if (!respuesta.ok) {
+    throw new Error("No se pudieron obtener los comentarios");
+  }
 
-
-    // SIN PERMISOS
-    if (
-        respuesta.status === 403
-    ) {
-
-        window.location.replace(
-            '../index.html'
-        );
-
-        throw new Error(
-            'Sin permisos'
-        );
-    }
-
-
-    if (!respuesta.ok) {
-
-        throw new Error(
-            'No se pudieron obtener los comentarios'
-        );
-    }
-
-
-    return await respuesta.json();
+  return await respuesta.json();
 }
-
 
 // ==========================================
 // CARGAR COMENTARIOS PENDIENTES
@@ -4572,244 +2802,146 @@ async function obtenerComentariosAPI(
 // ==========================================
 
 async function cargarComentariosPendientes() {
+  const contenedor = document.getElementById("comentarios-pendientes");
 
-    const contenedor =
-        document.getElementById(
-            'comentarios-pendientes'
-        );
+  if (!contenedor) {
+    return;
+  }
 
+  const token = obtenerTokenAdmin();
 
-    if (!contenedor) {
-        return;
-    }
+  if (!token) {
+    limpiarSesionAdmin();
 
+    window.location.replace("../login.html");
 
-    const token =
-        obtenerTokenAdmin();
+    return;
+  }
 
-
-    if (!token) {
-
-        limpiarSesionAdmin();
-
-        window.location.replace(
-            '../login.html'
-        );
-
-        return;
-    }
-
-
-    contenedor.innerHTML = `
+  contenedor.innerHTML = `
         <div class="p-4 text-muted">
             Cargando comentarios pendientes...
         </div>
     `;
 
+  try {
+    const [
+      comentariosProductos,
+      comentariosRestaurantes,
+      comentariosLocales,
+      comentariosNutricionistas,
+    ] = await Promise.all([
+      obtenerComentariosAPI(API_ADMIN_PRODUCTOS, token),
 
-    try {
+      obtenerComentariosAPI(API_ADMIN_RESTAURANTES_COMENTARIOS, token),
 
-        const [
-    comentariosProductos,
-    comentariosRestaurantes,
-    comentariosLocales,
-    comentariosNutricionistas
-] = await Promise.all([
+      obtenerComentariosAPI(API_ADMIN_LOCALES, token),
 
-    obtenerComentariosAPI(
-        API_ADMIN_PRODUCTOS,
-        token
-    ),
+      obtenerComentariosAPI(API_ADMIN_NUTRICIONISTAS, token),
+    ]);
 
-    obtenerComentariosAPI(
-        API_ADMIN_RESTAURANTES_COMENTARIOS,
-        token
-    ),
+    // AGREGAMOS EL TIPO A CADA COMENTARIO
 
-    obtenerComentariosAPI(
-        API_ADMIN_LOCALES,
-        token
-    ),
+    const productos = comentariosProductos.map((comentario) => ({
+      ...comentario,
+      tipoComentario: "producto",
+    }));
 
-    obtenerComentariosAPI(
-        API_ADMIN_NUTRICIONISTAS,
-        token
-    )
+    const restaurantes = comentariosRestaurantes.map((comentario) => ({
+      ...comentario,
+      tipoComentario: "restaurante",
+    }));
 
-]);
+    const locales = comentariosLocales.map((comentario) => ({
+      ...comentario,
+      tipoComentario: "local",
+    }));
 
+    const nutricionistas = comentariosNutricionistas.map((comentario) => ({
+      ...comentario,
+      tipoComentario: "nutricionista",
+    }));
 
-        // AGREGAMOS EL TIPO A CADA COMENTARIO
+    const comentarios = [
+      ...productos,
+      ...restaurantes,
+      ...locales,
+      ...nutricionistas,
+    ];
 
-        const productos =
-            comentariosProductos.map(
-                comentario => ({
-                    ...comentario,
-                    tipoComentario: 'producto'
-                })
-            );
+    // ORDENAR POR FECHA MÁS RECIENTE
 
-
-        const restaurantes =
-            comentariosRestaurantes.map(
-                comentario => ({
-                    ...comentario,
-                    tipoComentario: 'restaurante'
-                })
-            );
-
-        const locales =
-    comentariosLocales.map(
-        comentario => ({
-            ...comentario,
-            tipoComentario: 'local'
-        })
+    comentarios.sort(
+      (a, b) => new Date(b.fechaComentario) - new Date(a.fechaComentario),
     );
 
-    const nutricionistas =
-    comentariosNutricionistas.map(
-        comentario => ({
-            ...comentario,
-            tipoComentario: 'nutricionista'
-        })
-    );
+    contenedor.innerHTML = "";
 
+    actualizarContadorComentarios(comentarios.length);
 
-        const comentarios = [
-            ...productos,
-            ...restaurantes,
-            ...locales,
-            ...nutricionistas
-        ];
+    // ==================================
+    // SIN PENDIENTES
+    // ==================================
 
-
-        // ORDENAR POR FECHA MÁS RECIENTE
-
-        comentarios.sort(
-            (a, b) =>
-                new Date(b.fechaComentario) -
-                new Date(a.fechaComentario)
-        );
-
-
-        contenedor.innerHTML = '';
-
-
-        actualizarContadorComentarios(
-            comentarios.length
-        );
-
-
-        // ==================================
-        // SIN PENDIENTES
-        // ==================================
-
-        if (
-            comentarios.length === 0
-        ) {
-
-            contenedor.innerHTML = `
+    if (comentarios.length === 0) {
+      contenedor.innerHTML = `
                 <div class="p-4 text-muted">
                     No hay comentarios pendientes de moderación.
                 </div>
             `;
 
-            return;
+      return;
+    }
+
+    // ==================================
+    // MOSTRAR COMENTARIOS
+    // ==================================
+
+    comentarios.forEach((comentario) => {
+      const item = document.createElement("div");
+
+      item.className = "mod-item";
+
+      const iniciales = generarIniciales(
+        comentario.usuarioNombre,
+        comentario.usuarioApellido,
+      );
+
+      const nombreUsuario = `${comentario.usuarioNombre} ${comentario.usuarioApellido}`;
+
+      let destino = "";
+      let etiquetaTipo = "";
+
+      // PRODUCTO
+      if (comentario.tipoComentario === "producto") {
+        destino = comentario.marca
+          ? `${comentario.productoNombre} · ${comentario.marca}`
+          : comentario.productoNombre;
+
+        etiquetaTipo = "Producto";
+      }
+
+      // RESTAURANTE
+      if (comentario.tipoComentario === "restaurante") {
+        destino = comentario.restauranteNombre;
+
+        etiquetaTipo = "Restaurante";
+        // LOCAL
+        if (comentario.tipoComentario === "local") {
+          destino = comentario.localNombre;
+
+          etiquetaTipo = "Local";
         }
 
+        // NUTRICIONISTA
+        if (comentario.tipoComentario === "nutricionista") {
+          destino = comentario.nutricionistaNombre;
 
-        // ==================================
-        // MOSTRAR COMENTARIOS
-        // ==================================
+          etiquetaTipo = "Nutricionista";
+        }
+      }
 
-        comentarios.forEach(
-            comentario => {
-
-                const item =
-                    document.createElement(
-                        'div'
-                    );
-
-
-                item.className =
-                    'mod-item';
-
-
-                const iniciales =
-                    generarIniciales(
-                        comentario.usuarioNombre,
-                        comentario.usuarioApellido
-                    );
-
-
-                const nombreUsuario =
-                    `${comentario.usuarioNombre} ${comentario.usuarioApellido}`;
-
-
-                let destino = '';
-                let etiquetaTipo = '';
-
-
-                // PRODUCTO
-                if (
-                    comentario.tipoComentario ===
-                    'producto'
-                ) {
-
-                    destino =
-                        comentario.marca
-                            ? `${comentario.productoNombre} · ${comentario.marca}`
-                            : comentario.productoNombre;
-
-                    etiquetaTipo =
-                        'Producto';
-
-                }
-
-
-                // RESTAURANTE
-                if (
-                    comentario.tipoComentario ===
-                    'restaurante'
-                ) {
-
-                    destino =
-                        comentario.restauranteNombre;
-
-                    etiquetaTipo =
-                        'Restaurante';
-                // LOCAL
-if (
-    comentario.tipoComentario ===
-    'local'
-) {
-
-    destino =
-        comentario.localNombre;
-
-    etiquetaTipo =
-        'Local';
-
-}
-
-// NUTRICIONISTA
-if (
-    comentario.tipoComentario ===
-    'nutricionista'
-) {
-
-    destino =
-        comentario.nutricionistaNombre;
-
-    etiquetaTipo =
-        'Nutricionista';
-
-}
-
-                }
-
-
-                item.innerHTML = `
+      item.innerHTML = `
 
                     <div class="mod-head">
 
@@ -4843,13 +2975,13 @@ if (
 
 
                     ${
-                        comentario.titulo
-                            ? `
+                      comentario.titulo
+                        ? `
                                 <strong class="d-block mb-1">
                                     ${comentario.titulo}
                                 </strong>
                             `
-                            : ''
+                        : ""
                     }
 
 
@@ -4892,299 +3024,155 @@ if (
                     </div>
                 `;
 
+      const botones = item.querySelectorAll("[data-comentario-id]");
 
-                const botones =
-                    item.querySelectorAll(
-                        '[data-comentario-id]'
-                    );
+      botones.forEach((boton) => {
+        boton.addEventListener("click", () => {
+          abrirModalModeracion(
+            Number(boton.dataset.comentarioId),
+            boton.dataset.estado,
+            boton.dataset.tipo,
+          );
+        });
+      });
 
+      contenedor.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Error al cargar comentarios pendientes:", error);
 
-                botones.forEach(
-                    boton => {
-
-                        boton.addEventListener(
-                            'click',
-                            () => {
-
-                                abrirModalModeracion(
-                                    Number(
-                                        boton.dataset.comentarioId
-                                    ),
-                                    boton.dataset.estado,
-                                    boton.dataset.tipo
-                                );
-
-                            }
-                        );
-
-                    }
-                );
-
-
-                contenedor.appendChild(
-                    item
-                );
-
-            }
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al cargar comentarios pendientes:',
-            error
-        );
-
-
-        contenedor.innerHTML = `
+    contenedor.innerHTML = `
             <div class="p-4 text-danger">
                 No se pudieron cargar los comentarios pendientes.
             </div>
         `;
-
-    }
+  }
 }
-
 
 // ==========================================
 // ACTUALIZAR CONTADOR
 // ==========================================
 
-function actualizarContadorComentarios(
-    cantidad
-) {
+function actualizarContadorComentarios(cantidad) {
+  const contadorPanel = document.querySelector(
+    ".admin-panel-title .admin-count",
+  );
 
-    const contadorPanel =
-        document.querySelector(
-            '.admin-panel-title .admin-count'
-        );
+  if (contadorPanel) {
+    contadorPanel.textContent = cantidad;
+  }
 
+  const contadorSidebar = document.getElementById("adminComentariosCount");
 
-    if (contadorPanel) {
-
-        contadorPanel.textContent =
-            cantidad;
-
-    }
-
-
-    const contadorSidebar =
-        document.getElementById(
-            'adminComentariosCount'
-        );
-
-
-    if (contadorSidebar) {
-
-        contadorSidebar.textContent =
-            cantidad;
-
-    }
+  if (contadorSidebar) {
+    contadorSidebar.textContent = cantidad;
+  }
 }
-
 
 // ==========================================
 // INICIALIZAR MODAL
 // ==========================================
 
 function inicializarModalModeracion() {
+  const botonConfirmar = document.getElementById("btnConfirmarModeracion");
 
-    const botonConfirmar =
-        document.getElementById(
-            'btnConfirmarModeracion'
-        );
+  if (!botonConfirmar) {
+    return;
+  }
 
-
-    if (!botonConfirmar) {
-        return;
-    }
-
-
-    botonConfirmar.addEventListener(
-        'click',
-        confirmarModeracion
-    );
+  botonConfirmar.addEventListener("click", confirmarModeracion);
 }
-
 
 // ==========================================
 // ABRIR MODAL
 // ==========================================
 
-function abrirModalModeracion(
-    comentarioId,
-    estado,
-    tipo
-) {
+function abrirModalModeracion(comentarioId, estado, tipo) {
+  comentarioSeleccionado = comentarioId;
 
-    comentarioSeleccionado =
-        comentarioId;
+  estadoSeleccionado = estado;
 
-    estadoSeleccionado =
-        estado;
+  tipoComentarioSeleccionado = tipo;
 
-    tipoComentarioSeleccionado =
-        tipo;
+  const titulo = document.getElementById("modalModeracionTitulo");
 
+  const pregunta = document.getElementById("modalModeracionPregunta");
 
-    const titulo =
-        document.getElementById(
-            'modalModeracionTitulo'
-        );
+  const botonConfirmar = document.getElementById("btnConfirmarModeracion");
 
-    const pregunta =
-        document.getElementById(
-            'modalModeracionPregunta'
-        );
+  const icono = document.getElementById("modalModeracionIcono");
 
-    const botonConfirmar =
-        document.getElementById(
-            'btnConfirmarModeracion'
-        );
+  if (estado === "aprobado") {
+    titulo.textContent = "Aprobar comentario";
 
-    const icono =
-        document.getElementById(
-            'modalModeracionIcono'
-        );
+    pregunta.textContent = "¿Confirmás que querés aprobar esta opinión?";
 
+    botonConfirmar.textContent = "Aprobar";
 
-    if (
-        estado === 'aprobado'
-    ) {
+    botonConfirmar.className = "btn btn-success";
 
-        titulo.textContent =
-            'Aprobar comentario';
+    icono.className = "bi bi-check-circle fs-5 text-success";
+  } else {
+    titulo.textContent = "Rechazar comentario";
 
-        pregunta.textContent =
-            '¿Confirmás que querés aprobar esta opinión?';
+    pregunta.textContent = "¿Confirmás que querés rechazar esta opinión?";
 
-        botonConfirmar.textContent =
-            'Aprobar';
+    botonConfirmar.textContent = "Rechazar";
 
-        botonConfirmar.className =
-            'btn btn-success';
+    botonConfirmar.className = "btn btn-danger";
 
-        icono.className =
-            'bi bi-check-circle fs-5 text-success';
+    icono.className = "bi bi-x-circle fs-5 text-danger";
+  }
 
-    } else {
+  const elementoModal = document.getElementById("modalModeracion");
 
-        titulo.textContent =
-            'Rechazar comentario';
+  const modal = bootstrap.Modal.getOrCreateInstance(elementoModal);
 
-        pregunta.textContent =
-            '¿Confirmás que querés rechazar esta opinión?';
-
-        botonConfirmar.textContent =
-            'Rechazar';
-
-        botonConfirmar.className =
-            'btn btn-danger';
-
-        icono.className =
-            'bi bi-x-circle fs-5 text-danger';
-
-    }
-
-
-    const elementoModal =
-        document.getElementById(
-            'modalModeracion'
-        );
-
-
-    const modal =
-        bootstrap.Modal.getOrCreateInstance(
-            elementoModal
-        );
-
-
-    modal.show();
+  modal.show();
 }
-
 
 // ==========================================
 // CONFIRMAR MODERACIÓN
 // ==========================================
 
 async function confirmarModeracion() {
+  if (
+    !comentarioSeleccionado ||
+    !estadoSeleccionado ||
+    !tipoComentarioSeleccionado
+  ) {
+    return;
+  }
 
-    if (
-        !comentarioSeleccionado ||
-        !estadoSeleccionado ||
-        !tipoComentarioSeleccionado
-    ) {
-        return;
-    }
+  const token = obtenerTokenAdmin();
 
+  const boton = document.getElementById("btnConfirmarModeracion");
 
-    const token =
-        obtenerTokenAdmin();
+  if (!token) {
+    limpiarSesionAdmin();
 
-    const boton =
-        document.getElementById(
-            'btnConfirmarModeracion'
-        );
-
-
-    if (!token) {
-
-        limpiarSesionAdmin();
-
-        window.location.replace(
-            '../login.html'
-        );
-
-        return;
-    }
-
-
-
-let apiModeracion = '';
-
-if (
-    tipoComentarioSeleccionado ===
-    'producto'
-) {
-
-    apiModeracion =
-        API_ADMIN_PRODUCTOS
-
-} else if (
-    tipoComentarioSeleccionado ===
-    'restaurante'
-) {
-
-    apiModeracion =
-        API_ADMIN_RESTAURANTES_COMENTARIOS;
-
-} else if (
-    tipoComentarioSeleccionado ===
-    'local'
-) {
-
-    apiModeracion =
-        API_ADMIN_COMENTARIOS_LOCALES;
-
-} else if (
-    tipoComentarioSeleccionado ===
-    'nutricionista'
-) {
-
-    apiModeracion =
-        API_ADMIN_COMENTARIOS_NUTRICIONISTAS;
-
-} else {
+    window.location.replace("../login.html");
 
     return;
+  }
 
-}
+  let apiModeracion = "";
 
+  if (tipoComentarioSeleccionado === "producto") {
+    apiModeracion = API_ADMIN_PRODUCTOS;
+  } else if (tipoComentarioSeleccionado === "restaurante") {
+    apiModeracion = API_ADMIN_RESTAURANTES_COMENTARIOS;
+  } else if (tipoComentarioSeleccionado === "local") {
+    apiModeracion = API_ADMIN_LOCALES;
+  } else if (tipoComentarioSeleccionado === "nutricionista") {
+    apiModeracion = API_ADMIN_NUTRICIONISTAS;
+  } else {
+    return;
+  }
 
-    boton.disabled = true;
+  boton.disabled = true;
 
-    boton.innerHTML = `
+  boton.innerHTML = `
         <span
             class="spinner-border spinner-border-sm me-2"
             aria-hidden="true"
@@ -5192,163 +3180,99 @@ if (
         Procesando...
     `;
 
+  try {
+    const respuesta = await fetch(
+      `${apiModeracion}/${comentarioSeleccionado}`,
+      {
+        method: "PATCH",
 
-    try {
+        headers: {
+          "Content-Type": "application/json",
 
-        const respuesta =
-            await fetch(
-                `${apiModeracion}/${comentarioSeleccionado}`,
-                {
-                    method: 'PATCH',
+          Authorization: `Bearer ${token}`,
+        },
 
-                    headers: {
+        body: JSON.stringify({
+          estado: estadoSeleccionado,
+        }),
+      },
+    );
 
-                        'Content-Type':
-                            'application/json',
+    const datos = await respuesta.json();
 
-                        Authorization:
-                            `Bearer ${token}`
+    // SESIÓN VENCIDA
+    if (respuesta.status === 401) {
+      limpiarSesionAdmin();
 
-                    },
+      window.location.replace("../login.html");
 
-                    body: JSON.stringify({
-                        estado:
-                            estadoSeleccionado
-                    })
-                }
-            );
-
-
-        const datos =
-            await respuesta.json();
-
-
-        // SESIÓN VENCIDA
-        if (
-            respuesta.status === 401
-        ) {
-
-            limpiarSesionAdmin();
-
-            window.location.replace(
-                '../login.html'
-            );
-
-            return;
-        }
-
-
-        // SIN PERMISOS
-        if (
-            respuesta.status === 403
-        ) {
-
-            window.location.replace(
-                '../index.html'
-            );
-
-            return;
-        }
-
-
-        if (!respuesta.ok) {
-
-            mostrarMensajeModeracion(
-                datos.mensaje ||
-                'No se pudo moderar el comentario.',
-                'danger'
-            );
-
-            return;
-        }
-
-
-        // ==================================
-        // CERRAR MODAL
-        // ==================================
-
-        const elementoModal =
-            document.getElementById(
-                'modalModeracion'
-            );
-
-
-        const modal =
-            bootstrap.Modal.getInstance(
-                elementoModal
-            );
-
-
-        if (modal) {
-            modal.hide();
-        }
-
-
-        // ==================================
-        // MOSTRAR ÉXITO
-        // ==================================
-
-        mostrarMensajeModeracion(
-            datos.mensaje,
-            'success'
-        );
-
-
-        // ==================================
-        // RECARGAR PRODUCTOS + RESTAURANTES
-        // ==================================
-
-        await cargarComentariosPendientes();
-
-
-        comentarioSeleccionado = null;
-        estadoSeleccionado = null;
-        tipoComentarioSeleccionado = null;
-
-
-    } catch (error) {
-
-        console.error(
-            'Error al moderar comentario:',
-            error
-        );
-
-
-        mostrarMensajeModeracion(
-            'No se pudo conectar con el servidor.',
-            'danger'
-        );
-
-
-    } finally {
-
-        boton.disabled = false;
-
+      return;
     }
-}
 
+    // SIN PERMISOS
+    if (respuesta.status === 403) {
+      window.location.replace("../index.html");
+
+      return;
+    }
+
+    if (!respuesta.ok) {
+      mostrarMensajeModeracion(
+        datos.mensaje || "No se pudo moderar el comentario.",
+        "danger",
+      );
+
+      return;
+    }
+
+    // ==================================
+    // CERRAR MODAL
+    // ==================================
+
+    const elementoModal = document.getElementById("modalModeracion");
+
+    const modal = bootstrap.Modal.getInstance(elementoModal);
+
+    if (modal) {
+      modal.hide();
+    }
+
+    // ==================================
+    // MOSTRAR ÉXITO
+    // ==================================
+
+    mostrarMensajeModeracion(datos.mensaje, "success");
+
+    // ==================================
+    // RECARGAR PRODUCTOS + RESTAURANTES
+    // ==================================
+
+    await cargarComentariosPendientes();
+
+    comentarioSeleccionado = null;
+    estadoSeleccionado = null;
+    tipoComentarioSeleccionado = null;
+  } catch (error) {
+    console.error("Error al moderar comentario:", error);
+
+    mostrarMensajeModeracion("No se pudo conectar con el servidor.", "danger");
+  } finally {
+    boton.disabled = false;
+  }
+}
 
 // ==========================================
 // MENSAJE DE MODERACIÓN
 // ==========================================
 
-function mostrarMensajeModeracion(
-    texto,
-    tipo
-) {
+function mostrarMensajeModeracion(texto, tipo) {
+  const contenedor = document.getElementById("mensajeModeracion");
 
-    const contenedor =
-        document.getElementById(
-            'mensajeModeracion'
-        );
+  if (!contenedor) {
+    return;
+  }
 
-
-    if (!contenedor) {
-        return;
-    }
-
-
-    contenedor.innerHTML = `
+  contenedor.innerHTML = `
         <div
             class="alert alert-${tipo} alert-dismissible fade show shadow"
             role="alert"
@@ -5364,13 +3288,7 @@ function mostrarMensajeModeracion(
         </div>
     `;
 
-
-    setTimeout(
-        () => {
-
-            contenedor.innerHTML = '';
-
-        },
-        4000
-    );
+  setTimeout(() => {
+    contenedor.innerHTML = "";
+  }, 4000);
 }

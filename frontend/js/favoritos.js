@@ -30,6 +30,26 @@ const contenedorLocales =
 const contenedorNutricionistas =
     document.getElementById('favoritos-nutricionistas');
 
+const paginacionProductos =
+    document.getElementById(
+        'favoritos-productos-paginacion'
+    );
+
+const paginacionRestaurantes =
+    document.getElementById(
+        'favoritos-restaurantes-paginacion'
+    );
+
+const paginacionLocales =
+    document.getElementById(
+        'favoritos-locales-paginacion'
+    );
+
+const paginacionNutricionistas =
+    document.getElementById(
+        'favoritos-nutricionistas-paginacion'
+    );
+
 
 // ==========================================
 // TOKEN
@@ -42,6 +62,28 @@ function obtenerToken() {
         sessionStorage.getItem('celiaToken')
     );
 }
+
+
+// ==========================================
+// ESTADO DE FAVORITOS
+// ==========================================
+
+let productosFavoritos = [];
+let restaurantesFavoritos = [];
+let localesFavoritos = [];
+let nutricionistasFavoritos = [];
+
+
+// ==========================================
+// PAGINACIÓN
+// ==========================================
+
+const FAVORITOS_POR_PAGINA = 6;
+
+let paginaProductos = 1;
+let paginaRestaurantes = 1;
+let paginaLocales = 1;
+let paginaNutricionistas = 1;
 
 
 // ==========================================
@@ -76,7 +118,6 @@ async function cargarFavoritos() {
 
             fetch(`${API_BASE}/productos`),
 
-
             fetch(
                 `${API_BASE}/restaurantes/favoritos`,
                 {
@@ -89,7 +130,6 @@ async function cargarFavoritos() {
 
             fetch(`${API_BASE}/restaurantes`),
 
-
             fetch(
                 `${API_BASE}/locales/favoritos`,
                 {
@@ -101,7 +141,6 @@ async function cargarFavoritos() {
             ),
 
             fetch(`${API_BASE}/locales`),
-
 
             fetch(
                 `${API_BASE}/nutricionistas/favoritos`,
@@ -145,10 +184,6 @@ async function cargarFavoritos() {
         );
 
 
-        // ======================================
-        // PRODUCTOS FAVORITOS
-        // ======================================
-
         const idsProductos =
             favoritosProductos.map(
                 favorito =>
@@ -156,7 +191,7 @@ async function cargarFavoritos() {
             );
 
 
-        const productosFavoritos =
+        productosFavoritos =
             productos.filter(
                 producto =>
                     idsProductos.includes(
@@ -164,10 +199,6 @@ async function cargarFavoritos() {
                     )
             );
 
-
-        // ======================================
-        // RESTAURANTES FAVORITOS
-        // ======================================
 
         const idsRestaurantes =
             favoritosRestaurantes.map(
@@ -178,7 +209,7 @@ async function cargarFavoritos() {
             );
 
 
-        const restaurantesFavoritos =
+        restaurantesFavoritos =
             restaurantes.filter(
                 restaurante =>
                     idsRestaurantes.includes(
@@ -187,10 +218,6 @@ async function cargarFavoritos() {
             );
 
 
-        // ======================================
-        // LOCALES FAVORITOS
-        // ======================================
-
         const idsLocales =
             favoritosLocales.map(
                 favorito =>
@@ -198,7 +225,7 @@ async function cargarFavoritos() {
             );
 
 
-        const localesFavoritos =
+        localesFavoritos =
             locales.filter(
                 local =>
                     idsLocales.includes(
@@ -206,10 +233,6 @@ async function cargarFavoritos() {
                     )
             );
 
-
-        // ======================================
-        // NUTRICIONISTAS FAVORITOS
-        // ======================================
 
         const idsNutricionistas =
             favoritosNutricionistas.map(
@@ -220,7 +243,7 @@ async function cargarFavoritos() {
             );
 
 
-        const nutricionistasFavoritos =
+        nutricionistasFavoritos =
             nutricionistas.filter(
                 nutricionista =>
                     idsNutricionistas.includes(
@@ -229,54 +252,14 @@ async function cargarFavoritos() {
             );
 
 
-        // ======================================
-        // OCULTAR LOADING
-        // ======================================
-
         loading.classList.add('d-none');
 
+        comprobarEstadoGeneral();
 
-        const totalFavoritos =
-            productosFavoritos.length +
-            restaurantesFavoritos.length +
-            localesFavoritos.length +
-            nutricionistasFavoritos.length;
-
-
-        // ======================================
-        // SIN FAVORITOS
-        // ======================================
-
-        if (totalFavoritos === 0) {
-
-            vacio.classList.remove('d-none');
-
-            return;
-        }
-
-
-        contenido.classList.remove('d-none');
-
-
-        // ======================================
-        // MOSTRAR FAVORITOS
-        // ======================================
-
-        mostrarProductos(
-            productosFavoritos
-        );
-
-        mostrarRestaurantes(
-            restaurantesFavoritos
-        );
-
-        mostrarLocales(
-            localesFavoritos
-        );
-
-        mostrarNutricionistas(
-            nutricionistasFavoritos
-        );
+        mostrarProductos();
+        mostrarRestaurantes();
+        mostrarLocales();
+        mostrarNutricionistas();
 
 
     } catch (error) {
@@ -312,10 +295,370 @@ async function cargarFavoritos() {
 
 
 // ==========================================
+// ESTADO GENERAL
+// ==========================================
+
+function comprobarEstadoGeneral() {
+
+    const totalFavoritos =
+        productosFavoritos.length +
+        restaurantesFavoritos.length +
+        localesFavoritos.length +
+        nutricionistasFavoritos.length;
+
+
+    if (totalFavoritos === 0) {
+
+        contenido.classList.add('d-none');
+
+        vacio.classList.remove('d-none');
+
+        vacio.innerHTML = `
+            <i class="bi bi-heart fs-1 text-muted"></i>
+
+            <h3 class="fw-bold mt-3">
+                Todavía no tenés favoritos
+            </h3>
+
+            <p class="text-muted mb-4">
+                Explorá CeliaConnect y guardá los productos,
+                lugares y profesionales que más te interesen.
+            </p>
+
+            <a
+                href="index.html"
+                class="btn btn-success"
+            >
+                Explorar CeliaConnect
+            </a>
+        `;
+
+        return;
+    }
+
+
+    vacio.classList.add('d-none');
+
+    contenido.classList.remove('d-none');
+}
+
+
+// ==========================================
+// ACTUALIZAR CANTIDAD
+// ==========================================
+
+function actualizarCantidad(id, cantidad) {
+
+    const elemento =
+        document.getElementById(id);
+
+    if (elemento) {
+
+        elemento.textContent =
+            `(${cantidad})`;
+    }
+}
+
+
+// ==========================================
+// PAGINADOR GENERAL
+// ==========================================
+
+function crearPaginacion(
+    contenedorPaginacion,
+    totalElementos,
+    paginaActual,
+    cambiarPagina
+) {
+
+    contenedorPaginacion.innerHTML = '';
+
+
+    const totalPaginas =
+        Math.ceil(
+            totalElementos /
+            FAVORITOS_POR_PAGINA
+        );
+
+
+    if (totalPaginas <= 1) {
+
+        return;
+    }
+
+
+    // ANTERIOR
+
+    const anterior =
+        document.createElement('li');
+
+
+    anterior.className =
+        `page-item ${
+            paginaActual === 1
+                ? 'disabled'
+                : ''
+        }`;
+
+
+    anterior.innerHTML = `
+        <button
+            class="page-link"
+            type="button"
+            aria-label="Página anterior"
+        >
+            <i class="bi bi-chevron-left"></i>
+        </button>
+    `;
+
+
+    anterior
+        .querySelector('button')
+        .addEventListener(
+            'click',
+            () => {
+
+                if (paginaActual > 1) {
+
+                    cambiarPagina(
+                        paginaActual - 1
+                    );
+                }
+            }
+        );
+
+
+    contenedorPaginacion.appendChild(
+        anterior
+    );
+
+
+    // NÚMEROS
+
+    for (
+        let pagina = 1;
+        pagina <= totalPaginas;
+        pagina++
+    ) {
+
+        const item =
+            document.createElement('li');
+
+
+        item.className =
+            `page-item ${
+                pagina === paginaActual
+                    ? 'active'
+                    : ''
+            }`;
+
+
+        item.innerHTML = `
+            <button
+                class="page-link"
+                type="button"
+            >
+                ${pagina}
+            </button>
+        `;
+
+
+        item
+            .querySelector('button')
+            .addEventListener(
+                'click',
+                () => {
+
+                    cambiarPagina(pagina);
+                }
+            );
+
+
+        contenedorPaginacion.appendChild(
+            item
+        );
+    }
+
+
+    // SIGUIENTE
+
+    const siguiente =
+        document.createElement('li');
+
+
+    siguiente.className =
+        `page-item ${
+            paginaActual === totalPaginas
+                ? 'disabled'
+                : ''
+        }`;
+
+
+    siguiente.innerHTML = `
+        <button
+            class="page-link"
+            type="button"
+            aria-label="Página siguiente"
+        >
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    `;
+
+
+    siguiente
+        .querySelector('button')
+        .addEventListener(
+            'click',
+            () => {
+
+                if (
+                    paginaActual <
+                    totalPaginas
+                ) {
+
+                    cambiarPagina(
+                        paginaActual + 1
+                    );
+                }
+            }
+        );
+
+
+    contenedorPaginacion.appendChild(
+        siguiente
+    );
+}
+
+
+// ==========================================
+// ELIMINAR FAVORITO
+// ==========================================
+
+async function eliminarFavorito(
+    tipo,
+    id,
+    boton
+) {
+
+    const token = obtenerToken();
+
+    if (!token) {
+
+        window.location.href = 'login.html';
+
+        return;
+    }
+
+
+    boton.disabled = true;
+
+
+    try {
+
+        const respuesta = await fetch(
+            `${API_BASE}/${tipo}/${id}/favorito`,
+            {
+                method: 'DELETE',
+
+                headers: {
+                    Authorization:
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                'No se pudo eliminar el favorito'
+            );
+        }
+
+
+        const idNumerico = Number(id);
+
+
+        switch (tipo) {
+
+            case 'productos':
+
+                productosFavoritos =
+                    productosFavoritos.filter(
+                        producto =>
+                            Number(producto.id) !==
+                            idNumerico
+                    );
+
+                mostrarProductos();
+
+                break;
+
+
+            case 'restaurantes':
+
+                restaurantesFavoritos =
+                    restaurantesFavoritos.filter(
+                        restaurante =>
+                            Number(restaurante.id) !==
+                            idNumerico
+                    );
+
+                mostrarRestaurantes();
+
+                break;
+
+
+            case 'locales':
+
+                localesFavoritos =
+                    localesFavoritos.filter(
+                        local =>
+                            Number(local.id) !==
+                            idNumerico
+                    );
+
+                mostrarLocales();
+
+                break;
+
+
+            case 'nutricionistas':
+
+                nutricionistasFavoritos =
+                    nutricionistasFavoritos.filter(
+                        nutricionista =>
+                            Number(nutricionista.id) !==
+                            idNumerico
+                    );
+
+                mostrarNutricionistas();
+
+                break;
+        }
+
+
+        comprobarEstadoGeneral();
+
+
+    } catch (error) {
+
+        console.error(
+            'Error al eliminar favorito:',
+            error
+        );
+
+
+        boton.disabled = false;
+    }
+}
+
+
+// ==========================================
 // PRODUCTOS
 // ==========================================
 
-function mostrarProductos(productos) {
+function mostrarProductos() {
 
     const seccion =
         document.getElementById(
@@ -323,93 +666,143 @@ function mostrarProductos(productos) {
         );
 
 
-    if (productos.length === 0) {
+    actualizarCantidad(
+        'cantidad-productos',
+        productosFavoritos.length
+    );
+
+
+    if (productosFavoritos.length === 0) {
 
         seccion.classList.add('d-none');
+
+        contenedorProductos.innerHTML = '';
+
+        paginacionProductos.innerHTML = '';
 
         return;
     }
 
 
+    seccion.classList.remove('d-none');
+
+
+    const totalPaginas =
+        Math.ceil(
+            productosFavoritos.length /
+            FAVORITOS_POR_PAGINA
+        );
+
+
+    if (paginaProductos > totalPaginas) {
+
+        paginaProductos =
+            Math.max(totalPaginas, 1);
+    }
+
+
+    const inicio =
+        (paginaProductos - 1) *
+        FAVORITOS_POR_PAGINA;
+
+
+    const productosPagina =
+        productosFavoritos.slice(
+            inicio,
+            inicio + FAVORITOS_POR_PAGINA
+        );
+
+
     contenedorProductos.innerHTML =
-        productos.map(producto => {
+        productosPagina.map(producto => {
 
-            const tieneImagen =
+            const imagen =
                 producto.imagen &&
-                producto.imagen.trim() !== '';
-
-
-            const imagen = tieneImagen
-                ? `
-                    <img
-                        src="${producto.imagen}"
-                        class="card-img-top"
-                        alt="${producto.nombre}"
-                        style="
-                            height: 220px;
-                            object-fit: cover;
-                            object-position: center;
-                        "
-                    >
-                `
-                : `
-                    <div
-                        class="d-flex align-items-center justify-content-center bg-light"
-                        style="height: 220px;"
-                    >
-                        <i
-                            class="bi bi-box-seam text-secondary"
-                            style="font-size: 4rem;"
-                        ></i>
-                    </div>
-                `;
+                producto.imagen.trim() !== ''
+                    ? `
+                        <img
+                            src="${producto.imagen}"
+                            alt="${producto.nombre}"
+                            class="favorito-card-img"
+                        >
+                    `
+                    : `
+                        <div class="favorito-card-placeholder">
+                            <i class="bi bi-box-seam"></i>
+                        </div>
+                    `;
 
 
             return `
-                <div class="col-md-6 col-xl-4">
+                <div class="col-12 col-lg-6">
 
-                    <div
-                        class="card h-100 shadow-sm border-0"
-                    >
+                    <article class="favorito-card">
 
-                        ${imagen}
+                        <div class="favorito-card-media">
+                            ${imagen}
+                        </div>
 
-                        <div
-                            class="card-body d-flex flex-column"
-                        >
+                        <div class="favorito-card-contenido">
 
-                            <span
-                                class="badge bg-success-subtle text-success align-self-start mb-2"
-                            >
-                                Sin TACC
-                            </span>
+                            <div class="favorito-card-superior">
 
+                                <span class="favorito-badge">
+                                    Producto
+                                </span>
 
-                            <h5 class="card-title fw-bold">
+                                <button
+                                    type="button"
+                                    class="favorito-corazon"
+                                    data-tipo="productos"
+                                    data-id="${producto.id}"
+                                    aria-label="Quitar ${producto.nombre} de favoritos"
+                                    title="Quitar de favoritos"
+                                >
+                                    <i class="bi bi-heart-fill"></i>
+                                </button>
+
+                            </div>
+
+                            <h3 class="favorito-card-titulo">
                                 ${producto.nombre}
-                            </h5>
+                            </h3>
 
-
-                            <p class="text-muted small">
-                                ${producto.marca || ''}
+                            <p class="favorito-card-info">
+                                ${
+                                    producto.marca ||
+                                    'Producto Sin TACC'
+                                }
                             </p>
-
 
                             <a
                                 href="producto-detalle.html?id=${producto.id}"
-                                class="btn btn-outline-success mt-auto"
+                                class="favorito-card-link"
                             >
-                                Ver producto
+                                Ver detalle
+                                <i class="bi bi-arrow-right"></i>
                             </a>
 
                         </div>
 
-                    </div>
+                    </article>
 
                 </div>
             `;
         })
         .join('');
+
+
+    crearPaginacion(
+        paginacionProductos,
+        productosFavoritos.length,
+        paginaProductos,
+        nuevaPagina => {
+
+            paginaProductos = nuevaPagina;
+
+            mostrarProductos();
+        }
+    );
 }
 
 
@@ -417,7 +810,7 @@ function mostrarProductos(productos) {
 // RESTAURANTES
 // ==========================================
 
-function mostrarRestaurantes(restaurantes) {
+function mostrarRestaurantes() {
 
     const seccion =
         document.getElementById(
@@ -425,115 +818,153 @@ function mostrarRestaurantes(restaurantes) {
         );
 
 
-    if (restaurantes.length === 0) {
+    actualizarCantidad(
+        'cantidad-restaurantes',
+        restaurantesFavoritos.length
+    );
+
+
+    if (restaurantesFavoritos.length === 0) {
 
         seccion.classList.add('d-none');
+
+        contenedorRestaurantes.innerHTML = '';
+
+        paginacionRestaurantes.innerHTML = '';
 
         return;
     }
 
 
+    seccion.classList.remove('d-none');
+
+
+    const totalPaginas =
+        Math.ceil(
+            restaurantesFavoritos.length /
+            FAVORITOS_POR_PAGINA
+        );
+
+
+    if (paginaRestaurantes > totalPaginas) {
+
+        paginaRestaurantes =
+            Math.max(totalPaginas, 1);
+    }
+
+
+    const inicio =
+        (paginaRestaurantes - 1) *
+        FAVORITOS_POR_PAGINA;
+
+
+    const restaurantesPagina =
+        restaurantesFavoritos.slice(
+            inicio,
+            inicio + FAVORITOS_POR_PAGINA
+        );
+
+
     contenedorRestaurantes.innerHTML =
-        restaurantes.map(restaurante => {
+        restaurantesPagina.map(
+            restaurante => {
 
-            const tieneImagen =
-                restaurante.imagenExterior &&
-                restaurante.imagenExterior.trim() !== '';
+                const imagen =
+                    restaurante.imagenExterior &&
+                    restaurante.imagenExterior.trim() !== ''
+                        ? `
+                            <img
+                                src="${restaurante.imagenExterior}"
+                                alt="${restaurante.nombre}"
+                                class="favorito-card-img"
+                            >
+                        `
+                        : `
+                            <div class="favorito-card-placeholder">
+                                <i class="bi bi-cup-hot"></i>
+                            </div>
+                        `;
 
 
-            const imagen = tieneImagen
-                ? `
-                    <img
-                        src="${restaurante.imagenExterior}"
-                        class="card-img-top"
-                        alt="${restaurante.nombre}"
-                        style="
-                            height: 220px;
-                            object-fit: cover;
-                            object-position: center;
-                        "
-                    >
-                `
-                : `
-                    <div
-                        class="d-flex align-items-center justify-content-center bg-light"
-                        style="height: 220px;"
-                    >
-                        <i
-                            class="bi bi-shop text-secondary"
-                            style="font-size: 4rem;"
-                        ></i>
+                return `
+                    <div class="col-12 col-lg-6">
+
+                        <article class="favorito-card">
+
+                            <div class="favorito-card-media">
+                                ${imagen}
+                            </div>
+
+                            <div class="favorito-card-contenido">
+
+                                <div class="favorito-card-superior">
+
+                                    <span class="favorito-badge">
+                                        ${
+                                            restaurante.tipoRestaurante ||
+                                            'Restaurante'
+                                        }
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        class="favorito-corazon"
+                                        data-tipo="restaurantes"
+                                        data-id="${restaurante.id}"
+                                        aria-label="Quitar ${restaurante.nombre} de favoritos"
+                                        title="Quitar de favoritos"
+                                    >
+                                        <i class="bi bi-heart-fill"></i>
+                                    </button>
+
+                                </div>
+
+                                <h3 class="favorito-card-titulo">
+                                    ${restaurante.nombre}
+                                </h3>
+
+                                <p class="favorito-card-info">
+
+                                    <i class="bi bi-geo-alt"></i>
+
+                                    ${
+                                        restaurante.barrio ||
+                                        'CABA'
+                                    }
+
+                                </p>
+
+                                <a
+                                    href="restaurante-detalle.html?id=${restaurante.id}"
+                                    class="favorito-card-link"
+                                >
+                                    Ver detalle
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+
+                            </div>
+
+                        </article>
+
                     </div>
                 `;
-
-
-            return `
-                <div class="col-md-6 col-xl-4">
-
-                    <div
-                        class="card h-100 shadow-sm border-0"
-                    >
-
-                        ${imagen}
-
-
-                        <div
-                            class="card-body d-flex flex-column"
-                        >
-
-                            ${
-                                restaurante.tipoRestaurante
-                                    ? `
-                                        <span
-                                            class="badge text-bg-success text-white align-self-start mb-2"
-                                        >
-                                            ${restaurante.tipoRestaurante}
-                                        </span>
-                                    `
-                                    : ''
-                            }
-
-
-                            <h5 class="card-title fw-bold">
-                                ${restaurante.nombre}
-                            </h5>
-
-
-                            <p class="text-muted small mb-2">
-
-                                <i class="bi bi-geo-alt"></i>
-
-                                ${
-                                    restaurante.barrio ||
-                                    'CABA'
-                                }
-
-                            </p>
-
-
-                            <p class="card-text text-muted">
-                                ${
-                                    restaurante.descripcion ||
-                                    ''
-                                }
-                            </p>
-
-
-                            <a
-                                href="restaurante-detalle.html?id=${restaurante.id}"
-                                class="btn btn-outline-success mt-auto"
-                            >
-                                Ver restaurante
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-            `;
-        })
+            }
+        )
         .join('');
+
+
+    crearPaginacion(
+        paginacionRestaurantes,
+        restaurantesFavoritos.length,
+        paginaRestaurantes,
+        nuevaPagina => {
+
+            paginaRestaurantes =
+                nuevaPagina;
+
+            mostrarRestaurantes();
+        }
+    );
 }
 
 
@@ -541,7 +972,7 @@ function mostrarRestaurantes(restaurantes) {
 // LOCALES
 // ==========================================
 
-function mostrarLocales(locales) {
+function mostrarLocales() {
 
     const seccion =
         document.getElementById(
@@ -549,75 +980,111 @@ function mostrarLocales(locales) {
         );
 
 
-    if (locales.length === 0) {
+    actualizarCantidad(
+        'cantidad-locales',
+        localesFavoritos.length
+    );
+
+
+    if (localesFavoritos.length === 0) {
 
         seccion.classList.add('d-none');
+
+        contenedorLocales.innerHTML = '';
+
+        paginacionLocales.innerHTML = '';
 
         return;
     }
 
 
+    seccion.classList.remove('d-none');
+
+
+    const totalPaginas =
+        Math.ceil(
+            localesFavoritos.length /
+            FAVORITOS_POR_PAGINA
+        );
+
+
+    if (paginaLocales > totalPaginas) {
+
+        paginaLocales =
+            Math.max(totalPaginas, 1);
+    }
+
+
+    const inicio =
+        (paginaLocales - 1) *
+        FAVORITOS_POR_PAGINA;
+
+
+    const localesPagina =
+        localesFavoritos.slice(
+            inicio,
+            inicio + FAVORITOS_POR_PAGINA
+        );
+
+
     contenedorLocales.innerHTML =
-        locales.map(local => {
+        localesPagina.map(local => {
 
-            const tieneImagen =
+            const imagen =
                 local.imagen &&
-                local.imagen.trim() !== '';
-
-
-            const imagen = tieneImagen
-                ? `
-                    <img
-                        src="${local.imagen}"
-                        class="card-img-top"
-                        alt="${local.nombre}"
-                        style="
-                            height: 220px;
-                            object-fit: cover;
-                            object-position: center;
-                        "
-                    >
-                `
-                : `
-                    <div
-                        class="d-flex align-items-center justify-content-center bg-light"
-                        style="height: 220px;"
-                    >
-                        <i
-                            class="bi bi-shop text-secondary"
-                            style="font-size: 4rem;"
-                        ></i>
-                    </div>
-                `;
+                local.imagen.trim() !== ''
+                    ? `
+                        <img
+                            src="${local.imagen}"
+                            alt="${local.nombre}"
+                            class="favorito-card-img"
+                        >
+                    `
+                    : `
+                        <div class="favorito-card-placeholder">
+                            <i class="bi bi-shop"></i>
+                        </div>
+                    `;
 
 
             return `
-                <div class="col-md-6 col-xl-4">
+                <div class="col-12 col-lg-6">
 
-                    <div
-                        class="card h-100 shadow-sm border-0"
-                    >
+                    <article class="favorito-card">
 
-                        ${imagen}
+                        <div class="favorito-card-media">
+                            ${imagen}
+                        </div>
 
+                        <div class="favorito-card-contenido">
 
-                        <div
-                            class="card-body d-flex flex-column"
-                        >
+                            <div class="favorito-card-superior">
 
-                            <span
-                                class="badge bg-success-subtle text-success align-self-start mb-2"
-                            >
-                                ${local.tipoLocal || 'Local'}
-                            </span>
+                                <span class="favorito-badge">
+                                    ${
+                                        local.tipoLocal ||
+                                        'Local'
+                                    }
+                                </span>
 
+                                <button
+                                    type="button"
+                                    class="favorito-corazon"
+                                    data-tipo="locales"
+                                    data-id="${local.id}"
+                                    aria-label="Quitar ${local.nombre} de favoritos"
+                                    title="Quitar de favoritos"
+                                >
+                                    <i class="bi bi-heart-fill"></i>
+                                </button>
 
-                            <h5 class="card-title fw-bold">
+                            </div>
+
+                            <h3 class="favorito-card-titulo">
                                 ${local.nombre}
-                            </h5>
+                            </h3>
 
-
-                            <p class="text-muted small mb-2">
+                            <p class="favorito-card-info">
 
                                 <i class="bi bi-geo-alt"></i>
 
@@ -628,30 +1095,35 @@ function mostrarLocales(locales) {
 
                             </p>
 
-
-                            <p class="card-text text-muted">
-                                ${
-                                    local.descripcion ||
-                                    ''
-                                }
-                            </p>
-
-
                             <a
                                 href="local-detalle.html?id=${local.id}"
-                                class="btn btn-outline-success mt-auto"
+                                class="favorito-card-link"
                             >
-                                Ver local
+                                Ver detalle
+                                <i class="bi bi-arrow-right"></i>
                             </a>
 
                         </div>
 
-                    </div>
+                    </article>
 
                 </div>
             `;
         })
         .join('');
+
+
+    crearPaginacion(
+        paginacionLocales,
+        localesFavoritos.length,
+        paginaLocales,
+        nuevaPagina => {
+
+            paginaLocales = nuevaPagina;
+
+            mostrarLocales();
+        }
+    );
 }
 
 
@@ -659,9 +1131,7 @@ function mostrarLocales(locales) {
 // NUTRICIONISTAS
 // ==========================================
 
-function mostrarNutricionistas(
-    nutricionistas
-) {
+function mostrarNutricionistas() {
 
     const seccion =
         document.getElementById(
@@ -669,79 +1139,110 @@ function mostrarNutricionistas(
         );
 
 
-    if (nutricionistas.length === 0) {
+    actualizarCantidad(
+        'cantidad-nutricionistas',
+        nutricionistasFavoritos.length
+    );
+
+
+    if (nutricionistasFavoritos.length === 0) {
 
         seccion.classList.add('d-none');
+
+        contenedorNutricionistas.innerHTML = '';
+
+        paginacionNutricionistas.innerHTML = '';
 
         return;
     }
 
 
+    seccion.classList.remove('d-none');
+
+
+    const totalPaginas =
+        Math.ceil(
+            nutricionistasFavoritos.length /
+            FAVORITOS_POR_PAGINA
+        );
+
+
+    if (paginaNutricionistas > totalPaginas) {
+
+        paginaNutricionistas =
+            Math.max(totalPaginas, 1);
+    }
+
+
+    const inicio =
+        (paginaNutricionistas - 1) *
+        FAVORITOS_POR_PAGINA;
+
+
+    const nutricionistasPagina =
+        nutricionistasFavoritos.slice(
+            inicio,
+            inicio + FAVORITOS_POR_PAGINA
+        );
+
+
     contenedorNutricionistas.innerHTML =
-        nutricionistas.map(
+        nutricionistasPagina.map(
             nutricionista => {
 
-                const tieneFoto =
+                const foto =
                     nutricionista.fotoPerfil &&
-                    nutricionista.fotoPerfil.trim() !== '';
-
-
-                const foto = tieneFoto
-                    ? `
-                        <img
-                            src="${nutricionista.fotoPerfil}"
-                            class="card-img-top"
-                            alt="${nutricionista.nombre} ${nutricionista.apellido}"
-                            style="
-                                height: 300px;
-                                object-fit: cover;
-                                object-position: center;
-                            "
-                        >
-                    `
-                    : `
-                        <div
-                            class="d-flex align-items-center justify-content-center bg-light"
-                            style="height: 300px;"
-                        >
-                            <i
-                                class="bi bi-person text-secondary"
-                                style="font-size: 5rem;"
-                            ></i>
-                        </div>
-                    `;
+                    nutricionista.fotoPerfil.trim() !== ''
+                        ? `
+                            <img
+                                src="${nutricionista.fotoPerfil}"
+                                alt="${nutricionista.nombre} ${nutricionista.apellido}"
+                                class="favorito-card-img"
+                            >
+                        `
+                        : `
+                            <div class="favorito-card-placeholder">
+                                <i class="bi bi-person"></i>
+                            </div>
+                        `;
 
 
                 return `
-                    <div class="col-md-6 col-xl-4">
+                    <div class="col-12 col-lg-6">
 
-                        <div
-                            class="card h-100 shadow-sm border-0"
-                        >
+                        <article class="favorito-card">
 
-                            ${foto}
+                            <div class="favorito-card-media">
+                                ${foto}
+                            </div>
 
+                            <div class="favorito-card-contenido">
 
-                            <div
-                                class="card-body d-flex flex-column"
-                            >
+                                <div class="favorito-card-superior">
 
-                                <span
-                                    class="badge bg-success-subtle text-success align-self-start mb-2"
-                                >
-                                    Profesional verificado
-                                </span>
+                                    <span class="favorito-badge">
+                                        Nutricionista
+                                    </span>
 
+                                    <button
+                                        type="button"
+                                        class="favorito-corazon"
+                                        data-tipo="nutricionistas"
+                                        data-id="${nutricionista.id}"
+                                        aria-label="Quitar ${nutricionista.nombre} ${nutricionista.apellido} de favoritos"
+                                        title="Quitar de favoritos"
+                                    >
+                                        <i class="bi bi-heart-fill"></i>
+                                    </button>
 
-                                <h5 class="card-title fw-bold">
+                                </div>
 
+                                <h3 class="favorito-card-titulo">
                                     ${nutricionista.nombre}
                                     ${nutricionista.apellido}
+                                </h3>
 
-                                </h5>
-
-
-                                <p class="text-muted small">
+                                <p class="favorito-card-info">
 
                                     <i class="bi bi-geo-alt"></i>
 
@@ -752,32 +1253,74 @@ function mostrarNutricionistas(
 
                                 </p>
 
-
-                                <p class="card-text text-muted">
-                                    ${
-                                        nutricionista.descripcion ||
-                                        'Profesional de nutrición.'
-                                    }
-                                </p>
-
-
                                 <a
                                     href="nutricionista-detalle.html?id=${nutricionista.id}"
-                                    class="btn btn-outline-success mt-auto"
+                                    class="favorito-card-link"
                                 >
-                                    Ver perfil
+                                    Ver detalle
+                                    <i class="bi bi-arrow-right"></i>
                                 </a>
 
                             </div>
 
-                        </div>
+                        </article>
 
                     </div>
                 `;
             }
         )
         .join('');
+
+
+    crearPaginacion(
+        paginacionNutricionistas,
+        nutricionistasFavoritos.length,
+        paginaNutricionistas,
+        nuevaPagina => {
+
+            paginaNutricionistas =
+                nuevaPagina;
+
+            mostrarNutricionistas();
+        }
+    );
 }
+
+
+// ==========================================
+// CLICK EN CORAZÓN
+// ==========================================
+
+contenido.addEventListener(
+    'click',
+    async event => {
+
+        const boton =
+            event.target.closest(
+                '.favorito-corazon'
+            );
+
+
+        if (!boton) {
+
+            return;
+        }
+
+
+        const tipo =
+            boton.dataset.tipo;
+
+        const id =
+            boton.dataset.id;
+
+
+        await eliminarFavorito(
+            tipo,
+            id,
+            boton
+        );
+    }
+);
 
 
 // ==========================================
