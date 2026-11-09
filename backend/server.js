@@ -2306,7 +2306,7 @@ app.get("/api/locales/:id", async (req, res) => {
 
                 FROM local l
 
-                INNER JOIN tipoLocal tl
+                INNER JOIN tipolocal tl
                     ON l.tipoLocalId = tl.id
 
                 INNER JOIN barrio b
@@ -3941,7 +3941,7 @@ app.get(
                         tl.nombre AS tipo,
                         b.nombre AS barrio
                     FROM local l
-                    INNER JOIN tipoLocal tl
+                    INNER JOIN tipolocal tl
                         ON l.tipoLocalId = tl.id
                     INNER JOIN barrio b
                         ON l.barrioId = b.id
