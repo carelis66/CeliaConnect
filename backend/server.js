@@ -1296,7 +1296,7 @@ app.get("/api/restaurantes", async (req, res) => {
                 tr.nombre AS tipoRestaurante,
                 b.nombre AS barrio
             FROM restaurante r
-            INNER JOIN tipoRestaurante tr
+            INNER JOIN tiporestaurante tr
                 ON r.tipoRestauranteId = tr.id
             INNER JOIN barrio b
                 ON r.barrioId = b.id
@@ -1994,7 +1994,7 @@ app.get("/api/restaurantes/:id", async (req, res) => {
                 tr.nombre AS tipoRestaurante,
                 b.nombre AS barrio
             FROM restaurante r
-            INNER JOIN tipoRestaurante tr
+            INNER JOIN tiporestaurante tr
                 ON r.tipoRestauranteId = tr.id
             INNER JOIN barrio b
                 ON r.barrioId = b.id
@@ -3450,7 +3450,7 @@ app.get(
                         tr.nombre AS tipo,
                         b.nombre AS barrio
                     FROM restaurante r
-                    INNER JOIN tipoRestaurante tr
+                    INNER JOIN tiporestaurante tr
                         ON r.tipoRestauranteId = tr.id
                     INNER JOIN barrio b
                         ON r.barrioId = b.id
