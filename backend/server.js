@@ -313,7 +313,7 @@ app.get(
 
                         m.nombre AS marca
 
-                    FROM comentarioProducto cp
+                    FROM comentarioproducto cp
 
                     INNER JOIN usuario u
                         ON cp.usuarioId = u.id
@@ -383,7 +383,7 @@ app.patch(
                     SELECT
                         id,
                         estado
-                    FROM comentarioProducto
+                    FROM comentarioproducto
                     WHERE id = ?
                     LIMIT 1
                 `,
@@ -412,7 +412,7 @@ app.patch(
 
       await pool.query(
         `
-                UPDATE comentarioProducto
+                UPDATE comentarioproducto
                 SET estado = ?
                 WHERE id = ?
             `,
@@ -466,7 +466,7 @@ app.get(
                         r.id AS restauranteId,
                         r.nombre AS restauranteNombre
 
-                    FROM comentarioRestaurante cr
+                    FROM comentariorestaurante cr
 
                     INNER JOIN usuario u
                         ON cr.usuarioId = u.id
@@ -528,7 +528,7 @@ app.patch(
                         id,
                         estado,
                         restauranteId
-                    FROM comentarioRestaurante
+                    FROM comentariorestaurante
                     WHERE id = ?
                     LIMIT 1
                 `,
@@ -553,7 +553,7 @@ app.patch(
       // ACTUALIZAR ESTADO
       await pool.query(
         `
-                UPDATE comentarioRestaurante
+                UPDATE comentariorestaurante
                 SET estado = ?
                 WHERE id = ?
             `,
@@ -570,7 +570,7 @@ app.patch(
                             0
                         ) AS promedio,
                         COUNT(*) AS cantidad
-                    FROM comentarioRestaurante
+                    FROM comentariorestaurante
                     WHERE restauranteId = ?
                         AND estado = 'aprobado'
                 `,
@@ -635,7 +635,7 @@ app.get(
                         l.id AS localId,
                         l.nombre AS localNombre
 
-                    FROM comentarioLocal cl
+                    FROM comentariolocal cl
 
                     INNER JOIN usuario u
                         ON cl.usuarioId = u.id
@@ -706,7 +706,7 @@ app.patch(
                         id,
                         estado,
                         localId
-                    FROM comentarioLocal
+                    FROM comentariolocal
                     WHERE id = ?
                     LIMIT 1
                 `,
@@ -737,7 +737,7 @@ app.patch(
 
       await pool.query(
         `
-                UPDATE comentarioLocal
+                UPDATE comentariolocal
                 SET estado = ?
                 WHERE id = ?
             `,
@@ -757,7 +757,7 @@ app.patch(
                             0
                         ) AS promedio,
                         COUNT(*) AS cantidad
-                    FROM comentarioLocal
+                    FROM comentariolocal
                     WHERE localId = ?
                         AND estado = 'aprobado'
                 `,
@@ -846,7 +846,7 @@ app.get("/api/productos", async (req, res) => {
             INNER JOIN categoria c
                 ON p.categoriaId = c.id
 
-            LEFT JOIN comentarioProducto cp
+            LEFT JOIN comentarioproducto cp
                 ON cp.productoId = p.id
 
             GROUP BY
@@ -914,7 +914,7 @@ app.post("/api/productos/:id/favorito", verificarToken, async (req, res) => {
     const [favoritos] = await pool.query(
       `
           SELECT usuarioId, productoId
-          FROM favoritoProducto
+          FROM favoritoproducto
           WHERE usuarioId = ?
             AND productoId = ?
           LIMIT 1
@@ -931,7 +931,7 @@ app.post("/api/productos/:id/favorito", verificarToken, async (req, res) => {
     // Agregar a favoritos
     await pool.query(
       `
-          INSERT INTO favoritoProducto (
+          INSERT INTO favoritoproducto (
             usuarioId,
             productoId
           )
@@ -969,7 +969,7 @@ app.delete("/api/productos/:id/favorito", verificarToken, async (req, res) => {
 
     const [resultado] = await pool.query(
       `
-          DELETE FROM favoritoProducto
+          DELETE FROM favoritoproducto
           WHERE usuarioId = ?
             AND productoId = ?
         `,
@@ -1007,7 +1007,7 @@ app.get("/api/productos/favoritos", verificarToken, async (req, res) => {
           SELECT
             fp.productoId,
             fp.fechaAgregado
-          FROM favoritoProducto fp
+          FROM favoritoproducto fp
           WHERE fp.usuarioId = ?
           ORDER BY fp.fechaAgregado DESC
         `,
@@ -1052,7 +1052,7 @@ app.get("/api/productos/:id/comentarios", async (req, res) => {
                 cp.fechaComentario,
                 u.nombre,
                 u.apellido
-            FROM comentarioProducto cp
+            FROM comentarioproducto cp
             INNER JOIN usuario u
                 ON cp.usuarioId = u.id
             WHERE cp.productoId = ?
@@ -1145,7 +1145,7 @@ app.post("/api/productos/:id/comentarios", verificarToken, async (req, res) => {
     const [comentariosExistentes] = await pool.query(
       `
                     SELECT id
-                    FROM comentarioProducto
+                    FROM comentarioproducto
                     WHERE usuarioId = ?
                         AND productoId = ?
                     LIMIT 1
@@ -1165,7 +1165,7 @@ app.post("/api/productos/:id/comentarios", verificarToken, async (req, res) => {
 
     const [resultado] = await pool.query(
       `
-                    INSERT INTO comentarioProducto (
+                    INSERT INTO comentarioproducto (
                         titulo,
                         comentario,
                         calificacion,
@@ -1348,7 +1348,7 @@ app.post("/api/restaurantes/:id/favorito", verificarToken, async (req, res) => {
     const [favoritos] = await pool.query(
       `
           SELECT usuarioId, restauranteId
-          FROM favoritoRestaurante
+          FROM favoritorestaurante
           WHERE usuarioId = ?
             AND restauranteId = ?
           LIMIT 1
@@ -1364,7 +1364,7 @@ app.post("/api/restaurantes/:id/favorito", verificarToken, async (req, res) => {
 
     await pool.query(
       `
-          INSERT INTO favoritoRestaurante (
+          INSERT INTO favoritorestaurante (
             usuarioId,
             restauranteId
           )
@@ -1405,7 +1405,7 @@ app.delete(
 
       const [resultado] = await pool.query(
         `
-          DELETE FROM favoritoRestaurante
+          DELETE FROM favoritorestaurante
           WHERE usuarioId = ?
             AND restauranteId = ?
         `,
@@ -1444,7 +1444,7 @@ app.get("/api/restaurantes/favoritos", verificarToken, async (req, res) => {
           SELECT
             fr.restauranteId,
             fr.fechaAgregado
-          FROM favoritoRestaurante fr
+          FROM favoritorestaurante fr
           WHERE fr.usuarioId = ?
           ORDER BY fr.fechaAgregado DESC
         `,
@@ -1487,7 +1487,7 @@ app.get("/api/restaurantes/:id/comentarios", async (req, res) => {
                 cr.fechaComentario,
                 u.nombre,
                 u.apellido
-            FROM comentarioRestaurante cr
+            FROM comentariorestaurante cr
             INNER JOIN usuario u
                 ON cr.usuarioId = u.id
             INNER JOIN restaurante r
@@ -1591,7 +1591,7 @@ app.post(
       const [comentariosExistentes] = await pool.query(
         `
                     SELECT id
-                    FROM comentarioRestaurante
+                    FROM comentariorestaurante
                     WHERE usuarioId = ?
                         AND restauranteId = ?
                     LIMIT 1
@@ -1611,7 +1611,7 @@ app.post(
 
       const [resultado] = await pool.query(
         `
-                    INSERT INTO comentarioRestaurante (
+                    INSERT INTO comentariorestaurante (
                         titulo,
                         comentario,
                         calificacion,
@@ -1734,7 +1734,7 @@ app.post("/api/locales/:id/comentarios", verificarToken, async (req, res) => {
     const [comentariosExistentes] = await pool.query(
       `
                     SELECT id
-                    FROM comentarioLocal
+                    FROM comentariolocal
                     WHERE usuarioId = ?
                         AND localId = ?
                     LIMIT 1
@@ -1754,7 +1754,7 @@ app.post("/api/locales/:id/comentarios", verificarToken, async (req, res) => {
 
     const [resultado] = await pool.query(
       `
-                    INSERT INTO comentarioLocal (
+                    INSERT INTO comentariolocal (
                         titulo,
                         comentario,
                         calificacion,
@@ -2097,7 +2097,7 @@ app.get("/api/locales/:id/comentarios", async (req, res) => {
                 u.nombre AS usuarioNombre,
                 u.apellido AS usuarioApellido
 
-            FROM comentarioLocal cl
+            FROM comentariolocal cl
 
             INNER JOIN usuario u
                 ON cl.usuarioId = u.id
@@ -2158,7 +2158,7 @@ app.post("/api/locales/:id/favorito", verificarToken, async (req, res) => {
     const [favoritos] = await pool.query(
       `
           SELECT usuarioId, localId
-          FROM favoritoLocal
+          FROM favoritolocal
           WHERE usuarioId = ?
             AND localId = ?
           LIMIT 1
@@ -2174,7 +2174,7 @@ app.post("/api/locales/:id/favorito", verificarToken, async (req, res) => {
 
     await pool.query(
       `
-          INSERT INTO favoritoLocal (
+          INSERT INTO favoritolocal (
             usuarioId,
             localId
           )
@@ -2212,7 +2212,7 @@ app.delete("/api/locales/:id/favorito", verificarToken, async (req, res) => {
 
     const [resultado] = await pool.query(
       `
-          DELETE FROM favoritoLocal
+          DELETE FROM favoritolocal
           WHERE usuarioId = ?
             AND localId = ?
         `,
@@ -2250,7 +2250,7 @@ app.get("/api/locales/favoritos", verificarToken, async (req, res) => {
           SELECT
             fl.localId,
             fl.fechaAgregado
-          FROM favoritoLocal fl
+          FROM favoritolocal fl
           WHERE fl.usuarioId = ?
           ORDER BY fl.fechaAgregado DESC
         `,
@@ -2421,7 +2421,7 @@ app.post(
       const [favoritos] = await pool.query(
         `
           SELECT usuarioId, nutricionistaId
-          FROM favoritoNutricionista
+          FROM favoritonutricionista
           WHERE usuarioId = ?
             AND nutricionistaId = ?
           LIMIT 1
@@ -2437,7 +2437,7 @@ app.post(
 
       await pool.query(
         `
-          INSERT INTO favoritoNutricionista (
+          INSERT INTO favoritonutricionista (
             usuarioId,
             nutricionistaId
           )
@@ -2479,7 +2479,7 @@ app.delete(
 
       const [resultado] = await pool.query(
         `
-          DELETE FROM favoritoNutricionista
+          DELETE FROM favoritonutricionista
           WHERE usuarioId = ?
             AND nutricionistaId = ?
         `,
@@ -2518,7 +2518,7 @@ app.get("/api/nutricionistas/favoritos", verificarToken, async (req, res) => {
           SELECT
             fn.nutricionistaId,
             fn.fechaAgregado
-          FROM favoritoNutricionista fn
+          FROM favoritonutricionista fn
           WHERE fn.usuarioId = ?
           ORDER BY fn.fechaAgregado DESC
         `,
@@ -2647,7 +2647,7 @@ app.get("/api/nutricionistas/:id/comentarios", async (req, res) => {
                     u.nombre AS usuarioNombre,
                     u.apellido AS usuarioApellido
 
-                FROM comentarioNutricionista cn
+                FROM comentarionutricionista cn
 
                 INNER JOIN usuario u
                     ON cn.usuarioId = u.id
@@ -2751,7 +2751,7 @@ app.post(
       const [comentariosExistentes] = await pool.query(
         `
                     SELECT id
-                    FROM comentarioNutricionista
+                    FROM comentarionutricionista
                     WHERE usuarioId = ?
                         AND nutricionistaId = ?
                     LIMIT 1
@@ -2771,7 +2771,7 @@ app.post(
 
       const [resultado] = await pool.query(
         `
-                    INSERT INTO comentarioNutricionista (
+                    INSERT INTO comentarionutricionista (
                         titulo,
                         comentario,
                         calificacion,
@@ -3150,7 +3150,7 @@ app.get(
                             n.apellido
                         ) AS nutricionistaNombre
 
-                    FROM comentarioNutricionista cn
+                    FROM comentarionutricionista cn
 
                     INNER JOIN usuario u
                         ON u.id = cn.usuarioId
@@ -3215,7 +3215,7 @@ app.patch(
                     SELECT
                         id,
                         nutricionistaId
-                    FROM comentarioNutricionista
+                    FROM comentarionutricionista
                     WHERE id = ?
                     LIMIT 1
                 `,
@@ -3238,7 +3238,7 @@ app.patch(
 
       await conexion.query(
         `
-                UPDATE comentarioNutricionista
+                UPDATE comentarionutricionista
                 SET estado = ?
                 WHERE id = ?
             `,
@@ -3259,7 +3259,7 @@ app.patch(
 
                         COUNT(*) AS cantidad
 
-                    FROM comentarioNutricionista
+                    FROM comentarionutricionista
 
                     WHERE nutricionistaId = ?
                         AND estado = 'aprobado'
