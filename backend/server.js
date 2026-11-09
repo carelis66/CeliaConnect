@@ -817,7 +817,7 @@ app.get("/api/productos", async (req, res) => {
                 p.certificadoSinTacc,
                 p.estadoVerificacion,
                 p.marcaId,
-                P.categoriaId,
+                p.categoriaId,
                 m.nombre AS marca,
                 c.nombre AS categoria,
 
