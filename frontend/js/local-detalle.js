@@ -2,7 +2,7 @@
 // CELIACONNECT - DETALLE DE LOCAL
 // ==========================================
 
-const API_LOCALES = 'http://localhost:3000/api/locales';
+const API_LOCALES = 'https://celiaconnect-production.up.railway.app/api/locales';
 
 
 // ==========================================

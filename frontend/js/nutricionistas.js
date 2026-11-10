@@ -2,7 +2,7 @@
 // CELIACONNECT - NUTRICIONISTAS
 // ==========================================
 
-const API_NUTRICIONISTAS = "http://localhost:3000/api/nutricionistas";
+const API_NUTRICIONISTAS = "https://celiaconnect-production.up.railway.app/api/nutricionistas";
 
 let nutricionistas = [];
 let nutricionistasFiltrados = [];

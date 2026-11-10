@@ -270,7 +270,7 @@ async function cargarRatingProductosHome() {
   }
 
   try {
-    const respuesta = await fetch("http://localhost:3000/api/productos");
+    const respuesta = await fetch("https://celiaconnect-production.up.railway.app/api/productos");
 
     if (!respuesta.ok) {
       throw new Error("No se pudieron obtener los productos");

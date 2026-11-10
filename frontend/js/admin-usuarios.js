@@ -3,7 +3,7 @@
 // ==========================================
 
 const API_ADMIN_USUARIOS =
-    'http://localhost:3000/api/admin/usuarios';
+    'https://celiaconnect-production.up.railway.app/api/admin/usuarios';
 
 
 // ==========================================

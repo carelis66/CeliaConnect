@@ -3,7 +3,7 @@
 // ==========================================
 
 const API_RESTAURANTES =
-    'http://localhost:3000/api/restaurantes';
+    'https://celiaconnect-production.up.railway.app/api/restaurantes';
 
 const RESTAURANTES_POR_PAGINA = 9;
 

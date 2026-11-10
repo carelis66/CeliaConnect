@@ -3,7 +3,7 @@
 // ==========================================
 
 const API_NUTRICIONISTAS =
-    'http://localhost:3000/api/nutricionistas';
+    'https://celiaconnect-production.up.railway.app/api/nutricionistas';
 
 
 // ==========================================

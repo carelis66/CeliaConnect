@@ -1,5 +1,5 @@
 const API_REGISTRO =
-    'http://localhost:3000/api/registro';
+    'https://celiaconnect-production.up.railway.app/api/registro';
 
 
 document.addEventListener(

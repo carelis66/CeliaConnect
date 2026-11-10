@@ -7,59 +7,59 @@
    DASHBOARD
 ===================================================== */
 
-const API_ADMIN_DASHBOARD = "http://localhost:3000/api/admin/dashboard";
+const API_ADMIN_DASHBOARD = "https://celiaconnect-production.up.railway.app/api/admin/dashboard";
 
-const API_ADMIN_ULTIMAS_ALTAS = "http://localhost:3000/api/admin/ultimas-altas";
+const API_ADMIN_ULTIMAS_ALTAS = "https://celiaconnect-production.up.railway.app/api/admin/ultimas-altas";
 
 /* =====================================================
    MODERACIÓN DE COMENTARIOS
 ===================================================== */
 
 const API_ADMIN_PRODUCTOS =
-  "http://localhost:3000/api/admin/comentarios/productos";
+  "https://celiaconnect-production.up.railway.app/api/admin/comentarios/productos";
 
 const API_ADMIN_RESTAURANTES_COMENTARIOS =
-  "http://localhost:3000/api/admin/comentarios/restaurantes";
+  "https://celiaconnect-production.up.railway.app/api/admin/comentarios/restaurantes";
 
-const API_ADMIN_LOCALES = "http://localhost:3000/api/admin/comentarios/locales";
+const API_ADMIN_LOCALES = "https://celiaconnect-production.up.railway.app/api/admin/comentarios/locales";
 
 const API_ADMIN_NUTRICIONISTAS =
-  "http://localhost:3000/api/admin/comentarios/nutricionistas";
+  "https://celiaconnect-production.up.railway.app/api/admin/comentarios/nutricionistas";
 
 /* =====================================================
    PRODUCTOS
 ===================================================== */
 
-const API_PRODUCTOS = "http://localhost:3000/api/productos";
+const API_PRODUCTOS = "https://celiaconnect-production.up.railway.app/api/productos";
 
-const API_ADMIN_MARCAS = "http://localhost:3000/api/admin/marcas";
+const API_ADMIN_MARCAS = "https://celiaconnect-production.up.railway.app/api/admin/marcas";
 
-const API_ADMIN_CATEGORIAS = "http://localhost:3000/api/admin/categorias";
+const API_ADMIN_CATEGORIAS = "https://celiaconnect-production.up.railway.app/api/admin/categorias";
 
 /* =====================================================
    RESTAURANTES
 ===================================================== */
 
-const API_RESTAURANTES = "http://localhost:3000/api/restaurantes";
+const API_RESTAURANTES = "https://celiaconnect-production.up.railway.app/api/restaurantes";
 
-const API_ADMIN_RESTAURANTES = "http://localhost:3000/api/admin/restaurantes";
+const API_ADMIN_RESTAURANTES = "https://celiaconnect-production.up.railway.app/api/admin/restaurantes";
 
 const API_ADMIN_TIPOS_RESTAURANTE =
-  "http://localhost:3000/api/admin/tipos-restaurante";
+  "https://celiaconnect-production.up.railway.app/api/admin/tipos-restaurante";
 
-const API_ADMIN_BARRIOS = "http://localhost:3000/api/admin/barrios";
+const API_ADMIN_BARRIOS = "https://celiaconnect-production.up.railway.app/api/admin/barrios";
 
 /* =====================================================
    LOCALES
 ===================================================== */
 
-const API_ADMIN_LOCALES_CRUD = "http://localhost:3000/api/admin/locales";
+const API_ADMIN_LOCALES_CRUD = "https://celiaconnect-production.up.railway.app/api/admin/locales";
 
-const API_ADMIN_TIPOS_LOCAL = "http://localhost:3000/api/admin/tipos-local";
+const API_ADMIN_TIPOS_LOCAL = "https://celiaconnect-production.up.railway.app/api/admin/tipos-local";
 
 /* NUTRICIONISTAS */
 const API_ADMIN_NUTRICIONISTAS_CRUD =
-  "http://localhost:3000/api/admin/nutricionistas";
+  "https://celiaconnect-production.up.railway.app/api/admin/nutricionistas";
 let comentarioSeleccionado = null;
 let estadoSeleccionado = null;
 let tipoComentarioSeleccionado = null;
@@ -1225,7 +1225,7 @@ function inicializarConfirmarEliminarProducto() {
       botonConfirmar.disabled = true;
 
       const respuesta = await fetch(
-        `http://localhost:3000/api/admin/productos/${productoId}`,
+  `https://celiaconnect-production.up.railway.app/api/admin/productos/${productoId}`,
         {
           method: "DELETE",
 
@@ -1312,8 +1312,8 @@ function inicializarGuardarProducto() {
       const esNuevo = !productoId;
 
       const url = esNuevo
-        ? "http://localhost:3000/api/admin/productos"
-        : `http://localhost:3000/api/admin/productos/${productoId}`;
+          ? "https://celiaconnect-production.up.railway.app/api/admin/productos"
+  : `https://celiaconnect-production.up.railway.app/api/admin/productos/${productoId}`;
 
       const metodo = esNuevo ? "POST" : "PUT";
 

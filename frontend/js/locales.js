@@ -3,7 +3,7 @@
 // ==========================================
 
 const API_LOCALES =
-    'http://localhost:3000/api/locales';
+'https://celiaconnect-production.up.railway.app/api/locales';
 
 const LOCALES_POR_PAGINA = 9;
 

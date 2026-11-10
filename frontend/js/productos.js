@@ -1,4 +1,4 @@
-const API_PRODUCTOS = "http://localhost:3000/api/productos";
+const API_PRODUCTOS = "https://celiaconnect-production.up.railway.app/api/productos";
 
 const PRODUCTOS_POR_PAGINA = 9;
 
