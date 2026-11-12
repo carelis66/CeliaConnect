@@ -1,80 +1,364 @@
 # 09 - Mockups
- 
+
 ## Información del documento
- 
+
 | Campo | Valor |
 |---|---|
 | Proyecto | CeliaConnect |
 | Documento | Mockups |
-| Versión | 1.1 |
-| Fecha | 15/09/2026 |
+| Versión | 2.0 |
+| Fecha | 12/11/2026 |
 | Autor | Carelis Fagundez |
-| Estado | En elaboración |
- 
-## 1. Introducción
-
- Nota de vigencia: estos mockups corresponden a una etapa temprana del proyecto (semestre anterior), previa a que se terminaran de definir el alcance y las decisiones actuales (stack, módulos, reglas de negocio). Donde haya diferencia entre este documento y lo ya construido en el frontend (login.html, registro.html, index.html, productos.html), el frontend construido es la referencia vigente, no el mockup. Este documento queda como registro histórico del diseño preliminar y guía general de estilo, no como especificación exacta a seguir para las pantallas que faltan.
-
-Los siguientes mockups representan el diseño preliminar de la interfaz de usuario (UI) y la experiencia de usuario (UX) de CeliaConnect.
-
-Su objetivo es ilustrar la apariencia y la organización de las principales pantallas que formarán parte de la aplicación web y mobile. Estos diseños sirven como referencia para la etapa de desarrollo, permitiendo validar la navegación, la distribución de los componentes y la interacción entre los distintos módulos del sistema antes de su implementación.
+| Estado | Finalizado — Diseño preliminar documentado |
 
 ---
 
-# 2. Mockups Web
+# 1. Introducción
 
-## 2.1 Página de Inicio
+Los mockups de CeliaConnect fueron elaborados durante las primeras etapas del proyecto con el objetivo de definir una propuesta visual inicial para la aplicación Web y Mobile.
+
+Estos diseños permitieron explorar:
+
+- Identidad visual.
+- Distribución de componentes.
+- Navegación.
+- Jerarquía de información.
+- Formularios.
+- Catálogos.
+- Adaptación entre Web y dispositivos móviles.
+
+Los mockups constituyen una **referencia del proceso de diseño** y no una representación exacta de la versión final implementada.
+
+Durante el desarrollo, CeliaConnect evolucionó funcional y técnicamente, por lo que algunas características representadas en los diseños preliminares fueron modificadas, reemplazadas o excluidas del MVP final.
+
+La aplicación implementada constituye la referencia vigente del comportamiento y diseño final del sistema.
+
+---
+
+# 2. Objetivo de los mockups
+
+Los mockups tuvieron como objetivo:
+
+- Definir una identidad visual inicial.
+- Evaluar la organización de las pantallas.
+- Representar los principales flujos de navegación.
+- Diseñar formularios de autenticación.
+- Representar la visualización de contenido.
+- Analizar la adaptación de la interfaz a dispositivos móviles.
+- Servir como referencia durante el desarrollo del frontend.
+
+---
+
+# 3. Identidad visual
+
+Desde las primeras propuestas se establecieron elementos visuales que posteriormente fueron utilizados como base de CeliaConnect.
+
+Entre ellos:
+
+- Logo de CeliaConnect.
+- Uso predominante de tonos violetas.
+- Uso complementario de tonos amarillos/naranjas.
+- Fondos claros.
+- Tarjetas para representar contenido.
+- Diseño simple y accesible.
+- Formularios con estructura visual uniforme.
+- Identificación gráfica relacionada con alimentación Sin TACC.
+
+Aunque la interfaz evolucionó durante el desarrollo, la identidad general definida en los mockups sirvió como referencia para la versión implementada.
+
+---
+
+# 4. Mockups Web
+
+## 4.1 Página de Inicio
 
 ![Inicio](mockups/web-home.png)
 
-
 ### Descripción
 
-La página principal presenta la propuesta de valor de CeliaConnect y permite acceder rápidamente a las principales funcionalidades de la plataforma, como productos, restaurantes, nutricionistas, recetas y promociones.
+El mockup de la página principal representa una propuesta inicial de acceso a CeliaConnect.
+
+La pantalla fue diseñada para:
+
+- Presentar la identidad de la plataforma.
+- Comunicar la propuesta de valor.
+- Facilitar el acceso a los principales módulos.
+- Proporcionar navegación hacia las distintas secciones.
+
+Durante el desarrollo se realizaron modificaciones sobre la estructura y los módulos disponibles para adaptarlos al alcance definitivo del MVP.
 
 ---
 
-## 2.2 Inicio de Sesión
+## 4.2 Inicio de Sesión
 
 ![Login](mockups/web-login.png)
 
 ### Descripción
 
-Pantalla destinada a la autenticación de usuarios registrados. Incluye acceso al registro de nuevos usuarios y recuperación de contraseña.
+El mockup de inicio de sesión fue diseñado para representar el acceso de usuarios registrados.
+
+Incluye:
+
+- Campo de email.
+- Campo de contraseña.
+- Botón de inicio de sesión.
+- Acceso al registro.
+- Identidad visual de CeliaConnect.
+
+El diseño preliminar también contemplaba una opción de recuperación de contraseña.
+
+Esta funcionalidad finalmente quedó **fuera del alcance del MVP implementado**.
+
+La pantalla definitiva conserva el objetivo principal del mockup: permitir la autenticación de usuarios mediante una interfaz clara y sencilla.
 
 ---
 
-## 2.3 Restaurantes
+## 4.3 Restaurantes
 
 ![Restaurantes](mockups/web-restaurantes.png)
 
 ### Descripción
 
-Pantalla para consultar restaurantes aptos para personas celíacas mediante filtros, búsqueda y visualización de información relevante.
+El mockup de Restaurantes representa una propuesta inicial para la consulta de establecimientos gastronómicos.
+
+El diseño contempla elementos como:
+
+- Buscador.
+- Filtros.
+- Tarjetas de restaurantes.
+- Imágenes.
+- Ubicación.
+- Tipo de establecimiento.
+- Calificaciones.
+- Navegación.
+- Acceso a favoritos.
+
+Esta propuesta sirvió como referencia conceptual durante el desarrollo del módulo real de Restaurantes.
+
+La implementación final fue adaptada a los datos, funcionalidades y requerimientos definitivos de CeliaConnect.
 
 ---
 
-# 3. Mockups Mobile
+# 5. Mockups Mobile
 
 ![Mockups Mobile](mockups/mobile-registro-login-home.png)
 
-### Descripción
+Los mockups Mobile fueron creados para estudiar cómo podía adaptarse CeliaConnect a dispositivos móviles.
 
-Los mockups de la aplicación móvil presentan las principales pantallas diseñadas para CeliaConnect.
+Las pantallas diseñadas incluyen:
 
-Las interfaces incluidas corresponden a:
-
-- **Registro de usuario:** permite la creación de una nueva cuenta mediante un formulario simple e intuitivo.
-- **Inicio de sesión:** posibilita la autenticación de usuarios registrados y el acceso a la recuperación de contraseña.
-- **Pantalla principal:** ofrece acceso a los módulos principales de la aplicación, como Productos, Restaurantes, Nutricionistas, Recetas y Promociones, además de una barra de navegación inferior para facilitar la interacción del usuario.
-
-El diseño sigue una línea visual consistente con la versión web, priorizando la simplicidad, la accesibilidad y una experiencia de usuario intuitiva.
-
+- Registro.
+- Inicio de sesión.
+- Página principal.
 
 ---
 
-# 4. Consideraciones
+## 5.1 Registro Mobile
 
-Los mockups presentados constituyen un diseño preliminar y podrán sufrir modificaciones durante la etapa de desarrollo para mejorar la experiencia del usuario y adaptarse a nuevos requerimientos funcionales.
+La propuesta de registro incluye:
 
-Los cambios listados en la sección 1 deben aplicarse en el archivo de diseño original antes de tomarlos como referencia definitiva para las pantallas de Restaurantes y Locales que todavía están pendientes de desarrollo (ver README).
+- Logo.
+- Nombre de la plataforma.
+- Datos personales.
+- Email.
+- Contraseña.
+- Confirmación de contraseña.
+- Fecha de nacimiento.
+- Acceso al inicio de sesión.
+
+El objetivo fue diseñar un formulario sencillo y legible para pantallas pequeñas.
+
+---
+
+## 5.2 Login Mobile
+
+La pantalla de inicio de sesión contempla:
+
+- Logo.
+- Email.
+- Contraseña.
+- Botón de inicio de sesión.
+- Acceso al registro.
+
+El mockup también incluía recuperación de contraseña, funcionalidad que finalmente no forma parte del MVP.
+
+---
+
+## 5.3 Home Mobile
+
+La propuesta inicial de Home Mobile incluía accesos a diferentes categorías mediante tarjetas.
+
+Entre los módulos representados originalmente se encontraban:
+
+- Productos.
+- Restaurantes.
+- Nutricionistas.
+- Recetas.
+- Promociones.
+
+Durante la definición final del alcance, **Recetas y Promociones dejaron de formar parte del MVP**.
+
+La versión implementada se concentra en:
+
+- Productos.
+- Restaurantes.
+- Locales.
+- Nutricionistas.
+- Favoritos.
+- Comentarios y calificaciones.
+- Funcionalidades asociadas a la cuenta del usuario.
+
+---
+
+# 6. Evolución de los mockups
+
+Los mockups corresponden a una etapa anterior a la implementación definitiva.
+
+Por este motivo existen diferencias entre algunos elementos representados gráficamente y el sistema actual.
+
+| Mockup inicial | Implementación final |
+|---|---|
+| Productos | Implementado |
+| Restaurantes | Implementado |
+| Nutricionistas | Implementado |
+| Locales no destacados como módulo principal | Implementado como módulo principal |
+| Recetas | Fuera del MVP |
+| Promociones | Fuera del MVP |
+| Recuperación de contraseña | Fuera del MVP |
+| Favoritos | Implementado y ampliado |
+| Comentarios limitados | Implementados en los principales módulos |
+| Moderación no representada | Implementada |
+| Administrador | Implementado |
+| Moderador | Implementado |
+| Dashboard no representado | Implementado |
+
+Esta evolución responde al proceso iterativo del proyecto y a la definición progresiva del alcance del MVP.
+
+---
+
+# 7. De Mobile preliminar a aplicación Android
+
+Los mockups Mobile fueron realizados antes de seleccionar definitivamente la tecnología utilizada para distribuir CeliaConnect como aplicación móvil.
+
+Inicialmente se evaluó una estrategia basada en PWA.
+
+Posteriormente se decidió utilizar **Capacitor** para generar una aplicación Android a partir del frontend responsive existente.
+
+La arquitectura final es:
+
+```text id="6gdb1s"
+Frontend Responsive
+        ↓
+     Capacitor
+        ↓
+     Android
+        ↓
+    API REST
+        ↓
+      MySQL
+```
+
+La aplicación Android mantiene la identidad visual y las funcionalidades principales de la versión Web.
+
+---
+
+# 8. Diseño responsive
+
+Una de las decisiones adoptadas durante el desarrollo fue utilizar una única interfaz Web responsive como base de la experiencia en diferentes dispositivos.
+
+El frontend se adapta a:
+
+- Desktop.
+- Tablets.
+- Teléfonos móviles.
+
+Esta estrategia permitió reutilizar el frontend dentro de la aplicación Android mediante Capacitor.
+
+Por este motivo, la versión Android final no reproduce exactamente las pantallas de los mockups Mobile originales, sino que utiliza la versión responsive del sistema implementado.
+
+---
+
+# 9. Relación entre diseño e implementación
+
+El proceso seguido puede resumirse de la siguiente manera:
+
+```text id="kvsj8e"
+Wireframes
+    ↓
+Mockups
+    ↓
+Prototipo visual
+    ↓
+Desarrollo Frontend
+    ↓
+Pruebas responsive
+    ↓
+Ajustes de UI/UX
+    ↓
+Aplicación Web
+    ↓
+Aplicación Android
+```
+
+Los mockups funcionaron como punto de partida y permitieron establecer una dirección visual antes de comenzar la implementación completa.
+
+---
+
+# 10. Diferencias respecto del diseño preliminar
+
+Durante el desarrollo se realizaron cambios como consecuencia de:
+
+- Ajustes de alcance.
+- Evolución de los requisitos.
+- Incorporación de nuevas funcionalidades.
+- Implementación de roles.
+- Incorporación de moderación.
+- Incorporación de favoritos para los distintos módulos.
+- Incorporación de comentarios y calificaciones.
+- Necesidad de mantener una interfaz responsive.
+- Integración con datos reales.
+- Adaptación de la interfaz para Android.
+
+Estos cambios forman parte natural del proceso iterativo de desarrollo de software.
+
+---
+
+# 11. Estado actual
+
+Los mockups incluidos en este documento se conservan como **registro del proceso de diseño de CeliaConnect**.
+
+No es necesario que coincidan exactamente con la aplicación final, ya que representan una etapa previa del proyecto.
+
+La referencia actual para la interfaz y comportamiento del sistema corresponde a:
+
+- Aplicación Web implementada.
+- Aplicación Android.
+- Modelo funcional.
+- Casos de uso.
+- Requisitos funcionales.
+
+La aplicación Web se encuentra disponible en:
+
+```text id="6euk88"
+https://celiaconnect.up.railway.app
+```
+
+---
+
+# 12. Consideraciones finales
+
+Los mockups permitieron validar inicialmente la estructura, identidad visual y navegación propuesta para CeliaConnect antes de completar el desarrollo.
+
+La comparación entre los diseños preliminares y el producto implementado permite observar la evolución del proyecto desde la etapa conceptual hasta un MVP funcional.
+
+Las diferencias existentes entre los mockups y la aplicación final no representan inconsistencias de documentación, sino decisiones tomadas durante el proceso iterativo de análisis, diseño, implementación y validación.
+
+---
+
+# 13. Estado del documento
+
+**Versión:** 2.0
+
+**Estado:** Finalizado — Diseño preliminar documentado.
+
+Los mockups se conservan como evidencia de la etapa de diseño y como parte de la documentación del proceso de desarrollo de CeliaConnect.

@@ -16,3 +16,13 @@ Thumbs.db
 
 .env.*
 !.env.example
+
+# Android signing keys - NEVER commit
+*.jks
+*.keystore
+
+# Android Studio local configuration
+android/.idea/
+
+# Android release builds
+android/app/release/

@@ -1,313 +1,438 @@
 # CeliaConnect
 
-**Plataforma web de información y servicios para la comunidad celíaca**
+**Plataforma web y móvil de información y servicios para la comunidad celíaca**
 
 **Proyecto Final — Analista de Sistemas**  
 **Escuela Da Vinci**  
-**Autora:** Carelis Fagundez
+**Autora:** Carelis Fagundez  
+**Año:** 2026
 
 ---
 
 ## Descripción del proyecto
 
-CeliaConnect es una plataforma web orientada a centralizar información sobre productos, restaurantes, locales comerciales y profesionales de nutrición relacionados con la alimentación libre de gluten (Sin TACC).
+**CeliaConnect** es una plataforma orientada a centralizar información útil para personas celíacas o que siguen una alimentación libre de gluten (Sin TACC).
 
-El proyecto busca facilitar la consulta de información organizada y accesible, permitiendo a los usuarios encontrar productos y servicios, consultar detalles, realizar valoraciones y compartir experiencias.
+El sistema permite consultar información sobre:
 
-La primera etapa está enfocada en la Ciudad Autónoma de Buenos Aires (CABA), Argentina.
+- Productos Sin TACC.
+- Restaurantes.
+- Locales comerciales y dietéticas.
+- Profesionales de nutrición.
 
-CeliaConnect se desarrolla como una aplicación web responsive, con posibilidad de evolucionar posteriormente hacia una aplicación web progresiva (PWA).
+Además, los usuarios registrados pueden guardar favoritos, realizar valoraciones y compartir experiencias mediante comentarios y calificaciones.
+
+CeliaConnect incorpora un sistema de moderación que permite revisar las opiniones enviadas antes de su publicación, junto con herramientas administrativas para la gestión del contenido y los usuarios.
+
+La primera etapa del proyecto está enfocada en la **Ciudad Autónoma de Buenos Aires (CABA), Argentina**, con posibilidad de ampliar progresivamente su cobertura geográfica.
+
+Actualmente CeliaConnect cuenta con una **versión web responsive desplegada en la nube** y una **versión móvil Android desarrollada mediante Capacitor**.
+
+---
 
 ## Objetivo
 
-Desarrollar una plataforma web que facilite el acceso a información sobre alimentación Sin TACC, integrando consultas de productos y establecimientos, registro de usuarios, autenticación, comentarios, calificaciones y herramientas de administración.
+Desarrollar una plataforma centralizada, accesible y fácil de utilizar que facilite la búsqueda de información relacionada con la alimentación Sin TACC.
 
-## Funcionalidades del sistema
+El sistema integra catálogo de productos, establecimientos y profesionales, registro y autenticación de usuarios, favoritos, comentarios, calificaciones, moderación de contenido y herramientas administrativas.
 
-### Usuarios y autenticación
+---
+
+## Acceso al sistema
+
+### Aplicación web
+
+CeliaConnect se encuentra desplegada en Railway y puede utilizarse desde:
+
+**https://celiaconnect.up.railway.app**
+
+### API REST
+
+El backend se encuentra desplegado independientemente y disponible en:
+
+**https://celiaconnect-production.up.railway.app**
+
+### Aplicación Android
+
+La versión móvil utiliza **Capacitor** para empaquetar la interfaz web responsive como una aplicación Android nativa.
+
+El proyecto Android se encuentra incluido dentro del mismo repositorio, en la carpeta:
+
+```text
+android/
+```
+
+La aplicación fue compilada y probada mediante Android Studio utilizando un emulador Android.
+
+---
+
+# Funcionalidades
+
+## Usuarios y autenticación
 
 - Registro de usuarios.
 - Inicio de sesión mediante correo electrónico y contraseña.
-- Almacenamiento de contraseñas mediante bcrypt.
+- Contraseñas protegidas mediante bcrypt.
 - Autenticación mediante JSON Web Tokens (JWT).
-- Diferenciación entre usuarios y administradores.
-- Protección de endpoints que requieren autenticación.
+- Persistencia de sesión.
+- Cierre de sesión.
+- Protección de endpoints autenticados.
+- Control de acceso según roles.
 
-### Productos
+El sistema contempla tres roles principales:
+
+- Usuario.
+- Moderador.
+- Administrador.
+
+---
+
+## Productos
 
 - Consulta del catálogo de productos.
-- Visualización de información detallada.
-- Búsqueda de productos.
-- Filtros por categoría.
-- Filtro de productos certificados Sin TACC.
-- Ordenamiento de resultados.
+- Visualización del detalle de cada producto.
+- Información de marca y categoría.
+- Identificación de productos certificados Sin TACC.
+- Búsqueda por producto o marca.
+- Filtros.
+- Ordenamiento.
 - Paginación.
-- Consulta de comentarios y calificaciones.
+- Comentarios y calificaciones.
+- Gestión de favoritos.
 
-### Comentarios y valoraciones
+---
 
-- Publicación de comentarios por usuarios autenticados.
-- Calificaciones de 1 a 5 estrellas.
-- Estados de moderación: pendiente, aprobado y rechazado.
-- Visualización pública de comentarios aprobados.
-- Moderación administrativa de comentarios de productos.
-- Prevención de comentarios duplicados por usuario y producto.
+## Restaurantes
 
-### Restaurantes
+- Consulta de restaurantes.
+- Visualización de información detallada.
+- Dirección y ubicación.
+- Información de contacto.
+- Características del establecimiento.
+- Comentarios y calificaciones.
+- Gestión de favoritos.
 
-- Consulta de restaurantes verificados.
-- Visualización de detalles de establecimientos.
-- Información de ubicación y contacto.
-- Consulta de comentarios aprobados.
-- Publicación de opiniones por usuarios autenticados.
+---
 
-### Otros módulos contemplados
+## Locales
 
-La base de datos incluye estructuras para:
+- Consulta de locales comerciales y dietéticas.
+- Visualización del detalle del establecimiento.
+- Dirección y ubicación.
+- Información de contacto.
+- Características del local.
+- Comentarios y calificaciones.
+- Gestión de favoritos.
 
-- Locales comerciales y dietéticas.
+---
+
+## Nutricionistas
+
+- Consulta de profesionales de nutrición.
+- Visualización de información profesional.
+- Datos de contacto.
+- Información de atención.
+- Comentarios y calificaciones.
+- Gestión de favoritos.
+
+---
+
+## Favoritos
+
+Los usuarios autenticados pueden guardar y administrar favoritos correspondientes a:
+
+- Productos.
+- Restaurantes.
+- Locales.
 - Nutricionistas.
-- Favoritos de productos, restaurantes, locales y nutricionistas.
-- Características de establecimientos.
-- Roles y permisos.
 
-Estos módulos forman parte del modelo de datos y su implementación en la interfaz y la API puede encontrarse en distintas etapas de desarrollo.
+Los favoritos quedan asociados a la cuenta del usuario.
 
-## Tecnologías utilizadas
+---
 
-### Frontend
+## Comentarios y valoraciones
+
+Los usuarios autenticados pueden compartir experiencias dentro de los distintos módulos.
+
+El sistema permite:
+
+- Publicar comentarios.
+- Asignar calificaciones de 1 a 5 estrellas.
+- Enviar opiniones a moderación.
+- Consultar comentarios previamente aprobados.
+
+Los comentarios utilizan los siguientes estados:
+
+```text
+Pendiente → Aprobado / Rechazado
+```
+
+Solamente los comentarios aprobados son visibles públicamente.
+
+---
+
+## Moderación
+
+CeliaConnect cuenta con un rol específico de **moderador**.
+
+El panel de moderación permite:
+
+- Consultar opiniones pendientes.
+- Visualizar usuario, título, comentario y calificación.
+- Aprobar comentarios.
+- Rechazar comentarios.
+- Actualizar automáticamente el contenido visible públicamente.
+
+El flujo completo de moderación fue probado desde la aplicación móvil:
+
+```text
+Usuario publica opinión
+        ↓
+Comentario pendiente
+        ↓
+Moderador revisa
+        ↓
+Aprobación / Rechazo
+        ↓
+Publicación del comentario aprobado
+```
+
+---
+
+## Administración
+
+El sistema dispone de un panel administrativo protegido mediante autenticación y control de roles.
+
+Entre sus funcionalidades se encuentran:
+
+- Gestión de usuarios.
+- Gestión y supervisión de contenido.
+- Moderación de comentarios.
+- Consulta de información general del sistema.
+- Visualización de indicadores y datos del sistema.
+
+---
+
+## Dashboard
+
+El panel administrativo incluye indicadores obtenidos a partir de la información almacenada en la base de datos.
+
+Esto permite visualizar métricas generales del funcionamiento de CeliaConnect y disponer de información resumida para tareas administrativas.
+
+---
+
+# Versión móvil Android
+
+La aplicación móvil fue desarrollada utilizando **Capacitor**, reutilizando el frontend responsive de CeliaConnect.
+
+Esto permite mantener una misma base funcional para la versión web y móvil.
+
+### Tecnologías móviles
+
+- Capacitor.
+- Android.
+- Android Studio.
+- Gradle.
+- Android Emulator.
+
+### Identificador de aplicación
+
+```text
+com.celiaconnect.app
+```
+
+### Estructura
+
+El proyecto nativo generado por Capacitor se encuentra en:
+
+```text
+android/
+```
+
+La configuración principal de Capacitor se encuentra en:
+
+```text
+capacitor.config.json
+```
+
+La aplicación Android consume la misma API REST desplegada en Railway que la versión web.
+
+---
+
+# Tecnologías utilizadas
+
+## Frontend
 
 - HTML5.
 - CSS3.
-- JavaScript vanilla.
+- JavaScript Vanilla.
 - Bootstrap 5.
 - Bootstrap Icons.
-- Visual Studio Code.
-- Live Server para desarrollo local.
+- Diseño responsive.
 
-### Backend
+## Backend
 
 - Node.js.
-- Express 5.
+- Express.
 - MySQL2.
 - bcrypt.
 - JSON Web Token (JWT).
 - dotenv.
 - CORS.
 
-La conexión con la base de datos utiliza consultas SQL mediante `mysql2/promise`.
+La conexión con la base de datos se realiza mediante `mysql2/promise`.
 
-### Base de datos
+## Base de datos
 
-- MariaDB 10.4, mediante XAMPP en el entorno utilizado.
-- MySQL Workbench para administración, consultas y exportación.
-- SQL para definición de tablas, relaciones y manipulación de datos.
+- MySQL / MariaDB.
+- MySQL Workbench.
+- SQL.
+- XAMPP para el entorno local de desarrollo.
 
-### Control de versiones
+## Mobile
 
+- Capacitor.
+- Android Studio.
+- Gradle.
+- Android SDK.
+
+## Deploy
+
+- Railway.
+- Servicio independiente para frontend.
+- Servicio independiente para backend.
+- Base de datos MySQL en la nube.
+
+## Desarrollo y control de versiones
+
+- Visual Studio Code.
 - Git.
-- GitHub (repositorio privado).
+- GitHub.
+- npm.
 
-## Arquitectura del sistema
+---
 
-CeliaConnect utiliza una arquitectura cliente-servidor.
+# Arquitectura del sistema
 
-El frontend presenta la información y permite la interacción del usuario mediante HTML, CSS y JavaScript.
+CeliaConnect utiliza una arquitectura **cliente-servidor**.
 
-El backend implementa una API REST con Node.js y Express, encargada de recibir solicitudes, ejecutar consultas, gestionar autenticación y devolver respuestas en formato JSON.
+El frontend permite la interacción del usuario mediante HTML, CSS, Bootstrap y JavaScript.
 
-La persistencia de datos se realiza en MariaDB mediante el paquete MySQL2.
+El backend implementa una **API REST con Node.js y Express**, encargada de procesar las solicitudes, gestionar la autenticación, aplicar reglas de negocio y comunicarse con la base de datos.
 
-**Flujo general:**
+La persistencia de información se realiza mediante MySQL/MariaDB.
 
-Frontend → API REST (Express) → MariaDB
+### Arquitectura general
 
-La autenticación utiliza JWT y las contraseñas se almacenan como hashes bcrypt.
+```text
+                ┌──────────────────┐
+                │   Web Browser    │
+                └────────┬─────────┘
+                         │
+                         │
+                ┌────────▼─────────┐
+                │     Frontend     │
+                │ HTML/CSS/JS/BS5 │
+                └────────┬─────────┘
+                         │
+                         │ HTTPS / REST
+                         │
+                ┌────────▼─────────┐
+                │ Backend Express  │
+                │     Node.js      │
+                └────────┬─────────┘
+                         │
+                         │ SQL
+                         │
+                ┌────────▼─────────┐
+                │      MySQL       │
+                └──────────────────┘
+```
 
-## Estructura del proyecto
+La aplicación Android utiliza la misma arquitectura:
+
+```text
+Android App
+    │
+Capacitor
+    │
+Frontend CeliaConnect
+    │
+API REST
+    │
+Backend Node.js / Express
+    │
+MySQL
+```
+
+---
+
+# Estructura del proyecto
 
 ```text
 celiaconnect/
+│
+├── android/
+│   ├── app/
+│   ├── gradle/
+│   ├── build.gradle
+│   ├── settings.gradle
+│   └── ...
+│
 ├── backend/
-│   ├── .env
 │   ├── db.js
 │   ├── package.json
 │   ├── package-lock.json
 │   └── server.js
+│
 ├── database/
 │   ├── celiaconnect_backup.sql
 │   ├── schema.sql
 │   ├── seed.sql
 │   └── README.md
+│
 ├── docs/
+│
 ├── frontend/
+│   ├── admin/
+│   ├── assets/
+│   ├── components/
+│   ├── css/
+│   ├── js/
+│   ├── services/
+│   ├── index.html
+│   └── ...
+│
+├── capacitor.config.json
+├── package.json
+├── package-lock.json
 ├── .gitignore
 └── README.md
 ```
 
-La carpeta `frontend` contiene las páginas, estilos, componentes y scripts de la interfaz web.
+### `frontend/`
 
-La carpeta `backend` contiene el servidor, la configuración de conexión y las dependencias de Node.js.
+Contiene las páginas HTML, estilos, imágenes, componentes y scripts JavaScript utilizados por la interfaz web y móvil.
 
-La carpeta `database` contiene los scripts SQL y el respaldo de la base de datos.
+### `backend/`
 
-La carpeta `docs` contiene documentación técnica y funcional del proyecto.
+Contiene la API REST, conexión con la base de datos, autenticación y lógica del servidor.
 
-## Requisitos para ejecutar CeliaConnect
+### `database/`
 
-Para instalar y ejecutar el proyecto en una computadora nueva se necesita:
+Contiene el esquema SQL, datos iniciales y respaldo utilizado durante el desarrollo.
 
-- Git.
-- Node.js y npm.
-- XAMPP con MariaDB o una instalación compatible de MySQL/MariaDB.
-- Visual Studio Code.
-- Extensión Live Server de VS Code.
-- MySQL Workbench u otra herramienta compatible para importar el respaldo SQL.
+### `android/`
 
-**Entorno de desarrollo utilizado:** Node.js 22, MariaDB 10.4 y Windows.
+Contiene el proyecto Android generado mediante Capacitor y utilizado para compilar la aplicación móvil.
 
-## Instalación desde GitHub
+### `docs/`
 
-### 1. Clonar el repositorio
+Contiene documentación técnica y funcional relacionada con el análisis, diseño y desarrollo de CeliaConnect.
 
-Abrir una terminal y ejecutar:
+---
 
-```bash
-git clone https://github.com/carelis66/CeliaConnect.git
-```
-
-Ingresar a la carpeta:
-
-```bash
-cd CeliaConnect
-```
-
-El repositorio es privado, por lo que se necesita autorización de la cuenta propietaria para clonarlo.
-
-### 2. Instalar las dependencias del backend
-
-Desde la carpeta raíz del proyecto:
-
-```bash
-cd backend
-npm ci
-```
-
-Este comando instala las dependencias registradas en `package-lock.json`.
-
-No es necesario copiar la carpeta `node_modules` desde la computadora anterior.
-
-### 3. Configurar las variables de entorno
-
-El backend utiliza un archivo `.env` con la siguiente estructura:
-
-```dotenv
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=celiaconnectdb
-
-JWT_SECRET=CONFIGURAR_UNA_CLAVE_SECRETA
-```
-
-Los valores deben coincidir con la configuración de MariaDB de la computadora donde se ejecuta el proyecto.
-
-La clave JWT debe ser privada y utilizarse exclusivamente para el entorno correspondiente.
-
-**Nota de seguridad:** el archivo `.env` contiene configuración sensible. Aunque se haya incluido una versión de desarrollo en el repositorio privado, no se recomienda reutilizar esas credenciales en producción.
-
-### 4. Iniciar MariaDB
-
-Abrir el panel de control de XAMPP e iniciar el servicio MySQL/MariaDB.
-
-Comprobar que el servicio esté funcionando en el puerto configurado, normalmente `3306`.
-
-### 5. Restaurar la base de datos
-
-El proyecto incluye un respaldo SQL en:
-
-```text
-database/celiaconnect_backup.sql
-```
-
-Este archivo contiene la estructura de las 22 tablas, sus relaciones y los datos utilizados durante el desarrollo.
-
-Para restaurarlo mediante MySQL Workbench:
-
-1. Abrir MySQL Workbench.
-2. Conectarse al servidor local de MariaDB/MySQL.
-3. Ingresar a **Server → Data Import**.
-4. Seleccionar **Import from Self-Contained File**.
-5. Buscar `database/celiaconnect_backup.sql`.
-6. Verificar que el servidor de destino sea el correcto.
-7. Ejecutar **Start Import**.
-8. Confirmar que la importación finalice sin errores.
-
-El respaldo incluye instrucciones para crear y seleccionar la base de datos `celiaconnectdb`.
-
-**Importante:** el respaldo contiene instrucciones `DROP TABLE IF EXISTS`, por lo que debe restaurarse en una instalación nueva o una base de pruebas. No debe importarse sobre una base que contenga información que se quiera conservar.
-
-### 6. Iniciar el backend
-
-Desde la carpeta `backend`, ejecutar:
-
-```bash
-node server.js
-```
-
-El servidor utiliza el puerto `3000`.
-
-Cuando todo funciona correctamente, la terminal muestra mensajes similares a:
-
-```text
-CeliaConnect API funcionando en http://localhost:3000
-✅ Conexión exitosa a CeliaConnect DB
-```
-
-Abrir en el navegador:
-
-http://localhost:3000
-
-La respuesta esperada es:
-
-```text
-CeliaConnect API funcionando
-```
-
-### 7. Iniciar el frontend
-
-1. Abrir el proyecto en Visual Studio Code.
-2. Instalar la extensión Live Server si todavía no está instalada.
-3. Abrir `frontend/index.html`.
-4. Hacer clic derecho y seleccionar **Open with Live Server**.
-5. Navegar por CeliaConnect.
-
-El backend debe permanecer encendido para las funcionalidades que consultan la API.
-
-La dirección exacta del frontend depende del puerto asignado por Live Server.
-
-## Endpoints principales de la API
-
-| Método | Endpoint                               | Descripción                              |
-| ------ | -------------------------------------- | ---------------------------------------- |
-| GET    | `/`                                    | Verificación de funcionamiento de la API |
-| POST   | `/api/login`                           | Inicio de sesión                         |
-| POST   | `/api/registro`                        | Registro de usuarios                     |
-| GET    | `/api/productos`                       | Listado de productos                     |
-| GET    | `/api/productos/:id`                   | Detalle de producto                      |
-| GET    | `/api/productos/:id/comentarios`       | Comentarios aprobados                    |
-| POST   | `/api/productos/:id/comentarios`       | Crear comentario autenticado             |
-| GET    | `/api/restaurantes`                    | Restaurantes verificados                 |
-| GET    | `/api/restaurantes/:id`                | Detalle de restaurante                   |
-| GET    | `/api/restaurantes/:id/comentarios`    | Comentarios aprobados                    |
-| POST   | `/api/restaurantes/:id/comentarios`    | Crear comentario autenticado             |
-| GET    | `/api/admin/comentarios/productos`     | Consultar comentarios pendientes         |
-| PATCH  | `/api/admin/comentarios/productos/:id` | Aprobar o rechazar comentarios           |
-
-Las operaciones protegidas requieren enviar el token JWT mediante la cabecera `Authorization: Bearer`.
-
-## Base de datos
+# Base de datos
 
 La base de datos `celiaconnectdb` contiene 22 tablas:
 
@@ -334,50 +459,390 @@ La base de datos `celiaconnectdb` contiene 22 tablas:
 - `tiporestaurante`
 - `usuario`
 
-El modelo utiliza claves primarias, claves foráneas, restricciones de integridad y relaciones entre las distintas entidades.
+El modelo utiliza:
 
-El respaldo SQL contiene datos demostrativos utilizados para el desarrollo y las pruebas.
+- Claves primarias.
+- Claves foráneas.
+- Restricciones de integridad.
+- Relaciones entre entidades.
+- Tablas específicas para comentarios.
+- Tablas específicas para favoritos.
+- Roles de usuario.
 
-## Verificación de funcionamiento
+El repositorio incluye datos demostrativos utilizados durante el desarrollo y las pruebas.
 
-Después de instalar el proyecto, se recomienda comprobar:
+---
 
-1. Que MariaDB esté iniciado.
-2. Que el backend se conecte correctamente.
-3. Que `http://localhost:3000` responda.
-4. Que el frontend abra mediante Live Server.
-5. Que el catálogo de productos muestre información.
-6. Que funcionen la búsqueda, los filtros y la paginación.
-7. Que se pueda abrir el detalle de un producto.
-8. Que el inicio de sesión funcione con una cuenta de prueba.
-9. Que los comentarios aprobados se visualicen correctamente.
-10. Que las funcionalidades de administración respondan con los permisos correspondientes.
+# Instalación local
 
-Estas verificaciones permiten detectar problemas de instalación, conexión o configuración.
+## Requisitos
 
-## Estado actual del proyecto
+Para ejecutar CeliaConnect localmente se necesita:
 
-**En desarrollo — MVP universitario.**
+- Git.
+- Node.js.
+- npm.
+- MySQL o MariaDB.
+- XAMPP o servidor compatible.
+- Visual Studio Code.
+- MySQL Workbench u otra herramienta compatible.
 
-Se encuentran implementados y probados localmente el inicio del backend, la conexión con MariaDB y la consulta de productos desde el frontend.
+Para trabajar con la versión Android también se necesita:
 
-El código también incorpora autenticación, registro de usuarios, comentarios, moderación administrativa y endpoints para restaurantes.
+- Android Studio.
+- Android SDK.
+- JDK compatible con Gradle.
 
-El proyecto continúa evolucionando mediante la integración progresiva de sus módulos, mejoras de interfaz y pruebas funcionales.
+El entorno principal de desarrollo fue realizado sobre Windows.
 
-## Documentación
+---
 
-La carpeta `docs` contiene materiales relacionados con el análisis, diseño, planificación y documentación técnica del sistema.
+## 1. Clonar el repositorio
 
-La carpeta `database` conserva el modelo de datos y los scripts SQL.
+```bash
+git clone https://github.com/carelis66/CeliaConnect.git
+cd CeliaConnect
+```
 
-## Consideraciones
+---
 
-CeliaConnect es un proyecto académico en desarrollo.
+## 2. Instalar dependencias del backend
 
-La información de demostración, los establecimientos, profesionales, valoraciones y datos de prueba no deben interpretarse como un directorio comercial o sanitario validado.
+```bash
+cd backend
+npm ci
+```
 
-Las funcionalidades futuras, como la publicación en hosting, integración de servicios externos y evolución hacia PWA, están sujetas al alcance y planificación del proyecto.
+---
+
+## 3. Configurar variables de entorno
+
+Crear el archivo:
+
+```text
+backend/.env
+```
+
+Ejemplo de configuración local:
+
+```dotenv
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=celiaconnectdb
+
+JWT_SECRET=CONFIGURAR_UNA_CLAVE_SECRETA
+```
+
+Los valores deben adaptarse al servidor MySQL/MariaDB utilizado.
+
+**Importante:** las credenciales y claves utilizadas en producción no deben almacenarse en el repositorio.
+
+---
+
+## 4. Restaurar la base de datos
+
+El proyecto incluye el respaldo:
+
+```text
+database/celiaconnect_backup.sql
+```
+
+Puede importarse mediante MySQL Workbench u otra herramienta compatible.
+
+El respaldo contiene la estructura de las tablas, relaciones y datos utilizados durante el desarrollo.
+
+> El archivo puede contener instrucciones `DROP TABLE IF EXISTS`, por lo que se recomienda utilizar una base nueva o destinada a pruebas.
+
+---
+
+## 5. Ejecutar el backend localmente
+
+Desde:
+
+```text
+backend/
+```
+
+ejecutar:
+
+```bash
+node server.js
+```
+
+El servidor local utiliza normalmente:
+
+```text
+http://localhost:3000
+```
+
+Cuando la conexión funciona correctamente se muestran mensajes similares a:
+
+```text
+CeliaConnect API funcionando en http://localhost:3000
+Conexión exitosa a CeliaConnect DB
+```
+
+---
+
+## 6. Ejecutar el frontend localmente
+
+Abrir el proyecto mediante Visual Studio Code y utilizar Live Server sobre:
+
+```text
+frontend/index.html
+```
+
+Durante el desarrollo local, el frontend puede ejecutarse mediante una dirección similar a:
+
+```text
+http://127.0.0.1:5500/frontend/index.html
+```
+
+---
+
+# Ejecución de la versión Android
+
+Desde la raíz del proyecto se pueden sincronizar los archivos web con Android mediante:
+
+```bash
+npx cap sync android
+```
+
+Para abrir el proyecto Android:
+
+```bash
+npx cap open android
+```
+
+También puede abrirse directamente en Android Studio seleccionando:
+
+```text
+celiaconnect/android
+```
+
+Desde Android Studio se puede seleccionar un dispositivo físico o virtual y ejecutar:
+
+```text
+app
+```
+
+La aplicación Android utiliza el backend desplegado en Railway, por lo que necesita conexión a Internet para consumir la API.
+
+---
+
+# Endpoints principales de la API
+
+## Autenticación
+
+```text
+POST /api/registro
+POST /api/login
+```
+
+## Productos
+
+```text
+GET  /api/productos
+GET  /api/productos/:id
+GET  /api/productos/:id/comentarios
+POST /api/productos/:id/comentarios
+```
+
+## Restaurantes
+
+```text
+GET  /api/restaurantes
+GET  /api/restaurantes/:id
+GET  /api/restaurantes/:id/comentarios
+POST /api/restaurantes/:id/comentarios
+```
+
+## Locales
+
+```text
+GET  /api/locales
+GET  /api/locales/:id
+```
+
+## Nutricionistas
+
+```text
+GET  /api/nutricionistas
+GET  /api/nutricionistas/:id
+```
+
+La API también dispone de endpoints para favoritos, comentarios, moderación, usuarios y administración.
+
+Las operaciones protegidas requieren un JWT enviado mediante:
+
+```text
+Authorization: Bearer <token>
+```
+
+---
+
+# Roles y permisos
+
+CeliaConnect utiliza un sistema de autorización basado en roles.
+
+| Rol | Funciones principales |
+|---|---|
+| Usuario | Navegar, guardar favoritos, publicar opiniones y utilizar funcionalidades personales |
+| Moderador | Revisar, aprobar y rechazar comentarios |
+| Administrador | Gestionar usuarios, contenido, moderación e información administrativa |
+
+Los permisos son validados por el backend antes de permitir operaciones protegidas.
+
+---
+
+# Pruebas funcionales
+
+Durante el desarrollo se realizaron pruebas de los principales flujos del sistema.
+
+Entre los escenarios verificados se encuentran:
+
+- Navegación como visitante.
+- Registro de usuario.
+- Inicio y cierre de sesión.
+- Persistencia de sesión.
+- Consulta de productos.
+- Consulta de restaurantes.
+- Consulta de locales.
+- Consulta de nutricionistas.
+- Visualización de detalles.
+- Búsqueda y filtros.
+- Favoritos.
+- Comentarios.
+- Calificaciones.
+- Moderación.
+- Aprobación y rechazo de opiniones.
+- Publicación de comentarios aprobados.
+- Acceso según roles.
+- Panel administrativo.
+- Funcionamiento responsive.
+
+También se verificó el flujo completo desde Android:
+
+```text
+Login
+  ↓
+Navegación
+  ↓
+Favoritos
+  ↓
+Publicación de opinión
+  ↓
+Moderación
+  ↓
+Aprobación
+  ↓
+Visualización pública
+```
+
+---
+
+# Deploy
+
+CeliaConnect se encuentra desplegado utilizando **Railway**.
+
+La infraestructura se divide en:
+
+```text
+CeliaConnectFrontend
+        │
+        ▼
+CeliaConnect Backend
+        │
+        ▼
+      MySQL
+```
+
+Esto permite separar la interfaz, la API y la persistencia de datos.
+
+El frontend consume la API mediante HTTPS y tanto la aplicación web como la aplicación Android utilizan el mismo backend.
+
+---
+
+# Estado actual del proyecto
+
+**MVP funcional — Proyecto Final 2026.**
+
+Actualmente se encuentran implementados:
+
+- Frontend responsive.
+- Backend REST.
+- Base de datos relacional.
+- Deploy en Railway.
+- Registro y autenticación.
+- Roles y permisos.
+- Productos.
+- Restaurantes.
+- Locales.
+- Nutricionistas.
+- Favoritos.
+- Comentarios.
+- Calificaciones.
+- Moderación.
+- Administración.
+- Dashboard.
+- Versión Android mediante Capacitor.
+
+La versión web fue desplegada y probada contra la infraestructura en la nube.
+
+La versión Android fue compilada, instalada y probada mediante Android Studio y emulador Android, utilizando la misma API desplegada.
+
+---
+
+# Alcance del MVP
+
+CeliaConnect se desarrolló como un proyecto académico y el alcance actual corresponde al MVP definido para el Trabajo Final.
+
+La cobertura inicial se encuentra orientada a **CABA**.
+
+Posibles evoluciones posteriores incluyen:
+
+- Expansión a otras localidades de Argentina.
+- Ampliación del catálogo.
+- Incorporación de nuevos comercios y profesionales.
+- Mejoras en perfiles de usuario.
+- Nuevas herramientas de administración.
+- Optimización de la experiencia móvil.
+- Nuevas funcionalidades comunitarias.
+- Publicación de futuras versiones móviles.
+
+Estas funcionalidades no forman parte obligatoria del MVP actual.
+
+---
+
+# Documentación
+
+La carpeta:
+
+```text
+docs/
+```
+
+contiene documentación relacionada con el análisis, diseño, planificación y desarrollo del sistema.
+
+La carpeta:
+
+```text
+database/
+```
+
+contiene el modelo de datos, scripts SQL y respaldo de la base utilizada durante el desarrollo.
+
+---
+
+# Consideraciones
+
+CeliaConnect es un **proyecto académico**.
+
+La información de productos, establecimientos, profesionales, usuarios, comentarios y valoraciones utilizada durante el desarrollo puede contener datos demostrativos y no debe interpretarse como un directorio comercial, médico o sanitario oficialmente validado.
+
+El proyecto fue desarrollado con fines educativos como Trabajo Final de la carrera **Analista de Sistemas**.
 
 ---
 
@@ -388,4 +853,4 @@ Trabajo Final — Analista de Sistemas
 Escuela Da Vinci  
 Buenos Aires, Argentina
 
-**CeliaConnect — Proyecto académico, 2026.**
+**CeliaConnect — Proyecto de Tesis, 2026.**
