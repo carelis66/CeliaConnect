@@ -54,7 +54,7 @@ El backend se encuentra desplegado independientemente y disponible en:
 
 ### Aplicación Android
 
-La versión móvil utiliza **Capacitor** para empaquetar la interfaz web responsive como una aplicación Android nativa.
+CeliaConnect cuenta con una versión para dispositivos Android desarrollada mediante **Capacitor**, reutilizando la interfaz web responsive de la plataforma dentro de una aplicación móvil.
 
 El proyecto Android se encuentra incluido dentro del mismo repositorio, en la carpeta:
 
@@ -62,7 +62,20 @@ El proyecto Android se encuentra incluido dentro del mismo repositorio, en la ca
 android/
 ```
 
-La aplicación fue compilada y probada mediante Android Studio utilizando un emulador Android.
+La aplicación fue compilada y probada mediante **Android Studio** utilizando un emulador Android.
+
+Además, se generó un **APK Release firmado**, correspondiente a la versión **CeliaConnect v1.0.0**, disponible para su descarga desde la sección **Releases** del repositorio.
+
+Para instalar CeliaConnect en un dispositivo Android:
+
+1. Acceder a la sección **Releases** del repositorio.
+2. Seleccionar la versión **v1.0.0**.
+3. Descargar el archivo APK disponible en **Assets**.
+4. Abrir el archivo descargado desde el dispositivo Android.
+5. Autorizar la instalación desde esa fuente si Android lo solicita.
+6. Seleccionar **Instalar**.
+
+Una vez finalizada la instalación, CeliaConnect estará disponible entre las aplicaciones del dispositivo.
 
 ---
 
