@@ -849,6 +849,16 @@ contiene el modelo de datos, scripts SQL y respaldo de la base utilizada durante
 
 ---
 
+# Videos demostrativos
+
+- [Demo Web](https://youtu.be/xzG4Mn4hhDs)
+- [Demo Mobile](https://youtu.be/bWU5IfdM4-g)
+
+La documentación completa de las demostraciones se encuentra en
+[docs/15-videos-demostrativos.md](docs/15-videos-demostrativos.md).
+
+---
+
 # Consideraciones
 
 CeliaConnect es un **proyecto académico**.
