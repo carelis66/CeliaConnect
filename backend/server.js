@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { Resend } = require("resend");
 const pool = require("./db");
 
 const usuariosRoutes = require("./routes/usuarios.routes");
@@ -9,9 +10,7 @@ const usuariosRoutes = require("./routes/usuarios.routes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`CeliaConnect API funcionando en http://localhost:${PORT}`);
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const { verificarAdminOModerador } = require("./middleware/auth.middleware");
 
@@ -281,6 +280,199 @@ app.post("/api/registro", async (req, res) => {
 
     res.status(500).json({
       mensaje: "Error al crear la cuenta",
+    });
+  }
+});
+
+// ==========================================
+// RECUPERAR CONTRASEÑA - SOLICITAR ENLACE
+// ==========================================
+
+app.post("/api/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email || !email.trim()) {
+      return res.status(400).json({
+        mensaje: "El correo electrónico es obligatorio",
+      });
+    }
+
+    const emailNormalizado = email.trim().toLowerCase();
+
+    // Buscar usuario
+    const [usuarios] = await pool.query(
+      `
+        SELECT id, nombre, email, esActivo
+        FROM usuario
+        WHERE email = ?
+        LIMIT 1
+      `,
+      [emailNormalizado],
+    );
+
+    // Respuesta genérica para no revelar si el correo existe
+    if (
+      usuarios.length === 0 ||
+      Number(usuarios[0].esActivo) !== 1
+    ) {
+      return res.json({
+        mensaje:
+          "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.",
+      });
+    }
+
+    const usuario = usuarios[0];
+
+    // Crear token válido por 20 minutos
+    const token = jwt.sign(
+      {
+        id: usuario.id,
+        purpose: "password-reset",
+      },
+      process.env.RESET_PASSWORD_SECRET,
+      {
+        expiresIn: "20m",
+      },
+    );
+
+    // Crear enlace para cambiar contraseña
+    const resetUrl =
+      `${process.env.FRONTEND_URL}/reset-password.html?token=` +
+      encodeURIComponent(token);
+
+    // Enviar email con Resend
+    const resultadoEmail = await resend.emails.send({
+      from: "CeliaConnect <onboarding@resend.dev>",
+      to: usuario.email,
+      subject: "Restablecer contraseña - CeliaConnect",
+      html: `
+        <h2>Restablecer contraseña</h2>
+
+        <p>Hola ${usuario.nombre},</p>
+
+        <p>
+          Recibimos una solicitud para cambiar tu contraseña de CeliaConnect.
+        </p>
+
+        <p>
+          <a href="${resetUrl}">
+            Crear nueva contraseña
+          </a>
+        </p>
+
+        <p>Este enlace vence en 20 minutos.</p>
+
+        <p>
+          Si no solicitaste este cambio, podés ignorar este correo.
+        </p>
+
+        <p>CeliaConnect</p>
+      `,
+    });
+
+    // Mostrar en consola qué respondió Resend
+    console.log("RESPUESTA RESEND:", resultadoEmail);
+
+    // Si Resend devuelve un error, mostrarlo en consola
+    if (resultadoEmail.error) {
+      console.error("ERROR DE RESEND:", resultadoEmail.error);
+
+      return res.status(500).json({
+        mensaje: "No se pudo enviar el correo de recuperación.",
+      });
+    }
+
+    return res.json({
+      mensaje:
+        "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.",
+    });
+  } catch (error) {
+    console.error(
+      "Error al solicitar recuperación de contraseña:",
+      error,
+    );
+
+    return res.status(500).json({
+      mensaje: "Error al procesar la solicitud",
+    });
+  }
+});
+
+// ==========================================
+// RECUPERAR CONTRASEÑA - GUARDAR NUEVA CONTRASEÑA
+// ==========================================
+
+app.post("/api/reset-password", async (req, res) => {
+  try {
+    const { token, password } = req.body;
+
+    // Validar campos obligatorios
+    if (!token || !password) {
+      return res.status(400).json({
+        mensaje: "El token y la nueva contraseña son obligatorios",
+      });
+    }
+
+    // Validar longitud de contraseña
+    if (password.length < 8) {
+      return res.status(400).json({
+        mensaje: "La contraseña debe tener al menos 8 caracteres",
+      });
+    }
+
+    let payload;
+
+    // Verificar que el token sea válido y no haya vencido
+    try {
+      payload = jwt.verify(
+        token,
+        process.env.RESET_PASSWORD_SECRET,
+      );
+    } catch (error) {
+      return res.status(400).json({
+        mensaje: "El enlace de recuperación es inválido o venció",
+      });
+    }
+
+    // Verificar que sea un token de recuperación de contraseña
+    if (payload.purpose !== "password-reset") {
+      return res.status(400).json({
+        mensaje: "Token inválido",
+      });
+    }
+
+    // Crear hash de la nueva contraseña
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Actualizar contraseña
+    const [resultado] = await pool.query(
+      `
+        UPDATE usuario
+        SET password = ?
+        WHERE id = ?
+          AND esActivo = 1
+      `,
+      [passwordHash, payload.id],
+    );
+
+    if (resultado.affectedRows === 0) {
+      return res.status(400).json({
+        mensaje: "No se pudo restablecer la contraseña",
+      });
+    }
+
+    return res.json({
+      mensaje: "Contraseña actualizada correctamente",
+    });
+  } catch (error) {
+    console.error(
+      "Error al restablecer contraseña:",
+      error,
+    );
+
+    return res.status(500).json({
+      mensaje: "Error al restablecer la contraseña",
     });
   }
 });
